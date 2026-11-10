@@ -140,19 +140,34 @@ export default function ResourceSlider() {
   // untouched. Guards:
   // - first render is skipped: loading the page must not scroll the row,
   //   only tab changes do;
-  // - desktop row (lg:overflow-visible, ≥1024px) is not scrollable — skip.
+  // - the row only scrolls when its content overflows the shell (mobile and
+  //   the 1024–~1620px laptop band). When it fits (wide desktop), skip —
+  //   scrollIntoView on a non-scrollable row could nudge ancestor scrollers.
+  // A debounced resize/orientation re-center covers geometry changes after
+  // the selection (clamp drift would otherwise leave the tab half-hidden).
   const firstRenderRef = useRef(true)
   useEffect(() => {
-    if (firstRenderRef.current) {
-      firstRenderRef.current = false
-      return
+    const center = (behavior) => {
+      const row = tablistRef.current
+      if (!row || row.scrollWidth <= row.clientWidth + 1) return
+      tabButtonsRef.current.get(active)?.scrollIntoView({
+        inline: 'center',
+        block: 'nearest',
+        behavior,
+      })
     }
-    if (window.matchMedia('(min-width: 1024px)').matches) return
-    tabButtonsRef.current.get(active)?.scrollIntoView({
-      inline: 'center',
-      block: 'nearest',
-      behavior: reduce ? 'auto' : 'smooth',
-    })
+    if (firstRenderRef.current) firstRenderRef.current = false
+    else center(reduce ? 'auto' : 'smooth')
+    let resizeTimer
+    const onResize = () => {
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(() => center('auto'), 150)
+    }
+    window.addEventListener('resize', onResize)
+    return () => {
+      clearTimeout(resizeTimer)
+      window.removeEventListener('resize', onResize)
+    }
   }, [active, reduce])
 
   // Live gesture bookkeeping: { pointerId, startX, startScrollLeft, dragged }.
@@ -235,9 +250,19 @@ export default function ResourceSlider() {
         </Reveal>
 
         <Reveal delay={0.1} className="mt-10 lg:mt-16">
-          {/* Tabs — horizontal scroll on mobile, spaced row on desktop.
-              The row is mouse-draggable (grab cursor); touch keeps native
-              pan-x and keyboard focus/clicks are unaffected. */}
+          {/* Tabs — desktop (≥1024px) shows ALL four tabs spanning the full
+              grid width: `lg:justify-between` spreads the leftover space
+              between the buttons, and the edge tabs drop their outer
+              horizontal padding at lg+ so the FIRST tab's text/underline is
+              flush with the grid's left edge and the LAST tab's with the
+              right edge (human decision 2026-10-21 — supersedes the Figma
+              64px left / 99px right insets measured on desktop-v3.png
+              x 224..1661). The row is scaled down through the laptop band
+              (24px→28px type, tighter gaps/padding) and only reaches full
+              Figma geometry (32px) at ≥1600px. Below lg the row scrolls
+              horizontally and is mouse-draggable (grab cursor only there —
+              drag is a mobile/tablet affordance, not a desktop one); touch
+              keeps native pan-x and keyboard focus/clicks are unaffected. */}
           <div
             ref={tablistRef}
             role="tablist"
@@ -248,12 +273,22 @@ export default function ResourceSlider() {
             onPointerCancel={endDrag}
             onClickCapture={swallowClickAfterDrag}
             onDragStart={(e) => e.preventDefault()}
-            className={`-mx-6 flex gap-4 overflow-x-auto px-6 no-scrollbar sm:mx-0 sm:gap-8 sm:px-0 lg:gap-20 lg:overflow-visible lg:px-16 ${
+            className={`-mx-6 -my-1 flex gap-4 overflow-x-auto px-6 py-1 no-scrollbar sm:mx-0 sm:gap-8 sm:px-0 lg:cursor-default lg:justify-between lg:gap-8 lg:px-0 xl:gap-10 min-[1600px]:gap-14 ${
               dragging ? 'cursor-grabbing select-none' : 'cursor-grab'
             }`}
           >
-            {TABS.map((tab) => {
+            {TABS.map((tab, tabIndex) => {
               const selected = tab.id === active
+              // Desktop edge tabs: no outer horizontal padding at lg+ so the
+              // text/underline aligns exactly with the grid edges (see the
+              // tablist comment). Middle tabs keep symmetric padding for a
+              // generous click target. Mobile (<lg) padding is untouched.
+              const edgePadding =
+                tabIndex === 0
+                  ? 'lg:pl-0 lg:pr-3 xl:pr-5 min-[1600px]:pr-10'
+                  : tabIndex === TABS.length - 1
+                    ? 'lg:pr-0 lg:pl-3 xl:pl-5 min-[1600px]:pl-10'
+                    : 'lg:px-3 xl:px-5 min-[1600px]:px-10'
               return (
                 <button
                   key={tab.id}
@@ -274,7 +309,7 @@ export default function ResourceSlider() {
                     // above, so clicks and auto-advance share one code path.
                     scheduleRef.current?.()
                   }}
-                  className={`flex shrink-0 flex-col items-start gap-3 border-b-4 px-2 py-4 text-left transition-opacity duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-v3-green sm:gap-5 sm:px-6 sm:py-6 lg:px-10 ${
+                  className={`flex shrink-0 flex-col items-start gap-3 border-b-4 px-2 py-4 text-left transition-opacity duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-v3-green sm:gap-5 sm:py-6 sm:px-6 ${edgePadding} ${
                     dragging ? 'cursor-grabbing ' : ''
                   }${
                     selected
@@ -284,7 +319,7 @@ export default function ResourceSlider() {
                 >
                   <img src={tab.icon} alt="" className="h-8 w-8" aria-hidden="true" />
                   <span
-                    className={`font-condensed text-xl font-bold uppercase leading-[1.2] sm:text-2xl lg:text-[32px] ${
+                    className={`font-condensed text-xl font-bold uppercase leading-[1.2] sm:text-2xl lg:text-[24px] xl:text-[28px] min-[1600px]:text-[32px] ${
                       selected ? 'text-v3-green' : 'text-v3-teal'
                     }`}
                   >

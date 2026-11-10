@@ -25,16 +25,51 @@ mapgl-loader.js
 
 ### MapLibre GL (Default)
 
-- **Bundled** via npm (`maplibre-gl`)
+- **Bundled** via npm (`maplibre-gl`, ESM-only since v6 — imported as `import * as MapLibreGL`)
+- Web worker published alongside the bundles: `maplibregl-loader.js` calls `setWorkerUrl( jeo_settings.public_path + 'maplibre-gl-worker.js' )` at module scope (the file is copied to `src/js/build/` by webpack — see `build/README.md`)
 - Enriched with `map-gl-utils` for convenience
 - Default style: OSM raster tiles
-- CSS injected programmatically
+- CSS imported from the package
 
 ### Mapbox GL (Optional)
 
-- **NOT bundled** — uses `globalThis.mapboxgl` loaded via `wp_enqueue_script`
+- **NOT bundled** (licensing) — uses `globalThis.mapboxgl` loaded from the Mapbox CDN (`class-jeo.php::get_mapbox_external_sdk()`, currently pinned to v3.33, filterable via `jeo_mapbox_external_sdk`)
 - Token injected via `transformRequest`
 - Patches for missing/deprecated APIs: `getLight()`, `getSky()`, `setSky()`
+
+### Site-level projection (`map_projection`)
+
+`jeo_settings.map_projection` (localized on the `mapgl` script) carries the
+site's default projection **in the active runtime's dialect**: Mapbox GL JS
+reads `projection.name`, MapLibre GL JS reads `projection.type`. PHP resolves
+it in `class-jeo.php::get_map_projection()` (filter `jeo_map_projection`,
+default `{name: 'equirectangular'}` for Mapbox / `{type: 'mercator'}` for
+MapLibre) and guards the filter output back to the requested runtime's key.
+
+Each loader owns its dialect: `mapboxgl-loader.js` exports `mapProjection`
+with the localized value verbatim (`{name}`); `maplibregl-loader.js` exports
+it through `resolveProjection()` (`{type}` — translating the Mapbox dialect
+when the Mapbox runtime falls back to MapLibre client-side: `globe` and
+`mercator` map to themselves; Mapbox-only projections (equirectangular,
+conics, …) degrade to `mercator`). `mapgl-loader.js` routes it like
+`mapgl`/`defaultStyle`/`transformRequest`, so runtime-agnostic consumers
+always receive the correct dialect:
+
+- `mapboxgl-loader.js::createMap` → constructor `projection` option
+  (Mapbox GL v3 forwards it to `setProjection()`, which accepts the object
+  form natively — strings are normalized to `{name}` internally).
+- `maplibregl-loader.js::createMap` → re-applied on every `style.load` via
+  `map.setProjection()`, so the site-level projection wins over any
+  projection declared by a loaded style (MapLibre has no constructor
+  `projection` option — projection is style-driven).
+- `maplibregl-react.js` → the `projection` prop feeds the routed
+  `mapProjection` (react-map-gl forwards it to `map.setProjection()`);
+  under `MAP_RUNTIME === 'mapboxgl'` the wrapper's `mapLib` is the CDN
+  Mapbox runtime, so the Mapbox dialect arrives just in time.
+
+Projections are **flat by default** (`equirectangular` on Mapbox,
+`mercator` on MapLibre). The `jeo_map_projection` filter may override them —
+including globe or other 3D projections, at the site's own risk.
 
 ## Iframe Compatibility (Block API v3)
 
@@ -53,13 +88,22 @@ HTMLElement[Symbol.hasInstance] = function( obj ) {
 
 Patched to use `document.fullscreenElement` from iframe container.
 
-### Drag Listeners
+### Event Binding
 
-React wrapper duplicates listeners from parent document to iframe document.
+MapLibre GL JS (v6+) binds handler events to the map container's own document
+(`HandlerManager._ownerDocument`/`_ownerWindow`), so no listener duplication
+is needed when the map renders inside the editor iframe.
 
 ### ResizeObserver
 
 Used to detect map container size changes.
+
+### Missing style images
+
+Runtimes diverge on how sprite images are supplied on demand:
+`discovery/blocks/map-layers.js::registerStyleImageMissingHandler()` uses
+`map.setMissingStyleImageResolver()` when available (MapLibre) and falls back
+to the classic `styleimagemissing` event otherwise (Mapbox).
 
 ## React Components
 

@@ -92,6 +92,7 @@ registerBlockType( 'jeo/ai-minimap', {
 					show_legend: { type: 'boolean' },
 					load_as_style: { type: 'boolean' },
 					opacity: { type: 'number' },
+					provenance: { type: 'string' },
 				},
 			},
 		},

@@ -25,7 +25,7 @@ class Map_Style_Composer {
 	use Singleton;
 
 	const CACHE_DIR               = 'jeo-mapbox-composed-styles';
-	const CACHE_VERSION           = 15;
+	const CACHE_VERSION           = 18;
 	const TOKEN_PLACEHOLDER       = '__JEO_MAPBOX_ACCESS_TOKEN__';
 	const DEFAULT_FALLBACK_SPRITE = 'mapbox://sprites/mapbox/standard';
 	const VIRTUAL_SCOPE_PREVIEW   = 'preview';
@@ -262,10 +262,26 @@ class Map_Style_Composer {
 	/**
 	 * Return the composed style JSON.
 	 *
+	 * When the request carries a `hash` that matches an existing artifact,
+	 * that exact file is served with long-lived immutable caching (the URL
+	 * is content-addressed). Without a usable hash the current artifact is
+	 * served (and composed on miss) with short-lived caching.
+	 *
 	 * @param WP_REST_Request $request REST request.
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_style_response( WP_REST_Request $request ) {
+		$hash_addressed = $this->get_hash_addressed_paths( $request, 'stylePath' );
+
+		if ( null !== $hash_addressed ) {
+			$style = $this->read_json_file( $hash_addressed['stylePath'], false );
+			if ( is_wp_error( $style ) ) {
+				return $style;
+			}
+
+			return $this->immutable_json_response( $style );
+		}
+
 		$result = $this->get_or_create_artifacts( absint( $request['id'] ) );
 		if ( is_wp_error( $result ) ) {
 			return $result;
@@ -288,6 +304,17 @@ class Map_Style_Composer {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_manifest_response( WP_REST_Request $request ) {
+		$hash_addressed = $this->get_hash_addressed_paths( $request, 'manifestPath' );
+
+		if ( null !== $hash_addressed ) {
+			$manifest = $this->read_json_file( $hash_addressed['manifestPath'] );
+			if ( is_wp_error( $manifest ) ) {
+				return $manifest;
+			}
+
+			return $this->immutable_json_response( $manifest );
+		}
+
 		$result = $this->get_or_create_artifacts( absint( $request['id'] ) );
 		if ( is_wp_error( $result ) ) {
 			return $result;
@@ -300,6 +327,40 @@ class Map_Style_Composer {
 
 		$response = new WP_REST_Response( $manifest );
 		$response->header( 'Cache-Control', 'public, max-age=300' );
+		return $response;
+	}
+
+	/**
+	 * Resolve artifact paths for a hash-addressed request, when usable.
+	 *
+	 * @param WP_REST_Request $request REST request.
+	 * @param string          $required_file Path key that must exist.
+	 * @return array|null Paths array, or null when the hash is absent,
+	 *                    invalid, or has no matching artifact.
+	 */
+	private function get_hash_addressed_paths( WP_REST_Request $request, $required_file ) {
+		$hash = sanitize_key( (string) $request->get_param( 'hash' ) );
+		if ( 1 !== preg_match( '/^[a-f0-9]{16}$/', $hash ) ) {
+			return null;
+		}
+
+		$paths = $this->get_artifact_paths( absint( $request['id'] ), $hash );
+		if ( is_wp_error( $paths ) || ! file_exists( $paths[ $required_file ] ) ) {
+			return null;
+		}
+
+		return $paths;
+	}
+
+	/**
+	 * Build a long-lived immutable response for a content-addressed artifact.
+	 *
+	 * @param mixed $data Decoded artifact data.
+	 * @return WP_REST_Response
+	 */
+	private function immutable_json_response( $data ) {
+		$response = new WP_REST_Response( $data );
+		$response->header( 'Cache-Control', 'public, max-age=31536000, immutable' );
 		return $response;
 	}
 
@@ -345,7 +406,7 @@ class Map_Style_Composer {
 		}
 
 		$response = new WP_REST_Response( $style );
-		$response->header( 'Cache-Control', 'public, max-age=300' );
+		$response->header( 'Cache-Control', 'public, max-age=31536000, immutable' );
 		return $response;
 	}
 
@@ -367,7 +428,7 @@ class Map_Style_Composer {
 		}
 
 		$response = new WP_REST_Response( $manifest );
-		$response->header( 'Cache-Control', 'public, max-age=300' );
+		$response->header( 'Cache-Control', 'public, max-age=31536000, immutable' );
 		return $response;
 	}
 
@@ -601,15 +662,25 @@ class Map_Style_Composer {
 			$this->purge_ref_style_caches( $context['refs'] );
 		}
 
-		$composed = $this->compose_context( $context, $paths );
+		// Forced refresh bypasses both the shared style JSON cache and the
+		// sprite transient cache so recomposition goes back to the sources.
+		$composed = $this->compose_context( $context, $paths, $force_refresh );
 		if ( is_wp_error( $composed ) ) {
 			update_post_meta( $map_id, '_jeo_mapbox_composed_style_error', $composed->get_error_message() );
 			return $composed;
 		}
 
-		$this->write_json_file( $paths['stylePath'], $this->prepare_style_for_json( $composed['style'] ) );
-		$this->write_json_file( $paths['manifestPath'], $composed['manifest'] );
-		$this->write_json_file( $paths['reportPath'], $composed['report'] );
+		foreach ( array(
+			array( $paths['stylePath'], $this->prepare_style_for_json( $composed['style'] ) ),
+			array( $paths['manifestPath'], $composed['manifest'] ),
+			array( $paths['reportPath'], $composed['report'] ),
+		) as $artifact ) {
+			$write_error = $this->write_json_file( $artifact[0], $artifact[1] );
+			if ( is_wp_error( $write_error ) ) {
+				update_post_meta( $map_id, '_jeo_mapbox_composed_style_error', $write_error->get_error_message() );
+				return $write_error;
+			}
+		}
 
 		update_post_meta( $map_id, '_jeo_mapbox_composed_style_hash', $hash );
 		update_post_meta( $map_id, '_jeo_mapbox_composed_style_warnings', $composed['report']['warnings'] );
@@ -658,9 +729,16 @@ class Map_Style_Composer {
 			return $composed;
 		}
 
-		$this->write_json_file( $paths['stylePath'], $this->prepare_style_for_json( $composed['style'] ) );
-		$this->write_json_file( $paths['manifestPath'], $composed['manifest'] );
-		$this->write_json_file( $paths['reportPath'], $composed['report'] );
+		foreach ( array(
+			array( $paths['stylePath'], $this->prepare_style_for_json( $composed['style'] ) ),
+			array( $paths['manifestPath'], $composed['manifest'] ),
+			array( $paths['reportPath'], $composed['report'] ),
+		) as $artifact ) {
+			$write_error = $this->write_json_file( $artifact[0], $artifact[1] );
+			if ( is_wp_error( $write_error ) ) {
+				return $write_error;
+			}
+		}
 
 		return $this->build_virtual_metadata( $context['scope'], $hash, $paths, $composed['report'] );
 	}
@@ -1246,9 +1324,10 @@ class Map_Style_Composer {
 	 *
 	 * @param array $context Composer context.
 	 * @param array $paths Artifact paths.
+	 * @param bool  $bypass_sprite_cache Whether to bypass the sprite transient cache.
 	 * @return array|WP_Error
 	 */
-	private function compose_context( array $context, array $paths ) {
+	private function compose_context( array $context, array $paths, $bypass_sprite_cache = false ) {
 		$bundles       = array();
 		$failed_styles = array();
 		$warnings      = array();
@@ -1311,6 +1390,27 @@ class Map_Style_Composer {
 				);
 			}
 
+			// Pre-expressions Mapbox styles also declare text-field/icon-image
+			// values as "{token}" strings. MapLibre GL JS 3+ no longer
+			// interpolates tokens and would render the literal "{name_en}"
+			// text, so rewrite them to get/concat expressions. Idempotent:
+			// styles pre-migrated by Jeo::fetch_mapbox_style() /
+			// Jeo::fetch_style_json() pass through untouched.
+			$token_conversions = 0;
+			$style             = Style_Token_Migrator::migrate_style( $style, $token_conversions );
+
+			if ( $token_conversions > 0 ) {
+				$warnings[] = array(
+					'layerId' => $ref['layerId'],
+					'styleId' => $ref['styleId'] ?? null,
+					'warning' => sprintf(
+						/* translators: %d: number of converted style values. */
+						__( 'Converted %d legacy Mapbox token string(s) to style-spec expressions for MapLibre compatibility.', 'jeowp' ),
+						$token_conversions
+					),
+				);
+			}
+
 			$image_props              = $this->get_image_props( $style );
 			$prefix                   = $this->make_prefix( $context, $ref );
 			$bundles[ $ref['index'] ] = array(
@@ -1359,7 +1459,7 @@ class Map_Style_Composer {
 			}
 		}
 
-		$sprite_summary = $this->build_composite_sprite( $bundles, $paths );
+		$sprite_summary = $this->build_composite_sprite( $bundles, $paths, $bypass_sprite_cache );
 		if ( is_wp_error( $sprite_summary ) ) {
 			$warnings[]     = array(
 				'warning' => $sprite_summary->get_error_message(),
@@ -1841,9 +1941,10 @@ class Map_Style_Composer {
 	 *
 	 * @param array $bundles Style bundles.
 	 * @param array $paths Artifact paths.
+	 * @param bool  $bypass_sprite_cache Whether to bypass the sprite transient cache.
 	 * @return array|WP_Error
 	 */
-	private function build_composite_sprite( array $bundles, array $paths ) {
+	private function build_composite_sprite( array $bundles, array $paths, $bypass_sprite_cache = false ) {
 		$needed = array_filter(
 			$bundles,
 			function ( $bundle ) {
@@ -1878,7 +1979,7 @@ class Map_Style_Composer {
 			$fallback_cache = null;
 
 			foreach ( $needed as $bundle ) {
-				$fetched = $this->fetch_sprite( $bundle['spriteUrl'], $bundle['ref']['token'], $ratio );
+				$fetched = $this->fetch_sprite( $bundle['spriteUrl'], $bundle['ref']['token'], $ratio, $bypass_sprite_cache );
 				if ( is_wp_error( $fetched ) ) {
 					$summary['failures'][] = array(
 						'style' => $bundle['ref']['styleId'],
@@ -1908,7 +2009,7 @@ class Map_Style_Composer {
 
 				$missing = array_diff( $this->collect_style_image_names( $bundle['style'] ), array_keys( $fetched['json'] ) );
 				if ( ! empty( $missing ) && null === $fallback_cache && '' !== $fallback_sprite ) {
-					$fallback_cache = $this->fetch_sprite( $fallback_sprite, $bundle['ref']['token'], $ratio );
+					$fallback_cache = $this->fetch_sprite( $fallback_sprite, $bundle['ref']['token'], $ratio, $bypass_sprite_cache );
 				}
 
 				if ( ! empty( $missing ) && is_array( $fallback_cache ) ) {
@@ -1966,19 +2067,25 @@ class Map_Style_Composer {
 	/**
 	 * Fetch sprite JSON and PNG.
 	 *
+	 * Sprite assets are immutable per style version, so both requests are
+	 * transient-cached (keyed by asset URL) to keep recompositions from
+	 * re-hitting the Mapbox API. TTL is filterable via `jeo_sprite_cache_ttl`
+	 * (default 1 day); forced refreshes pass `$bypass_cache`.
+	 *
 	 * @param string $sprite Sprite root.
 	 * @param string $token Access token.
 	 * @param int    $ratio Pixel ratio.
+	 * @param bool   $bypass_cache Whether to bypass the sprite transient cache.
 	 * @return array|WP_Error
 	 */
-	private function fetch_sprite( $sprite, $token, $ratio ) {
+	private function fetch_sprite( $sprite, $token, $ratio, $bypass_cache = false ) {
 		$suffix = 2 === (int) $ratio ? '@2x' : '';
-		$json   = $this->remote_json( $this->sprite_asset_url( $sprite, $token, $suffix, 'json' ) );
+		$json   = $this->remote_sprite_payload( $this->sprite_asset_url( $sprite, $token, $suffix, 'json' ), 'json', $bypass_cache );
 		if ( is_wp_error( $json ) ) {
 			return $json;
 		}
 
-		$image_bytes = $this->remote_bytes( $this->sprite_asset_url( $sprite, $token, $suffix, 'png' ) );
+		$image_bytes = $this->remote_sprite_payload( $this->sprite_asset_url( $sprite, $token, $suffix, 'png' ), 'bytes', $bypass_cache );
 		if ( is_wp_error( $image_bytes ) ) {
 			return $image_bytes;
 		}
@@ -1995,6 +2102,38 @@ class Map_Style_Composer {
 			'json'  => $this->normalize_array( $json ),
 			'image' => $image,
 		);
+	}
+
+	/**
+	 * Fetch a sprite asset through the transient cache.
+	 *
+	 * @param string $url Asset URL (already token-resolved).
+	 * @param string $format 'json' (decoded array) or 'bytes' (raw body).
+	 * @param bool   $bypass_cache Whether to bypass the transient cache.
+	 * @return mixed|WP_Error
+	 */
+	private function remote_sprite_payload( $url, $format, $bypass_cache = false ) {
+		$cache_key = 'jeo_sprite_' . md5( $format . '|' . $url );
+
+		if ( ! $bypass_cache ) {
+			$cached = get_transient( $cache_key );
+			if ( is_array( $cached ) && array_key_exists( 'd', $cached ) ) {
+				return $cached['d'];
+			}
+		}
+
+		$payload = 'json' === $format ? $this->remote_json( $url ) : $this->remote_bytes( $url );
+		if ( is_wp_error( $payload ) ) {
+			return $payload;
+		}
+
+		set_transient(
+			$cache_key,
+			array( 'd' => $payload ),
+			(int) apply_filters( 'jeo_sprite_cache_ttl', DAY_IN_SECONDS, $url )
+		);
+
+		return $payload;
 	}
 
 	/**
@@ -2493,8 +2632,14 @@ class Map_Style_Composer {
 			}
 
 			foreach ( array( 'paint', 'layout' ) as $section ) {
-				if ( isset( $layer[ $section ] ) ) {
-					$style['layers'][ $layer_index ][ $section ] = $this->migrate_legacy_functions( $layer[ $section ], $conversions );
+				if ( ! isset( $layer[ $section ] ) ) {
+					continue;
+				}
+
+				$converted = $this->migrate_legacy_functions( $layer[ $section ], $conversions );
+
+				if ( $converted !== $layer[ $section ] ) {
+					$style['layers'][ $layer_index ][ $section ] = $converted;
 				}
 			}
 		}
@@ -2519,9 +2664,15 @@ class Map_Style_Composer {
 		}
 
 		// Recurse first so nested function outputs are converted before
-		// their container is inspected.
+		// their container is inspected. Assignments are conditional so an
+		// unchanged subtree keeps sharing its parent's array (PHP
+		// copy-on-write): unchanged children compare as identical zvals,
+		// making modern styles effectively copy-free.
 		foreach ( $value as $key => $item ) {
-			$value[ $key ] = $this->migrate_legacy_functions( $item, $conversions );
+			$converted = $this->migrate_legacy_functions( $item, $conversions );
+			if ( $converted !== $item ) {
+				$value[ $key ] = $converted;
+			}
 		}
 
 		if ( ! $this->is_legacy_function( $value ) ) {
@@ -2693,7 +2844,13 @@ class Map_Style_Composer {
 	/**
 	 * Wrap a function output for use inside an expression.
 	 *
-	 * Array outputs (offsets, padding, translate) must be literal-wrapped.
+	 * Array outputs (offsets, padding, translate, font stacks) must be
+	 * literal-wrapped. Token-free outputs are never expressions — the token
+	 * migrator does not descend into raw stop functions — so unconditional
+	 * wrapping is correct here. Cache entries that violate this (written by
+	 * the token-migration regression window) are invalidated by the style
+	 * cache key salt, not tolerated here: changing wrapping rules for
+	 * token-free values is out of scope for the `{token}` fix.
 	 *
 	 * @param mixed $output Raw stop output.
 	 * @return mixed
@@ -2965,16 +3122,36 @@ class Map_Style_Composer {
 	/**
 	 * Write a JSON file.
 	 *
+	 * Failures are logged (with the `[JEO]` prefix) and returned as a
+	 * WP_Error so callers can surface them — a silent write failure would
+	 * otherwise make every request fall back to full recomposition.
+	 *
 	 * @param string $path Path.
 	 * @param mixed  $data Data.
-	 * @return void
+	 * @return true|WP_Error
 	 */
 	private function write_json_file( $path, $data ) {
+		$json = wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+		if ( ! is_string( $json ) ) {
+			error_log( '[JEO] Could not encode composed style artifact: ' . basename( $path ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Cache write diagnostics.
+			return new WP_Error( 'jeo_mapbox_composer_cache_encode', __( 'Could not encode the composed style artifact as JSON.', 'jeowp' ) );
+		}
+
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Writes plugin-generated cache files.
-		file_put_contents(
-			$path,
-			wp_json_encode( $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
-		);
+		$written = file_put_contents( $path, $json );
+		if ( false === $written ) {
+			error_log( '[JEO] Could not write composed style artifact: ' . $path ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Cache write diagnostics.
+			return new WP_Error(
+				'jeo_mapbox_composer_cache_write',
+				sprintf(
+					/* translators: %s: artifact file name. */
+					__( 'Could not write the composed style artifact %s. Check that the uploads directory is writable.', 'jeowp' ),
+					basename( $path )
+				)
+			);
+		}
+
+		return true;
 	}
 
 	/**

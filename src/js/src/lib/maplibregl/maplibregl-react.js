@@ -2,9 +2,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import MapLibre, { FullscreenControl, NavigationControl } from 'react-map-gl/maplibre';
 
 import { computeInlineStart } from '../../shared/direction';
-import { defaultStyle, mapgl, transformRequest } from '../mapgl-loader'
-
-const defaultProjection = { name: 'equirectangular' };
+import { defaultStyle, mapgl, mapProjection, transformRequest } from '../mapgl-loader'
 
 // Fix: Ensure the HTMLElement instanceof patch is also applied in this chunk.
 // Depending on how webpack groups the runtime and vendor code, react-map-gl may
@@ -36,51 +34,25 @@ try {
 }
 
 /**
- * Fix: In WordPress Block API v3 the edit component runs inside an iframe,
- * but MapLibreGL binds its drag-critical `mousemove` (capture) and `mouseup`
- * listeners to the module-scope `document` and `window` objects, which may
- * point to the parent frame.  When the map canvas lives in the iframe those
- * events never fire on the parent, so drag/pan is completely broken.
+ * Keep the map in sync with container size changes. MapLibre GL JS binds its
+ * event handlers to the map container's own document, so no extra patching
+ * is needed when the map renders inside the Gutenberg editor iframe.
  *
- * After the map loads we detect this mismatch and duplicate the listeners
- * on the iframe's own `document` / `window` so they actually receive mouse
- * events.
+ * @param {import('maplibre-gl').Map} map
  */
-function patchIframeAndResize( map ) {
-	const container = map.getCanvasContainer();
-	const ownerDoc = container.ownerDocument;
-	const ownerWin = ownerDoc.defaultView;
-	const cleanups = [];
-
-	if ( ownerDoc !== document || ownerWin !== window ) {
-		const hm = map.handlers ?? map._handlers;
-		if ( hm && hm._listeners ) {
-			for ( const [ target, type, options ] of hm._listeners ) {
-				if ( target === document ) {
-					const fn = hm.handleWindowEvent;
-					ownerDoc.addEventListener( type, fn, options ?? undefined );
-					cleanups.push( () => ownerDoc.removeEventListener( type, fn, options ?? undefined ) );
-				} else if ( target === window ) {
-					const fn = hm.handleEvent;
-					ownerWin.addEventListener( type, fn, options ?? undefined );
-					cleanups.push( () => ownerWin.removeEventListener( type, fn, options ?? undefined ) );
-				}
-			}
-		}
-	}
-
+function observeMapResize( map ) {
 	const mapContainer = map.getContainer();
-	if ( typeof ResizeObserver !== 'undefined' ) {
-		const resizeObserver = new ResizeObserver( () => {
-			map.resize();
-		} );
-		resizeObserver.observe( mapContainer );
-		cleanups.push( () => resizeObserver.disconnect() );
+
+	if ( typeof ResizeObserver === 'undefined' ) {
+		return undefined;
 	}
 
-	return cleanups.length
-		? () => cleanups.forEach( ( fn ) => fn() )
-		: undefined;
+	const resizeObserver = new ResizeObserver( () => {
+		map.resize();
+	} );
+	resizeObserver.observe( mapContainer );
+
+	return () => resizeObserver.disconnect();
 }
 
 /**
@@ -91,7 +63,7 @@ function MapGL( { children, controls = undefined, fullscreen = true, mapStyle = 
 	const [ inlineStart ] = useState( computeInlineStart );
 	const controlsPosition = controls ?? `top-${inlineStart}`;
 
-	// Keep a local ref to patch iframe listeners after load.
+	// Keep a local ref to attach the resize observer after load.
 	const innerRef = useRef( null );
 	const cleanupRef = useRef( null );
 
@@ -107,7 +79,7 @@ function MapGL( { children, controls = undefined, fullscreen = true, mapStyle = 
 
 	const handleLoad = useCallback( ( e ) => {
 		const map = e.target;
-		cleanupRef.current = patchIframeAndResize( map );
+		cleanupRef.current = observeMapResize( map );
 
 		// Forward the original onLoad callback.
 		if ( onLoad ) {
@@ -130,7 +102,8 @@ function MapGL( { children, controls = undefined, fullscreen = true, mapStyle = 
 			ref={ setRef }
 			mapLib={ mapgl }
 			mapStyle={ mapStyle }
-			projection={ defaultProjection }
+			projection={ mapProjection }
+			validateStyle={ false }
 			reuseMaps={ false }
 			transformRequest={ transformRequest }
 			onLoad={ handleLoad }

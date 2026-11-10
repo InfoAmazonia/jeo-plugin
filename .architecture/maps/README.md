@@ -6,6 +6,7 @@
 |------|------|
 | `src/includes/maps/class-maps.php` | `Jeo\Maps` class — CPT, meta, shortcode |
 | `src/includes/maps/class-map-style-composer.php` | `Jeo\Map_Style_Composer` — merges Mapbox styles into cached composite Style JSON (see [`composed-styles/README.md`](../composed-styles/README.md)) |
+| `src/includes/maps/class-style-token-migrator.php` | `Jeo\Style_Token_Migrator` — converts legacy `{token}` strings to style-spec expressions (MapLibre compat) |
 | `src/js/src/jeo-map/class-jeo-map.js` | `JeoMap` class — frontend rendering |
 | `src/js/src/jeo-map/index.js` | Entry point, DOM scan |
 | `src/js/src/maps-sidebar/` | Gutenberg sidebar for editing |
@@ -21,7 +22,7 @@
 | `initial_zoom` | int (1-14) | Initial zoom level |
 | `center_lat` | float | Center latitude |
 | `center_lon` | float | Center longitude |
-| `layers` | array | Layer settings per selected layer. REST schema items accept: `id` (required), `use` (required: fixed/switchable/swappable), `load_as_style`, `style_layers`, `default`, `show_legend`, `style`, and `provenance` (string: `manual` \| `ai` — layer origin; declared for REST writes so AI/editor-tagged layers save cleanly. Core injects `additionalProperties: false` into object meta schemas, so any new layer field MUST be declared here) |
+| `layers` | array | Layer definitions (item schema below) |
 | `pan_limits` | array | Navigation bounds (min/max lat/lon) |
 | `related_posts` | array | Related posts config |
 | `disable_scroll_zoom` | boolean | Disable scroll zoom |
@@ -35,6 +36,10 @@
 
 All map meta is registered with `revisions_enabled => true` — WordPress stores it
 in autosaves and revisions (WP 6.4+) and restores it with the revision.
+
+#### `layers` Item Schema (REST-validated)
+
+Each item is an object declared in `class-maps.php::register_post_meta()`: `id` (required), `use` (required — `fixed`/`switchable`/`swappable`), `load_as_style`, `style_layers`, `default`, `show_legend`, `style`, and the optional `provenance` (`'manual'` | `'ai'`, enum-validated; missing means `'manual'`). `provenance` is stamped by the **shared** layer library modal (`map-blocks/layers-settings.js`, also used by the `map` CPT sidebar) — see [minimap provenance](../minimap/README.md). The REST schema rejects undeclared keys (core injects `additionalProperties: false` into object meta schemas), so any new layer field produced by the shared modal **must** be declared here, otherwise publishing a `map` post fails with "X is not a valid property of Object".
 
 ### Block Editor Template (W1)
 

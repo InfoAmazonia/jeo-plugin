@@ -11,6 +11,7 @@ rendering path for `mapbox`-type layers (shipped in 3.1.0).
 | File | Role |
 |------|------|
 | `src/includes/maps/class-map-style-composer.php` | `Jeo\Map_Style_Composer` — backend engine (Singleton) |
+| `src/includes/maps/class-style-token-migrator.php` | `Jeo\Style_Token_Migrator` — converts legacy `{token}` strings to expressions (MapLibre compat) |
 | `src/includes/loaders.php` | Accessor `jeo_map_style_composer()` |
 | `src/includes/class-jeo.php` | Instantiation (`::init`) + `jeoMapVars` localization |
 | `src/js/src/shared/composed-style-data.js` | Frontend/editor data loader (`loadComposedStyleData`) |
@@ -45,7 +46,7 @@ Registered in `Jeo::init()` (`class-jeo.php:49`).
 | Constant | Value | Purpose |
 |----------|-------|---------|
 | `CACHE_DIR` | `jeo-mapbox-composed-styles` | Subdirectory under `wp_upload_dir()['basedir']` |
-| `CACHE_VERSION` | `15` | Bump to invalidate all artifacts; embedded in hash & metadata |
+| `CACHE_VERSION` | `18` | Bump to invalidate all artifacts; embedded in hash & metadata |
 | `TOKEN_PLACEHOLDER` | `__JEO_MAPBOX_ACCESS_TOKEN__` | Replaces raw `access_token=...` in stored style JSON |
 | `DEFAULT_FALLBACK_SPRITE` | `mapbox://sprites/mapbox/standard` | Used when source sprites lack icons |
 | `VIRTUAL_SCOPE_PREVIEW` | `preview` | Editor preview scope (requires `edit_posts`) |
@@ -60,8 +61,15 @@ build_context(map_id) / build_virtual_context(payload)
        ├── Jeo::fetch_mapbox_style() // GET api.mapbox.com/styles/v1/{styleId} per mapbox ref
        │                             // shared helper, transient-cached (jeo_mapbox_style_json_*)
        │                             // purged on layer save + forced refresh; TTL filter jeo_mapbox_style_cache_ttl (default 1h)
+       │                             // transient stores the RAW body; decode + legacy {token} normalization
+       │                             // (Style_Token_Migrator) run on every read — cache never depends on the code
        ├── migrate_legacy_style_functions() // convert pre-expressions {base, stops} objects → interpolate/step/match expressions (MapLibre compat; see below)
+       ├── Style_Token_Migrator::migrate_style() // rewrite "{token}" strings in text-field/icon-image → get/concat expressions,
+       │                             // including tokens nested inside expression values (legacy function outputs); MapLibre 3+
+       │                             // renders unmigrated tokens literally (the "{name_en}" bug)
        ├── build_composite_sprite()// GD: merge sprites (1x + @2x), prefix image names, pack 2048px canvas
+       │                             // raw sprite JSON+PNG transient-cached (jeo_sprite_*, TTL filter jeo_sprite_cache_ttl, default 1d);
+       │                             // forced refresh bypasses the sprite cache
        ├── select_glyphs()         // first bundle with text-font, else first glyphs URL
        ├── merge root properties   // projection, light, terrain, fog (warns on conflicts)
        ├── copy + remap layers     // source remap, ref-layer remap, visibility by `default`, image-prefix rewrite
@@ -69,7 +77,9 @@ build_context(map_id) / build_virtual_context(payload)
        ├── is_style_layer_enabled()// honor per-layer style_layers[].show
        ├── transform_interactions()// remap click/mouseover targets → composite layer IDs
        └── build_direct_layer()    // append mapbox-tileset-*, mvt, tilelayer as plain sources+layers
-  → write_json_file() × 3          // style.json, manifest.json, report.json (pretty-printed)
+  → write_json_file() × 3          // style.json, manifest.json, report.json (pretty-printed);
+                                   // write failures are logged ([JEO] prefix) and returned as WP_Error
+                                   // (a silent failure would force recomposition on every request)
 ```
 
 ### Artifacts (per composition)
@@ -109,12 +119,12 @@ All under namespace `jeo/v1`. See also [`rest-api/README.md`](../rest-api/README
 | Route | Method | Permission | Description |
 |-------|--------|------------|-------------|
 | `/map-style/{id}` | GET | `can_read_map` (published OR `edit_post`) | Metadata (`enabled`, `style`/`manifest` URLs, `warnings`). Arg `refresh` forces regeneration. |
-| `/map-style/{id}/style` | GET | `can_read_map` | Serves `style.json` (`Cache-Control: public, max-age=300`) |
-| `/map-style/{id}/manifest` | GET | `can_read_map` | Serves `manifest.json` (`Cache-Control: public, max-age=300`) |
+| `/map-style/{id}/style` | GET | `can_read_map` | Serves `style.json`. With a valid `?hash=` matching an existing artifact: `Cache-Control: public, max-age=31536000, immutable` (content-addressed); otherwise current artifact with `max-age=300` |
+| `/map-style/{id}/manifest` | GET | `can_read_map` | Serves `manifest.json` with the same hash-aware caching as `/style` |
 | `/map-style/compose` | POST | `can_create_virtual` | Compose from a JSON payload (scope/kind/postId/layers/center/zoom). `onetime`=public, `preview`=logged-in + `edit_posts` |
 | `/map-style/layer/{id}/refresh` | POST | `can_refresh_layer` (`map-layer` + `edit_post`) | Force-regenerate all maps referencing a layer. Returns `{mapIds[], refreshed, failed}` |
-| `/map-style/{scope:preview\|onetime}/{hash}/style` | GET | `can_read_virtual` | Virtual artifact `style.json` (`onetime`=open, `preview`=logged-in + `edit_posts`) |
-| `/map-style/{scope:preview\|onetime}/{hash}/manifest` | GET | `can_read_virtual` | Virtual artifact `manifest.json` |
+| `/map-style/{scope:preview\|onetime}/{hash}/style` | GET | `can_read_virtual` | Virtual artifact `style.json` (`onetime`=open, `preview`=logged-in + `edit_posts`; `max-age=31536000, immutable`) |
+| `/map-style/{scope:preview\|onetime}/{hash}/manifest` | GET | `can_read_virtual` | Virtual artifact `manifest.json` (`max-age=31536000, immutable`) |
 
 > **Preview nonce (3.1.1):** for `preview` scope with a logged-in user, the metadata
 > response appends `_wpnonce=wp_create_nonce('wp_rest')` to style/manifest URLs so
@@ -154,6 +164,12 @@ run `compose_context`, write all three JSON files, persist post meta.
 - `save_post_map` → deletes the three meta keys above (next read regenerates).
 - `save_post_map-layer` → finds all maps using the layer (`get_map_ids_for_layer`,
   serialized-meta LIKE query) and invalidates each.
+- Forced refresh (`?refresh=true`, layer refresh endpoint) → purges the shared style JSON
+  transients (`purge_ref_style_caches`) **and** bypasses the sprite transients so
+  recomposition goes back to the sources.
+- Artifact write failures are surfaced (`_jeo_mapbox_composed_style_error` + `[JEO]` log
+  line) instead of being silently ignored — a failing write would otherwise make every
+  request recompose from scratch.
 
 ### Virtual Cache Cleanup
 
@@ -171,6 +187,7 @@ than the TTL (`jeo_mapbox_composed_virtual_cache_ttl`).
 | `jeo_mapbox_composed_style_fallback_sprite` | `mapbox://sprites/mapbox/standard` | Fallback sprite root (`''` disables) |
 | `jeo_mapbox_composed_virtual_cache_ttl` | `30 * DAY_IN_SECONDS` (onetime) / `DAY_IN_SECONDS` (preview) (arg: `$scope`) | Virtual cache TTL |
 | `jeo_mapbox_composed_style_default_glyphs` | `mapbox://fonts/mapbox/{fontstack}/{range}.pbf` | Default glyphs passed to frontend (in `class-jeo.php`) |
+| `jeo_sprite_cache_ttl` | `DAY_IN_SECONDS` (arg: `$url`) | TTL for the raw sprite JSON/PNG transients (`jeo_sprite_*`); sprites are immutable per style version |
 
 ## Frontend Localization (`jeoMapVars`)
 
@@ -299,6 +316,33 @@ token is set, the existing sanitize-to-placeholder behavior is preserved.
 - **MapLibre compatibility**: `normalize_unsupported_expressions` replaces Mapbox-only
   expression operators (`pitch`, `distance-from-center`) with `0` so composed styles render
   under MapLibre.
+- **Legacy token strings**: Pre-expressions Mapbox styles (streets v7/v8-era) declare
+  `text-field`/`icon-image` as `"{name_en}"` token strings. MapLibre GL JS 3+ removed token
+  interpolation, so unmigrated values render the literal `{name_en}` text on the map.
+  `Jeo\Style_Token_Migrator` (also applied in `Jeo::fetch_mapbox_style()` /
+  `Jeo::fetch_style_json()` before caching) rewrites them:
+  - a single `"{name}"` → `["get", "name"]`
+  - mixed text → `["concat", "text ", ["get", "a"], ...]`
+  - tokens nested inside expression values (e.g. `["step", ["zoom"], "{abbr}", 6, "{name_en}"]`,
+    produced when legacy stop-function outputs were tokens) are rewritten in place
+  - `{{`/`}}` literal-brace escapes are honored; strings that only produce literal text are
+    left untouched so the migration stays idempotent
+  - sources are never visited — tile URL templates (`{z}/{x}/{y}`) are safe
+  - **ordering matters**: the migrator never descends into JSON objects (PHP decoded both
+    objects and lists as arrays; `array_is_list()` distinguishes them). Raw legacy stop
+    functions (`{stops: [...]}`) are objects whose outputs must stay raw until
+    `migrate_legacy_style_functions()` converts them — the composer-side token pass then
+    converts the token strings that survive inside the resulting step/interpolate
+    expressions. Descending into the object pre-conversion caused the composer to
+    literal-wrap the migrated expressions (`["literal", ["get","abbr"]]`), which MapLibre
+    rejects with `Expected formatted but found array<string, 2> instead.`
+  - **scope invariant**: only strings containing `{}` are ever rewritten — token-free
+    values (font stacks, offsets, colors) are untouched, and `wrap_function_output()`
+    keeps its original unconditional literal-wrapping for array outputs. The style
+    transients cache the raw response body and derive (decode + normalize) on every
+    read, so changing normalization rules never invalidates cache entries and entries
+    from the regression window (derived arrays) are simply cache misses
+  Conversions are counted per style and reported as a composer warning.
 - **Legacy stop functions**: Old Mapbox styles (pre-expressions era, e.g. streets v7-based
   styles) declare paint/layout values as `{base, stops}` function objects, which MapLibre
   rejects with `Bare objects invalid. Use ["literal", {...}]`. Right after fetching each

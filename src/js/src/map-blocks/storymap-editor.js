@@ -549,6 +549,8 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		enabled: Boolean( attributes.map_id ),
 	} );
 
+	const isMapPublished = loadedMap?.status === 'publish';
+
 	const layerIds = useMemo( () => {
 		if ( ! loadedMap?.meta.layers ) {
 			return [];
@@ -948,17 +950,26 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 										} );
 									} }
 								/>
-								<CheckboxControl
-									className="navigate-button"
-									label={ __( 'Use "Navigate to map" button', 'jeowp'  ) }
-									checked={ attributes.navigateButton }
-									onChange={ ( newNavigateButton ) => {
-										setAttributes( {
-											...attributes,
-											navigateButton: newNavigateButton,
-										} );
-									} }
-								/>
+								{ isMapPublished ? (
+									<CheckboxControl
+										className="navigate-button"
+										label={ __( 'Use "Navigate to map" button', 'jeowp'  ) }
+										checked={ attributes.navigateButton }
+										onChange={ ( newNavigateButton ) => {
+											setAttributes( {
+												...attributes,
+												navigateButton: newNavigateButton,
+											} );
+										} }
+									/>
+								) : (
+									<p className="navigate-button-unavailable">
+										{ __(
+											'The "Navigate to map" step requires a published map.',
+											'jeowp'
+										) }
+									</p>
+								) }
 							</div>
 						) }
 						{ ! showStorySettings && (
@@ -1394,6 +1405,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 							id: `jeo-map-autosuggest-${ instanceId }`,
 						} }
 						postType="map"
+						showPrivate={ true }
 						onSuggestionSelected={ ( e, { suggestion } ) =>
 							setAttributes( {
 								...attributes,

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-10T13:17:58+00:00\n"
+"POT-Creation-Date: 2026-11-10T13:34:51+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -88,32 +88,32 @@ msgstr ""
 msgid "Gathering geodata and initializing JEO Engine..."
 msgstr ""
 
-#: includes/admin/dashboard-page.php:524
+#: includes/admin/dashboard-page.php:529
 #: includes/settings/class-settings.php:654
 msgid "Select Taxonomy..."
 msgstr ""
 
-#: includes/admin/dashboard-page.php:542
+#: includes/admin/dashboard-page.php:547
 #: includes/settings/class-settings.php:655
 msgid "Select Term..."
 msgstr ""
 
-#: includes/admin/dashboard-page.php:605
+#: includes/admin/dashboard-page.php:610
 #: includes/settings/class-settings.php:656
 msgid " locations found."
 msgstr ""
 
-#: includes/admin/dashboard-page.php:617
-#: includes/admin/dashboard-page.php:704
+#: includes/admin/dashboard-page.php:622
+#: includes/admin/dashboard-page.php:716
 msgid "Untitled"
 msgstr ""
 
-#: includes/admin/dashboard-page.php:707
+#: includes/admin/dashboard-page.php:719
 #: includes/settings/class-settings.php:652
 msgid "View Post"
 msgstr ""
 
-#: includes/admin/dashboard-page.php:707
+#: includes/admin/dashboard-page.php:719
 #: includes/settings/class-settings.php:653
 msgid "Edit Post"
 msgstr ""
@@ -1887,48 +1887,50 @@ msgstr ""
 msgid "Try saving again. If the problem persists, contact the site administrator."
 msgstr ""
 
-#: includes/class-jeo.php:676
+#: includes/class-jeo.php:731
 msgid "Ordered list of map-layer IDs to return."
 msgstr ""
 
-#: includes/class-jeo.php:681
+#: includes/class-jeo.php:736
 msgid "Request context."
 msgstr ""
 
-#: includes/class-jeo.php:935
+#: includes/class-jeo.php:991
 msgid "Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre."
 msgstr ""
 
-#: includes/class-jeo.php:936
+#: includes/class-jeo.php:992
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr ""
 
-#: includes/class-jeo.php:1474
+#: includes/class-jeo.php:1535
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr ""
 
-#: includes/class-jeo.php:1715
+#: includes/class-jeo.php:1776
 msgid "This JEO embed is not available."
 msgstr ""
 
-#: includes/class-jeo.php:1716
+#: includes/class-jeo.php:1777
 msgid "Embed not available"
 msgstr ""
 
-#: includes/class-jeo.php:2047
+#: includes/class-jeo.php:2110
 msgid "A Mapbox style ID and access token are required."
 msgstr ""
 
-#: includes/class-jeo.php:2091
+#: includes/class-jeo.php:2121
+#: includes/class-jeo.php:2159
 msgid "Unexpected Mapbox style payload."
 msgstr ""
 
-#: includes/class-jeo.php:2155
+#: includes/class-jeo.php:2217
 msgid "A valid http(s) style URL is required."
 msgstr ""
 
-#: includes/class-jeo.php:2193
+#: includes/class-jeo.php:2232
+#: includes/class-jeo.php:2265
 msgid "Unexpected style JSON payload."
 msgstr ""
 
@@ -2195,68 +2197,84 @@ msgstr ""
 msgid "Explore"
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:570
-#: includes/maps/class-map-style-composer.php:629
+#: includes/maps/class-map-style-composer.php:631
+#: includes/maps/class-map-style-composer.php:700
 msgid "Mapbox composed styles are disabled."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:595
-#: includes/maps/class-map-style-composer.php:653
+#: includes/maps/class-map-style-composer.php:656
+#: includes/maps/class-map-style-composer.php:724
 msgid "Could not create the Mapbox composed style cache directory."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:749
+#: includes/maps/class-map-style-composer.php:827
 msgid "Map not found."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:759
+#: includes/maps/class-map-style-composer.php:837
 msgid "A Mapbox access token is required to compose Mapbox styles."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:799
+#: includes/maps/class-map-style-composer.php:877
 msgid "Public payload composition is only available for one-time maps."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:805
+#: includes/maps/class-map-style-composer.php:883
 msgid "The map preview payload is too large."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:817
+#: includes/maps/class-map-style-composer.php:895
 msgid "The map preview has too many layers to compose."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:824
+#: includes/maps/class-map-style-composer.php:902
 msgid "The map preview does not include any renderable layers."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:846
+#: includes/maps/class-map-style-composer.php:924
 msgid "Map preview"
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:1222
+#: includes/maps/class-map-style-composer.php:1300
 msgid "Invalid composed style hash."
 msgstr ""
 
 #. translators: %d: number of converted style values.
-#: includes/maps/class-map-style-composer.php:1308
+#: includes/maps/class-map-style-composer.php:1387
 #, php-format
 msgid "Converted %d legacy Mapbox stop-function value(s) to style-spec expressions for MapLibre compatibility."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:1356
+#. translators: %d: number of converted style values.
+#: includes/maps/class-map-style-composer.php:1408
+#, php-format
+msgid "Converted %d legacy Mapbox token string(s) to style-spec expressions for MapLibre compatibility."
+msgstr ""
+
+#: includes/maps/class-map-style-composer.php:1456
 msgid "One or more Mapbox styles could not be fetched."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:1869
+#: includes/maps/class-map-style-composer.php:1970
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:1988
+#: includes/maps/class-map-style-composer.php:2095
 msgid "Could not decode a Mapbox sprite image."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:2954
+#: includes/maps/class-map-style-composer.php:3111
 msgid "Composed style artifact was not found."
+msgstr ""
+
+#: includes/maps/class-map-style-composer.php:3137
+msgid "Could not encode the composed style artifact as JSON."
+msgstr ""
+
+#. translators: %s: artifact file name.
+#: includes/maps/class-map-style-composer.php:3148
+#, php-format
+msgid "Could not write the composed style artifact %s. Check that the uploads directory is writable."
 msgstr ""
 
 #: includes/maps/class-maps.php:63
@@ -2442,97 +2460,97 @@ msgstr ""
 msgid "Layer origin on this map: \"manual\" for layers added by an editor through the layer library, \"ai\" for layers generated by the AI assistant."
 msgstr ""
 
-#: includes/maps/class-maps.php:365
+#: includes/maps/class-maps.php:366
 msgid "The map Layers"
 msgstr ""
 
-#: includes/maps/class-maps.php:378
+#: includes/maps/class-maps.php:379
 #: js/build/mapBlocks.js:1
 msgid "East pan limit"
 msgstr ""
 
-#: includes/maps/class-maps.php:382
+#: includes/maps/class-maps.php:383
 #: js/build/mapBlocks.js:1
 msgid "North pan limit"
 msgstr ""
 
-#: includes/maps/class-maps.php:386
+#: includes/maps/class-maps.php:387
 #: js/build/mapBlocks.js:1
 msgid "South pan limit"
 msgstr ""
 
-#: includes/maps/class-maps.php:390
+#: includes/maps/class-maps.php:391
 #: js/build/mapBlocks.js:1
 msgid "West pan limit"
 msgstr ""
 
-#: includes/maps/class-maps.php:400
+#: includes/maps/class-maps.php:401
 msgid "Map pan limits"
 msgstr ""
 
-#: includes/maps/class-maps.php:413
+#: includes/maps/class-maps.php:414
 msgid "List of category IDs related posts must have"
 msgstr ""
 
-#: includes/maps/class-maps.php:420
+#: includes/maps/class-maps.php:421
 msgid "List of tag IDs related posts must have"
 msgstr ""
 
-#: includes/maps/class-maps.php:427
+#: includes/maps/class-maps.php:428
 msgid "Maximum date for related posts"
 msgstr ""
 
-#: includes/maps/class-maps.php:431
+#: includes/maps/class-maps.php:432
 msgid "Minimum date for related posts"
 msgstr ""
 
-#: includes/maps/class-maps.php:435
+#: includes/maps/class-maps.php:436
 msgid "List of meta values related posts must have"
 msgstr ""
 
-#: includes/maps/class-maps.php:459
+#: includes/maps/class-maps.php:460
 msgid "The map criteria to get related posts"
 msgstr ""
 
-#: includes/maps/class-maps.php:472
+#: includes/maps/class-maps.php:473
 msgid "Disable scroll zoom"
 msgstr ""
 
-#: includes/maps/class-maps.php:485
+#: includes/maps/class-maps.php:486
 msgid "Disable drag pan"
 msgstr ""
 
-#: includes/maps/class-maps.php:498
+#: includes/maps/class-maps.php:499
 msgid "Disable drag rotation"
 msgstr ""
 
-#: includes/maps/class-maps.php:511
+#: includes/maps/class-maps.php:512
 msgid "Enable fullscreen button"
 msgstr ""
 
-#: includes/maps/class-maps.php:524
+#: includes/maps/class-maps.php:525
 msgid "Show all posts on map"
 msgstr ""
 
-#: includes/maps/class-maps.php:537
+#: includes/maps/class-maps.php:538
 msgid "Minimum Zoom level"
 msgstr ""
 
-#: includes/maps/class-maps.php:550
+#: includes/maps/class-maps.php:551
 msgid "Maximum zoom level"
 msgstr ""
 
-#: includes/maps/class-maps.php:563
+#: includes/maps/class-maps.php:564
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Hide in discovery"
 msgstr ""
 
-#: includes/maps/class-maps.php:576
+#: includes/maps/class-maps.php:577
 msgid "Disable embed"
 msgstr ""
 
-#: includes/maps/class-maps.php:732
+#: includes/maps/class-maps.php:733
 msgid "Map zoom must be between 1 and 14"
 msgstr ""
 

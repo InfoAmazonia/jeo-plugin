@@ -5,29 +5,50 @@ import { debounce } from 'lodash-es';
 import AsyncComboboxControl from '../shared/async-combobox-control';
 import { decodeHtmlEntity } from '../shared/html';
 
+const PUBLIC_STATUSES = 'publish';
+const PRIVATE_STATUSES = 'publish,private,future';
+
 const _filterSuggestions = () => true;
 const _getSuggestionValue = ( entityRecord ) =>
 	decodeHtmlEntity( entityRecord.title.rendered );
 const _renderSuggestion = ( entityRecord ) => (
 	<span>{ decodeHtmlEntity( entityRecord.title.rendered ) }</span>
 );
-const _handleFetchRequest = ( { value } ) => {
+
+/**
+ * Build the entity records query for the current input value.
+ *
+ * The `status` argument is always sent so the queried statuses are explicit.
+ * Pass `PRIVATE_STATUSES` to also surface private and scheduled posts.
+ *
+ * @param {Object} args               Fetch arguments.
+ * @param {string} args.value         Raw input value.
+ * @param {string} [args.status]      Comma-separated list of post statuses.
+ * @return {Object} Query for `getEntityRecords`.
+ */
+export const defaultHandleFetchRequest = ( {
+	value,
+	status = PUBLIC_STATUSES,
+} ) => {
 	const input = value.trim().toLowerCase();
-	return input ? { search: input } : {};
+	return input ? { search: input, status } : {};
 };
 
 export default function JeoAutosuggest( {
 	inputProps,
 	postType,
+	showPrivate = false,
 	onSuggestionSelected,
 	filterSuggestions = _filterSuggestions,
 	getSuggestionValue = _getSuggestionValue,
-	handleFetchRequest = _handleFetchRequest,
+	handleFetchRequest = defaultHandleFetchRequest,
 	renderSuggestion = _renderSuggestion,
 } ) {
 	const [ query, setQuery ] = useState( {} );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const [ selectedValue, setSelectedValue ] = useState( null );
+
+	const status = showPrivate ? PRIVATE_STATUSES : PUBLIC_STATUSES;
 
 	const entityRecords = useSelect(
 		( select ) => {
@@ -47,15 +68,40 @@ export default function JeoAutosuggest( {
 		[ postType, query ]
 	);
 
+	const hasFinished = useSelect(
+		( select ) => {
+			return select( 'core/data' ).hasFinishedResolution(
+				'core',
+				'getEntityRecords',
+				[ 'postType', postType, query ]
+			);
+		},
+		[ postType, query ]
+	);
+
+	// Users without the `edit_posts` capability for the post type cannot query
+	// non-public statuses. Fall back to a publish-only query so the autosuggest
+	// keeps working for those users.
+	useEffect( () => {
+		if (
+			hasFinished &&
+			entityRecords === null &&
+			query.status &&
+			query.status !== PUBLIC_STATUSES
+		) {
+			setQuery( { ...query, status: PUBLIC_STATUSES } );
+		}
+	}, [ hasFinished, entityRecords, query ] );
+
 	const suggestions = useMemo( () => {
 		return ( entityRecords || [] ).filter( filterSuggestions );
 	}, [ entityRecords, filterSuggestions ] );
 
 	const debouncedFetchRequest = useMemo( () => {
 		return debounce( ( nextValue ) => {
-			setQuery( handleFetchRequest( { value: nextValue } ) );
+			setQuery( handleFetchRequest( { value: nextValue, status } ) );
 		}, 500 );
-	}, [ handleFetchRequest ] );
+	}, [ handleFetchRequest, status ] );
 
 	useEffect( () => {
 		return () => {

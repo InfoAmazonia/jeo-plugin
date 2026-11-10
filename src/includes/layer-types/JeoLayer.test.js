@@ -1,20 +1,20 @@
 describe( 'JeoLayer style-type bridge', () => {
 	beforeEach( () => {
-		jest.resetModules();
+		vi.resetModules();
 		delete window.JeoLayerTypes;
 	} );
 
-	function registerType( slug, definition ) {
-		const layerTypes = require( './JeoLayerTypes' ).default;
+	async function registerType( slug, definition ) {
+		const { default: layerTypes } = await import( './JeoLayerTypes' );
 		layerTypes.registerLayerType( slug, definition );
 		return layerTypes;
 	}
 
-	it( 'exposes isStyle from the layer type definition', () => {
-		registerType( 'style-json', { label: 'Style JSON', isStyle: true } );
-		registerType( 'tilelayer', { label: 'Tile layer' } );
+	it( 'exposes isStyle from the layer type definition', async () => {
+		await registerType( 'style-json', { label: 'Style JSON', isStyle: true } );
+		await registerType( 'tilelayer', { label: 'Tile layer' } );
 
-		const JeoLayer = require( './JeoLayer' ).default;
+		const { default: JeoLayer } = await import( './JeoLayer' );
 
 		expect(
 			new JeoLayer( 'style-json', { layer_id: 'base' } ).isStyle
@@ -24,9 +24,9 @@ describe( 'JeoLayer style-type bridge', () => {
 		).toBe( false );
 	} );
 
-	it( 'dispatches getStyle with inline precedence over the URL', () => {
+	it( 'dispatches getStyle with inline precedence over the URL', async () => {
 		const inline = { version: 8, sources: {}, layers: [] };
-		registerType( 'style-json', {
+		await registerType( 'style-json', {
 			label: 'Style JSON',
 			isStyle: true,
 			getInlineStyle: ( attributes ) =>
@@ -43,7 +43,7 @@ describe( 'JeoLayer style-type bridge', () => {
 			},
 		} );
 
-		const JeoLayer = require( './JeoLayer' ).default;
+		const { default: JeoLayer } = await import( './JeoLayer' );
 
 		expect(
 			new JeoLayer( 'style-json', {
@@ -61,14 +61,14 @@ describe( 'JeoLayer style-type bridge', () => {
 		).toEqual( inline );
 	} );
 
-	it( 'falls back to getInlineStyle/getStyleUrl when getStyle is absent', () => {
-		registerType( 'legacy-style', {
+	it( 'falls back to getInlineStyle/getStyleUrl when getStyle is absent', async () => {
+		await registerType( 'legacy-style', {
 			label: 'Legacy',
 			isStyle: true,
 			getStyleUrl: () => 'https://example.com/legacy.json',
 		} );
 
-		const JeoLayer = require( './JeoLayer' ).default;
+		const { default: JeoLayer } = await import( './JeoLayer' );
 
 		expect( new JeoLayer( 'legacy-style', {} ).getStyle() ).toBe(
 			'https://example.com/legacy.json'

@@ -7,6 +7,7 @@ import {
 	loadImage as loadImageMapLibre,
 	mapboxToken as configuredMapboxToken,
 	mapgl as mapLibreRuntime,
+	mapProjection as mapProjectionMapLibre,
 	transformRequest as mapLibreTransformRequest,
 } from './maplibregl/maplibregl-loader'
 import {
@@ -16,6 +17,7 @@ import {
 	getMapLibrary as getMapboxRuntime,
 	isMapboxRuntimeAvailable,
 	loadImage as loadImageMapbox,
+	mapProjection as mapProjectionMapbox,
 	transformRequest as mapboxTransformRequest,
 } from './mapboxgl/mapboxgl-loader'
 
@@ -92,6 +94,7 @@ const activeRuntime = MAP_RUNTIME === 'mapboxgl'
 		getClusterLeaves: getClusterLeavesMapbox,
 		loadImage: loadImageMapbox,
 		mapgl: getMapboxRuntime(),
+		mapProjection: mapProjectionMapbox,
 		transformRequest: mapboxTransformRequest,
 	}
 	: {
@@ -100,6 +103,7 @@ const activeRuntime = MAP_RUNTIME === 'mapboxgl'
 		getClusterLeaves: getClusterLeavesMapLibre,
 		loadImage: loadImageMapLibre,
 		mapgl: mapLibreRuntime,
+		mapProjection: mapProjectionMapLibre,
 		transformRequest: mapLibreTransformRequest,
 	}
 
@@ -111,6 +115,7 @@ const {
 	getClusterLeaves,
 	loadImage,
 	mapgl,
+	mapProjection,
 	transformRequest,
 } = activeRuntime
 
@@ -121,5 +126,6 @@ export {
 	loadImage,
 	configuredMapboxToken as mapboxToken,
 	mapgl,
+	mapProjection,
 	transformRequest,
 }

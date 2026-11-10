@@ -39,6 +39,19 @@ import { GITHUB_URL, DOCS_URL } from '../links.js'
  * Motion: card and community content enter through `Reveal` with a
  * sequential delay (reduced-motion aware via Reveal).
  */
+
+// Workshop Card visibility (request by @marinarcruz, issue #669, 2026-10-19).
+// The "Oficinas de lançamento" card (signup form) stays OFF until there are
+// workshop schedules to announce — reactivation also depends on the
+// transactional email setup to be configured with the client. While false,
+// the Community Box renders alone, centered like the Features Showcase
+// header band ("Recursos inteligentes"): title and body centered, content
+// capped at max-w-[1152px] (narrower than the full 1600px shell used by
+// the image rows). To bring the card back: flip to true — the 2-column
+// grid, the +30px community offset and the full-width community box are
+// restored automatically.
+const SHOW_WORKSHOP_CARD = false
+
 export default function WorkshopsV3() {
   const { t } = useI18n()
   const ws = t.workshops
@@ -50,8 +63,16 @@ export default function WorkshopsV3() {
 
   return (
     <section id="oficinas" aria-labelledby="oficinas-title" className="bg-v3-mint">
-      <div className="section-shell-v3 grid items-start gap-12 section-pad-v3 sm:pt-20 sm:pb-20 lg:grid-cols-2 lg:pt-[100px] lg:pb-[100px]">
-        {/* Workshop Card (Figma 133:1777) */}
+      <div
+        className={`section-shell-v3 grid items-start gap-12 section-pad-v3 sm:pt-20 sm:pb-20 lg:pt-[100px] lg:pb-[100px] ${
+          SHOW_WORKSHOP_CARD ? 'lg:grid-cols-2' : 'lg:grid-cols-1'
+        }`}
+      >
+        {/* Workshop Card (Figma 133:1777) — hidden while SHOW_WORKSHOP_CARD
+            is false (see the constant above); kept in the codebase for
+            reactivation once workshops have schedules + transactional
+            emails. */}
+        {SHOW_WORKSHOP_CARD && (
         <Reveal className="h-full">
           <article className="flex h-full flex-col gap-8 rounded-2xl border border-[#E6E7E7] bg-v3-light p-6 sm:p-8 lg:gap-10 lg:p-10">
             <div className="flex items-center gap-4">
@@ -115,10 +136,20 @@ export default function WorkshopsV3() {
             </form>
           </article>
         </Reveal>
+        )}
 
-        {/* Community Box (Figma 133:1793 — +30px top offset on desktop) */}
-        <Reveal delay={0.12} className="lg:mt-[30px]">
-          <div className="flex flex-col gap-8 lg:gap-10">
+        {/* Community Box (Figma 133:1793 — +30px top offset on desktop when
+            the workshop card is visible; otherwise centered like the
+            Features Showcase header band: max-w-[1152px], text-center) */}
+        <Reveal
+          delay={0.12}
+          className={SHOW_WORKSHOP_CARD ? 'lg:mt-[30px]' : 'mx-auto w-full max-w-[1152px]'}
+        >
+          <div
+            className={`flex flex-col gap-8 lg:gap-10 ${
+              SHOW_WORKSHOP_CARD ? '' : 'items-center text-center'
+            }`}
+          >
             <h3 className="font-condensed text-3xl font-bold leading-[1.2] text-v3-navy sm:text-4xl lg:text-[40px]">
               {ws.communityTitle}
             </h3>
@@ -130,8 +161,13 @@ export default function WorkshopsV3() {
               ))}
             </div>
 
-            {/* Frame 23 (Figma 133:1796) — 40px row inset, ~40px between links */}
-            <div className="flex flex-wrap gap-x-10 gap-y-3 pl-0 lg:pl-10">
+            {/* Frame 23 (Figma 133:1796) — 40px row inset, ~40px between links;
+                centered when the workshop card is hidden */}
+            <div
+              className={`flex flex-wrap gap-x-10 gap-y-3 ${
+                SHOW_WORKSHOP_CARD ? 'pl-0 lg:pl-10' : 'justify-center'
+              }`}
+            >
               <a
                 href={GITHUB_URL}
                 target="_blank"

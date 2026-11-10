@@ -5,7 +5,7 @@ import {
 	styleLayerMapProps,
 } from './use-style-layer';
 
-jest.mock( '../lib/mapgl-loader', () => ( {
+vi.mock( '../lib/mapgl-loader', () => ( {
 	mapboxToken: 'global-test-token',
 	transformRequest: null,
 } ) );
@@ -47,6 +47,8 @@ describe( 'getStyleLayerStyle', () => {
 	} );
 
 	it( 'falls back to the URL when inline style JSON is invalid', () => {
+		const warn = vi.spyOn( console, 'warn' ).mockImplementation( () => {} );
+
 		expect(
 			getStyleLayerStyle(
 				{
@@ -59,7 +61,7 @@ describe( 'getStyleLayerStyle', () => {
 				{ load_as_style: true }
 			)
 		).toBe( 'https://example.com/style.json' );
-		expect( console ).toHaveWarned();
+		expect( warn ).toHaveBeenCalled();
 	} );
 
 	it( 'resolves a legacy mapbox style through the Mapbox API', () => {
@@ -90,8 +92,8 @@ describe( 'getStyleLayerStyle', () => {
 		);
 	} );
 
-	it( 'returns null for a mapbox style without any token', () => {
-		const loader = require( '../lib/mapgl-loader' );
+	it( 'returns null for a mapbox style without any token', async () => {
+		const loader = await import( '../lib/mapgl-loader' );
 		loader.mapboxToken = '';
 
 		expect(

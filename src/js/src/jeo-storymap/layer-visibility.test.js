@@ -7,11 +7,11 @@ const runtimeCases = [
 
 function createMapMock( overrides = {} ) {
 	return {
-		isStyleLoaded: jest.fn( () => true ),
-		getLayer: jest.fn( ( layerSlug ) =>
+		isStyleLoaded: vi.fn( () => true ),
+		getLayer: vi.fn( ( layerSlug ) =>
 			layerSlug === 'story-layer' ? { id: layerSlug } : undefined
 		),
-		setLayoutProperty: jest.fn(),
+		setLayoutProperty: vi.fn(),
 		...overrides,
 	};
 }
@@ -22,12 +22,12 @@ describe( 'isMapStyleReady', () => {
 	} );
 
 	it( 'keeps legacy map-like objects usable when they do not expose isStyleLoaded', () => {
-		expect( isMapStyleReady( { getLayer: jest.fn() } ) ).toBe( true );
+		expect( isMapStyleReady( { getLayer: vi.fn() } ) ).toBe( true );
 	} );
 
 	it( 'returns false when checking the style state throws', () => {
 		const map = createMapMock( {
-			isStyleLoaded: jest.fn( () => {
+			isStyleLoaded: vi.fn( () => {
 				throw new Error( 'Style is not done loading' );
 			} ),
 		} );
@@ -50,7 +50,7 @@ describe.each( runtimeCases )( 'setMapLayerVisibility with %s', () => {
 
 	it( 'waits for the style to be loaded before touching layer layout', () => {
 		const map = createMapMock( {
-			isStyleLoaded: jest.fn( () => false ),
+			isStyleLoaded: vi.fn( () => false ),
 		} );
 
 		expect( setMapLayerVisibility( map, 'story-layer', 'none' ) ).toBe( false );
@@ -67,7 +67,7 @@ describe.each( runtimeCases )( 'setMapLayerVisibility with %s', () => {
 
 	it( 'ignores transient style-loading errors from getLayer', () => {
 		const map = createMapMock( {
-			getLayer: jest.fn( () => {
+			getLayer: vi.fn( () => {
 				throw new Error( 'Style is not done loading' );
 			} ),
 		} );
@@ -78,7 +78,7 @@ describe.each( runtimeCases )( 'setMapLayerVisibility with %s', () => {
 
 	it( 'ignores transient missing-layer errors from setLayoutProperty', () => {
 		const map = createMapMock( {
-			setLayoutProperty: jest.fn( () => {
+			setLayoutProperty: vi.fn( () => {
 				throw new Error( 'Layer story-layer does not exist in the map' );
 			} ),
 		} );
@@ -88,7 +88,7 @@ describe.each( runtimeCases )( 'setMapLayerVisibility with %s', () => {
 
 	it( 'rethrows unexpected errors', () => {
 		const map = createMapMock( {
-			setLayoutProperty: jest.fn( () => {
+			setLayoutProperty: vi.fn( () => {
 				throw new Error( 'Unexpected renderer failure' );
 			} ),
 		} );

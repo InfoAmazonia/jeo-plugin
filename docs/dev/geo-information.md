@@ -2,7 +2,7 @@
 
 Each post can be related to one or more points on the map.
 
-For each point, JEO collects geographical information such as city and country names. For complete information on this, see [Geocoders](/dev/geocoders/).
+For each point, JEO collects geographical information such as city and country names. For complete information on this, see [Geocoders](geocoders.md).
 
 ## How geographical information is stored
 
@@ -67,7 +67,7 @@ Example:
 ],
 ```
 
-The AI also produces a `confidence` score (0–100) during georeferencing, but this is **not** stored in `_related_point` — it is used only during the approval workflow in the bulk processor. See [AI Georeferencing](/ai-georeferencing/) and [AI Bulk Geolocation](/ai-bulk-geolocation/).
+The AI also produces a `confidence` score (0–100) during georeferencing, but this is **not** stored in `_related_point` — it is used only during the approval workflow in the bulk processor. See [AI Georeferencing](../ai-georeferencing.md) and [AI Bulk Geolocation](../ai-bulk-geolocation.md).
 
 ## How to search for posts by geoinformation? (indexes)
 

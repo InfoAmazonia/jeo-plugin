@@ -13,7 +13,7 @@ You can post geolocated stories and create richly designed pages for each one of
 - Geocoding WordPress posts using OpenStreetMap (Nominatim), supporting the post type `Post`, with extensibility for additional geocoders via hook.
 - Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
 - Map markers query integrated to posts query.
-- Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilingual plugins
+- Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://wordpress.org/plugins/polylang/) multilingual plugins
 - AI-powered georeferencing, bulk geolocation, and map generation (multiple AI providers)
 - Stories Near You block with geolocation-based post discovery
 - AI-assisted map block (Minimap) with chat refinement and auto-generated layers
@@ -22,52 +22,52 @@ You can post geolocated stories and create richly designed pages for each one of
 
 ### Getting started
 
-- [Concepts](/concepts/)
-- [Installing and configuring the plugin](/getting-started/)
+- [Concepts](concepts.md)
+- [Installing and configuring the plugin](getting-started.md)
 
 ### Layers
 
-- [Creating layers](/layer-post/)
+- [Creating layers](layer-post.md)
 
 ### Maps
 
-- [Creating maps](/map-post/)
+- [Creating maps](map-post.md)
 
 ### Discovery
 
-- [Using discovery](/discovery/)
+- [Using discovery](discovery.md)
 
 ### Story Map
 
-- [Creating and using Story Map](/story-map/)
+- [Creating and using Story Map](story-map.md)
 
 ### Posts
 
-- [Geolocating posts](/geolocating-posts/)
-- [AI Georeferencing](/ai-georeferencing/)
-- [AI Bulk Geolocation](/ai-bulk-geolocation/)
-- [Using a map shortcode](/map-shortcode/)
-- [Using a map block](/map-block/)
-- [Using an one-time map block](/one-time-map-block/)
-- [Using a map embed](/map-embed/)
+- [Geolocating posts](geolocating-posts.md)
+- [AI Georeferencing](ai-georeferencing.md)
+- [AI Bulk Geolocation](ai-bulk-geolocation.md)
+- [Using a map shortcode](map-shortcode.md)
+- [Using a map block](map-block.md)
+- [Using an one-time map block](one-time-map-block.md)
+- [Using a map embed](map-embed.md)
 
 ### AI Features
 
-- [AI Settings](/ai-settings/)
-- [Minimap — AI-Assisted Map Block](/minimap/)
+- [AI Settings](ai-settings.md)
+- [Minimap — AI-Assisted Map Block](minimap.md)
 
 ### Stories Near You
 
-- [Stories Near You block](/stories-near-you/)
+- [Stories Near You block](stories-near-you.md)
 
 ## Developer documentation
 
 ### Tutorials
 
-- [Adding new Layer Types](/dev/layer-types/)
-- [Geographical Information of a post](/dev/geo-information/)
-- [Writing a Geocoder](/dev/geocoders/)
+- [Adding new Layer Types](dev/layer-types.md)
+- [Geographical Information of a post](dev/geo-information.md)
+- [Writing a Geocoder](dev/geocoders.md)
 
 ### Differences between the old and the present JEO
 
-- [Migration](/dev/migration/)
+- [Migration](dev/migration.md)

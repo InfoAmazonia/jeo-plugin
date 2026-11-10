@@ -2,7 +2,7 @@
 
 The AI Context Assistant is a Gutenberg sidebar panel that helps you enrich your articles with AI-suggested paragraphs and references to related content from your site's knowledge base.
 
-See [AI in JEO](/ai-in-jeo/) to learn how RAG, agents, and conversation memory power this feature.
+See [AI in JEO](ai-in-jeo.md) to learn how RAG, agents, and conversation memory power this feature.
 
 ## Opening the panel
 
@@ -81,6 +81,6 @@ When unchecked, the tab shows the default prompt in a read-only field for refere
 
 ## Requirements
 
-- An AI provider must be configured in **JEO → AI** (see [AI Settings](/ai-settings/)).
+- An AI provider must be configured in **JEO → AI** (see [AI Settings](ai-settings.md)).
 - For best results, index your posts in the Knowledge Base (**JEO → AI → Knowledge Base** tab). The assistant uses RAG to find related articles from the vectorized archive.
 - The article must have at least 100 characters of content before the AI can generate suggestions. If the article is too short, the assistant will ask you to write more or specify what you want.

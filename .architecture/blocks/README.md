@@ -21,7 +21,7 @@
 | `src/js/src/shared/save-error-notice.js` | Contract A on the save surface: when a save/publish fails with the humanized payload (`error.data.{action,detail}`), replaces the core `editor-save` notice with the single error pattern (cause + action + collapsed detail + "Copy details"). Payload-less errors keep the stock core notice |
 | `src/js/src/layers-sidebar/form-validation.js` | Pure form-validation helpers (`validateLayerFormData`, `validateMapFormData`) — single source of truth for the publish lock |
 | `src/js/src/map-blocks/mapbox-style-preview.js` | Composed Mapbox style adapter for editor previews (AbortSignal stale-state guard, token transform) — see [`composed-styles/README.md`](../composed-styles/README.md) |
-| `src/js/src/map-blocks/jeo-autosuggest.js` | Autosuggest for searching maps/layers |
+| `src/js/src/map-blocks/jeo-autosuggest.js` | Autosuggest for searching maps/storymaps. Opt-in `showPrivate` prop queries `publish,private,future` (falls back to `publish` when the user lacks permission); used by the storymap editor map search |
 | `src/js/src/map-blocks/color-palettes.js` | Color palette (437 colors) |
 | `src/includes/minimap/class-minimap.php` | `Jeo\Minimap` — REST endpoint, base layer logic |
 

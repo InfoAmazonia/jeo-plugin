@@ -85,5 +85,5 @@ If the [Newspack Blocks](https://newspack.pub/) plugin is active, the block auto
 
 ## Requirements
 
-- Posts must be geolocated (have `_related_point` meta data). See [Geolocating posts](/geolocating-posts/).
+- Posts must be geolocated (have `_related_point` meta data). See [Geolocating posts](geolocating-posts.md).
 - The JEO default map center must be configured in **Jeo → Settings** (used as fallback when the user does not share their location).

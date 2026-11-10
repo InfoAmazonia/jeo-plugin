@@ -1,5 +1,6 @@
 const path = require( 'path' );
 const webpack = require( 'webpack' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const defaultConfig = require( './node_modules/@wordpress/scripts/config/webpack.config' );
 
 module.exports = {
@@ -12,6 +13,22 @@ module.exports = {
 				resource.request = resource.request.replace( /^node:/, '' );
 			}
 		),
+		// MapLibre GL JS ships its web worker as a separate file. Publish it
+		// next to our entry bundles so maplibregl-loader.js can point
+		// `setWorkerUrl()` at it. The .mjs contents are self-contained (no
+		// imports), so renaming to .js is safe: MapLibre tries a module
+		// worker first and falls back to a classic worker.
+		new CopyWebpackPlugin( {
+			patterns: [
+				{
+					from: path.resolve(
+						__dirname,
+						'node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs'
+					),
+					to: 'maplibre-gl-worker.js',
+				},
+			],
+		} ),
 	],
 	resolve: {
 		...defaultConfig.resolve,
@@ -75,6 +92,14 @@ module.exports = {
 		...( defaultConfig.ignoreWarnings || [] ),
 		{
 			module: /node_modules\/react-datepicker\/dist\/index\.es\.js$/,
+			message: /Critical dependency: the request of a dependency is an expression/,
+		},
+		{
+			// MapLibre GL JS builds a Blob-based module worker from a dynamic
+			// import expression when the worker URL is cross-origin. Our
+			// worker is published same-origin next to the bundles, so this
+			// code path never executes.
+			module: /node_modules\/maplibre-gl\/dist\/maplibre-gl\.mjs$/,
 			message: /Critical dependency: the request of a dependency is an expression/,
 		},
 	],

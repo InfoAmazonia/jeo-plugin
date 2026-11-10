@@ -1,5 +1,5 @@
 import U from 'map-gl-utils';
-import MapLibreGL from 'maplibre-gl';
+import * as MapLibreGL from 'maplibre-gl';
 import {
 	isMapboxURL,
 	transformMapboxStyle,
@@ -7,6 +7,13 @@ import {
 } from 'maplibregl-mapbox-request-transformer';
 
 import 'maplibre-gl/dist/maplibre-gl.css';
+
+// MapLibre GL JS ships its web worker as a separate file that must be
+// published next to our bundles: webpack.config.js copies it to the build
+// output as `maplibre-gl-worker.js`, and the public path is injected by
+// WordPress (`jeo_settings.public_path`, localized in class-jeo.php).
+// Without this the map cannot spawn its tile workers and renders blank.
+MapLibreGL.setWorkerUrl( jeo_settings.public_path + 'maplibre-gl-worker.js' );
 
 if ( typeof MapLibreGL.Map?.prototype?.getLight === 'function' ) {
 	try {
@@ -348,10 +355,15 @@ export function createMap( {
 	const map = new MapLibreGL.Map( {
 		container: container,
 		maplibreLogo: false,
-		projection: 'equirectangular',
 		validateStyle: false,
 		transformRequest: createTransformRequest( transformRequest ),
 		...options,
+	} );
+
+	// Projection is style-driven in MapLibre (`style.projection.type`): the
+	// constructor has no `projection` option.
+	map.on( 'style.load', () => {
+		map.setProjection( mapProjection );
 	} );
 
 	map.setStyle( style ?? defaultStyle, {
@@ -362,6 +374,22 @@ export function createMap( {
 
 	return map;
 }
+
+function resolveProjection( value ) {
+	if ( typeof value?.type === 'string' && value.type ) {
+		return { type: value.type };
+	}
+
+	const name = value?.name ?? value;
+
+	if ( typeof name === 'string' && name ) {
+		return { type: name === 'globe' ? 'globe' : 'mercator' };
+	}
+
+	return { type: 'mercator' };
+}
+
+export const mapProjection = resolveProjection( jeo_settings.map_projection );
 
 /**
  * @param {import('maplibre-gl').GeoJSONSource} source

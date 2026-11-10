@@ -2,7 +2,7 @@
 
 The Minimap block (`jeo/ai-minimap`) generates contextual interactive maps inside the Gutenberg editor using AI. Describe what you need in natural language, and the AI builds a map with appropriate layers, center point, zoom level, and geolocation pins.
 
-See [AI in JEO](/ai-in-jeo/) to learn how RAG, agents, and tools power this feature.
+See [AI in JEO](ai-in-jeo.md) to learn how RAG, agents, and tools power this feature.
 
 ## Inserting the block
 
@@ -71,6 +71,6 @@ After generation, the minimap behaves like any JEO map:
 
 ## Requirements
 
-- An AI provider must be configured in **Jeo → AI** (see [AI Settings](/ai-settings/)).
+- An AI provider must be configured in **Jeo → AI** (see [AI Settings](ai-settings.md)).
 - For best results, index your posts and layers in the Knowledge Base (RAG tab).
 - For AI-generated thematic layers, a Mapbox API key is also required. Boundary layers (municipalities, states, indigenous lands) are generated as GeoJSON and work without a Mapbox key.

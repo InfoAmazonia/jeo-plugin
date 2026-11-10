@@ -6,7 +6,7 @@ JEO includes built-in AI capabilities for georeferencing posts, generating maps,
 
 JEO's AI features are powered by a configurable external AI provider. The plugin never runs its own AI model — instead, it sends requests to the provider you choose (such as OpenAI, Google Gemini, or a local Ollama instance) and processes the results.
 
-All AI features are **optional**. They activate only after you configure a provider in **Jeo → AI** (see [AI Settings](/ai-settings/)).
+All AI features are **optional**. They activate only after you configure a provider in **Jeo → AI** (see [AI Settings](ai-settings.md)).
 
 The key idea is that each AI feature is a specialized **agent** — an AI assistant with a specific role, a set of **tools** it can use, and access to your site's content through a **knowledge base**.
 
@@ -26,8 +26,8 @@ JEO maintains **two separate knowledge bases** (called *vector stores*):
 
 | Knowledge base | Content | Used by |
 |----------------|---------|---------|
-| **Posts** (`jeo_knowledge`) | Your published posts — titles and body text | [Context Assistant](/ai-context-assistant/) |
-| **Layers** (`jeo_layers_knowledge`) | Your map layers — titles, types, legends, and descriptions | [Minimap](/minimap/) |
+| **Posts** (`jeo_knowledge`) | Your published posts — titles and body text | [Context Assistant](ai-context-assistant.md) |
+| **Layers** (`jeo_layers_knowledge`) | Your map layers — titles, types, legends, and descriptions | [Minimap](minimap.md) |
 
 Each item is converted into a numerical representation (an *embedding*) and stored in a local file-based index. When an AI feature needs context, it:
 
@@ -59,10 +59,10 @@ The **topK** setting (in Knowledge Base tab, range 1–50, default 10) controls 
 
 | Feature | Uses RAG? | Knowledge base | Purpose |
 |---------|-----------|----------------|---------|
-| [AI Georeferencing](/ai-georeferencing/) | Optional | — | Can include taxonomy context; does not use the vector store directly |
-| [Minimap](/minimap/) | Yes | Layers (`jeo_layers_knowledge`) | Searches for relevant map layers to include in the generated map |
-| [Context Assistant](/ai-context-assistant/) | Yes | Posts (`jeo_knowledge`) | Finds related articles to reference in suggestions |
-| [AI Bulk Geolocation](/ai-bulk-geolocation/) | No | — | Processes posts individually without RAG |
+| [AI Georeferencing](ai-georeferencing.md) | Optional | — | Can include taxonomy context; does not use the vector store directly |
+| [Minimap](minimap.md) | Yes | Layers (`jeo_layers_knowledge`) | Searches for relevant map layers to include in the generated map |
+| [Context Assistant](ai-context-assistant.md) | Yes | Posts (`jeo_knowledge`) | Finds related articles to reference in suggestions |
+| [AI Bulk Geolocation](ai-bulk-geolocation.md) | No | — | Processes posts individually without RAG |
 | Minilayer | No | — | Uses MCP instead (see below) |
 
 ## Structured output
@@ -151,18 +151,18 @@ A quick reference for which concepts apply to each feature:
 
 | | Provider | RAG | Structured output | Tools | Conversation memory | MCP |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
-| [AI Georeferencing](/ai-georeferencing/) | ✓ | — | ✓ | — | ✓ | — |
-| [AI Bulk Geolocation](/ai-bulk-geolocation/) | ✓ | — | ✓ | — | — | — |
-| [Minimap](/minimap/) | ✓ | ✓ | ✓ | ✓ | ✓ | — |
-| [Context Assistant](/ai-context-assistant/) | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| [AI Georeferencing](ai-georeferencing.md) | ✓ | — | ✓ | — | ✓ | — |
+| [AI Bulk Geolocation](ai-bulk-geolocation.md) | ✓ | — | ✓ | — | — | — |
+| [Minimap](minimap.md) | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| [Context Assistant](ai-context-assistant.md) | ✓ | ✓ | ✓ | ✓ | ✓ | — |
 | Minilayer | ✓ | — | — | — | — | ✓ |
 
 ## Next steps
 
-- **Configure a provider**: [AI Settings](/ai-settings/)
+- **Configure a provider**: [AI Settings](ai-settings.md)
 - **Index your content**: Knowledge Base tab in **Jeo → AI**
 - **Start using features**:
-  - [AI Georeferencing](/ai-georeferencing/) — auto-tag posts with locations
-  - [Minimap](/minimap/) — generate maps from text or post content
-  - [Context Assistant](/ai-context-assistant/) — get AI-powered editorial suggestions
-  - [AI Bulk Geolocation](/ai-bulk-geolocation/) — process many posts at once
+  - [AI Georeferencing](ai-georeferencing.md) — auto-tag posts with locations
+  - [Minimap](minimap.md) — generate maps from text or post content
+  - [Context Assistant](ai-context-assistant.md) — get AI-powered editorial suggestions
+  - [AI Bulk Geolocation](ai-bulk-geolocation.md) — process many posts at once
