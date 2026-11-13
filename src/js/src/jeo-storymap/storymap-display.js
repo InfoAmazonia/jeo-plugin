@@ -282,9 +282,6 @@ class StoryMapDisplay extends Component {
 		const embeddedStyle = this.props.composedStyle;
 
 		if ( embeddedStyle?.style && embeddedStyle?.manifest ) {
-			// The server-rendered payload carries content-addressed static
-			// URLs. They are served straight from the uploads directory, so
-			// anonymous visitors never depend on the REST API.
 			try {
 				const { manifest, metadata } = await loadComposedStyleDataFromUrls( {
 					manifestUrl: embeddedStyle.manifest,

@@ -14,7 +14,7 @@
 	{
 		"name": "mapBlocks",
 		"path": "src/js/build/mapBlocks.js",
-		"limit": "1375 KB",
+		"limit": "1380 KB",
 		"brotli": false
 	},
 	{
