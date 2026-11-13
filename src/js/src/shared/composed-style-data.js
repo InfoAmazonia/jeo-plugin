@@ -74,6 +74,7 @@ export function postJson( url, data, options = {} ) {
 
 export async function loadComposedStyleData( {
 	forceRefresh = false,
+	forStorymap = 0,
 	includeStyle = false,
 	mapId,
 	payload,
@@ -95,9 +96,19 @@ export async function loadComposedStyleData( {
 			throw new Error( unavailableMessage );
 		}
 
+		const queryParams = {};
+		if ( forceRefresh ) {
+			queryParams.refresh = true;
+		}
+		if ( forStorymap ) {
+			// Grants access to the composed style of a non-published map when
+			// the current visitor may view the story map that uses it.
+			queryParams.for_storymap = forStorymap;
+		}
+
 		const metadataUrl = addQueryParams(
 			`${ composedStyleUrlBase }${ mapId }`,
-			forceRefresh ? { refresh: true } : {}
+			queryParams
 		);
 		metadata = await fetchJson( metadataUrl, { signal } );
 	}
@@ -118,6 +129,55 @@ export async function loadComposedStyleData( {
 	return {
 		manifest,
 		metadata,
+		style,
+	};
+}
+
+/**
+ * Load composed style data from pre-resolved URLs.
+ *
+ * Used when the server-rendered payload already carries content-addressed
+ * static URLs (e.g. the story map payload, for anonymous visitors), skipping
+ * the REST metadata endpoint entirely.
+ *
+ * @param {Object} args               Load arguments.
+ * @param {string} args.manifestUrl   Manifest JSON URL.
+ * @param {string} args.styleUrl      Style JSON URL.
+ * @param {Object} [args.signal]      Optional AbortSignal.
+ * @param {boolean} [args.includeStyle]
+ *                                      Whether to also fetch and return the
+ *                                      style JSON (default false — the URL is
+ *                                      returned either way, and GL runtimes
+ *                                      fetch the style themselves).
+ * @param {string} [args.emptyManifestMessage]
+ *                                      Error message for empty manifests.
+ * @return {Promise<Object>} Promise resolving `{ manifest, metadata, style }`.
+ */
+export async function loadComposedStyleDataFromUrls( {
+	manifestUrl,
+	signal,
+	styleUrl,
+	includeStyle = false,
+	emptyManifestMessage = DEFAULT_EMPTY_MANIFEST_MESSAGE,
+} = {} ) {
+	if ( ! styleUrl || ! manifestUrl ) {
+		throw new Error( DEFAULT_COMPOSITION_UNAVAILABLE_MESSAGE );
+	}
+
+	const [ manifest, style ] = await Promise.all( [
+		fetchJson( manifestUrl, { signal } ),
+		includeStyle ? fetchJson( styleUrl, { signal } ) : Promise.resolve( null ),
+	] );
+
+	if ( ! manifest?.layers?.length ) {
+		throw new Error( emptyManifestMessage );
+	}
+
+	return {
+		manifest,
+		metadata: {
+			style: styleUrl,
+		},
 		style,
 	};
 }

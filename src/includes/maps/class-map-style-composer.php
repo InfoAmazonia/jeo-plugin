@@ -56,11 +56,14 @@ class Map_Style_Composer {
 				'callback'            => array( $this, 'get_metadata_response' ),
 				'permission_callback' => array( $this, 'can_read_map_request' ),
 				'args'                => array(
-					'id'      => array(
+					'id'           => array(
 						'sanitize_callback' => 'absint',
 					),
-					'refresh' => array(
+					'refresh'      => array(
 						'sanitize_callback' => 'rest_sanitize_boolean',
+					),
+					'for_storymap' => array(
+						'sanitize_callback' => 'absint',
 					),
 				),
 			)
@@ -74,7 +77,10 @@ class Map_Style_Composer {
 				'callback'            => array( $this, 'get_style_response' ),
 				'permission_callback' => array( $this, 'can_read_map_request' ),
 				'args'                => array(
-					'id' => array(
+					'id'           => array(
+						'sanitize_callback' => 'absint',
+					),
+					'for_storymap' => array(
 						'sanitize_callback' => 'absint',
 					),
 				),
@@ -89,7 +95,10 @@ class Map_Style_Composer {
 				'callback'            => array( $this, 'get_manifest_response' ),
 				'permission_callback' => array( $this, 'can_read_map_request' ),
 				'args'                => array(
-					'id' => array(
+					'id'           => array(
+						'sanitize_callback' => 'absint',
+					),
+					'for_storymap' => array(
 						'sanitize_callback' => 'absint',
 					),
 				),
@@ -161,11 +170,65 @@ class Map_Style_Composer {
 	/**
 	 * Check whether the current request can read a map.
 	 *
+	 * A request carrying a valid `for_storymap` parameter is authorized when
+	 * the current user may view that storymap and the storymap actually uses
+	 * the map as its source (see `can_read_map_for_storymap()`). Otherwise,
+	 * the regular map read gate applies.
+	 *
 	 * @param WP_REST_Request $request REST request.
 	 * @return bool
 	 */
 	public function can_read_map_request( WP_REST_Request $request ) {
-		return $this->can_read_map( absint( $request['id'] ) );
+		$map_id      = absint( $request['id'] );
+		$storymap_id = absint( $request->get_param( 'for_storymap' ) );
+
+		if ( $storymap_id && $this->can_read_map_for_storymap( $map_id, $storymap_id ) ) {
+			return true;
+		}
+
+		return $this->can_read_map( $map_id );
+	}
+
+	/**
+	 * Check whether reading a map's composed style is granted through a storymap.
+	 *
+	 * Access is granted when the storymap exists, the current user may view it,
+	 * and the storymap uses the map as its source. The composed style layers of
+	 * a storymap are visible wherever the storymap itself is viewable, so this
+	 * mirrors the storymap's own visibility rules.
+	 *
+	 * @param int $map_id Map post ID.
+	 * @param int $storymap_id Story map post ID.
+	 * @return bool
+	 */
+	private function can_read_map_for_storymap( $map_id, $storymap_id ) {
+		$storymap = get_post( $storymap_id );
+		if ( ! $storymap instanceof WP_Post || 'storymap' !== $storymap->post_type ) {
+			return false;
+		}
+
+		// Publicly viewable storymaps grant everyone access to the composed
+		// style of their source map. For other statuses, require an explicit
+		// read capability. Note that `read_post` maps to the primitive
+		// `read_storymap` capability, which anonymous users never hold, so the
+		// status check must come first.
+		$status_object = get_post_status_object( get_post_status( $storymap ) );
+		if ( ( ! $status_object || ! $status_object->public ) && ! current_user_can( 'read_post', $storymap_id ) ) {
+			return false;
+		}
+
+		foreach ( parse_blocks( $storymap->post_content ) as $block ) {
+			if ( 'jeo/storymap' !== $block['blockName'] ) {
+				continue;
+			}
+
+			$payload = json_decode( \jeo()->extract_json_from_block_content( $block['innerHTML'] ) );
+			if ( is_object( $payload ) && absint( $payload->map_id ?? 0 ) === absint( $map_id ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -236,12 +299,14 @@ class Map_Style_Composer {
 	 */
 	public function get_metadata_response( WP_REST_Request $request ) {
 		$map_id        = absint( $request['id'] );
+		$for_storymap  = absint( $request->get_param( 'for_storymap' ) );
 		$force_refresh = rest_sanitize_boolean( $request->get_param( 'refresh' ) ) &&
 			current_user_can( 'edit_post', $map_id );
 
 		$result = $this->get_or_create_artifacts(
 			$map_id,
-			$force_refresh
+			$force_refresh,
+			$for_storymap
 		);
 
 		if ( is_wp_error( $result ) ) {
@@ -620,13 +685,63 @@ class Map_Style_Composer {
 	}
 
 	/**
+	 * Return composed style metadata with static upload URLs for a map.
+	 *
+	 * Used by the story map render callback to embed content-addressed style
+	 * and manifest URLs in the frontend payload, so story map visitors never
+	 * depend on the REST API (which site-level locks may block for anonymous
+	 * users, and which requires edit permissions for non-published maps).
+	 *
+	 * @param int $map_id Map post ID.
+	 * @return array|null {
+	 *     Metadata with static URLs, or null when composition is unavailable
+	 *     or produces no renderable layers.
+	 *
+	 *     @type bool   $enabled  Always true.
+	 *     @type string $style    Static URL of the composed style JSON.
+	 *     @type string $manifest Static URL of the composed manifest JSON.
+	 * }
+	 */
+	public function get_map_style_metadata( $map_id ) {
+		$map_id = absint( $map_id );
+		if ( ! $map_id ) {
+			return null;
+		}
+
+		$result = $this->get_or_create_artifacts( $map_id );
+		if ( is_wp_error( $result ) || empty( $result['hash'] ) ) {
+			return null;
+		}
+
+		$manifest = $this->read_json_file( $result['manifestPath'] );
+		if ( is_wp_error( $manifest ) || ! is_array( $manifest ) || empty( $manifest['layers'] ) || ! is_array( $manifest['layers'] ) ) {
+			return null;
+		}
+
+		$paths = $this->get_artifact_paths( $map_id, $result['hash'] );
+		if ( is_wp_error( $paths ) ) {
+			return null;
+		}
+
+		$baseurl = trailingslashit( $paths['baseurl'] );
+
+		return array(
+			'enabled'  => true,
+			'style'    => $baseurl . 'style.json',
+			'manifest' => $baseurl . 'manifest.json',
+		);
+	}
+
+	/**
 	 * Build or reuse cached artifacts.
 	 *
 	 * @param int  $map_id Map post ID.
 	 * @param bool $force_refresh Whether to force regeneration.
+	 * @param int  $for_storymap Optional story map post ID propagated to the
+	 *                           generated style/manifest URLs.
 	 * @return array|WP_Error
 	 */
-	private function get_or_create_artifacts( $map_id, $force_refresh = false ) {
+	private function get_or_create_artifacts( $map_id, $force_refresh = false, $for_storymap = 0 ) {
 		if ( ! $this->is_enabled() ) {
 			return new WP_Error( 'jeo_mapbox_composer_disabled', __( 'Mapbox composed styles are disabled.', 'jeowp' ) );
 		}
@@ -649,7 +764,7 @@ class Map_Style_Composer {
 			file_exists( $paths['stylePath'] ) &&
 			file_exists( $paths['manifestPath'] )
 		) {
-			return $this->build_metadata( $map_id, $hash, $paths );
+			return $this->build_metadata( $map_id, $hash, $paths, null, $for_storymap );
 		}
 
 		if ( ! wp_mkdir_p( $paths['dir'] ) ) {
@@ -686,7 +801,7 @@ class Map_Style_Composer {
 		update_post_meta( $map_id, '_jeo_mapbox_composed_style_warnings', $composed['report']['warnings'] );
 		delete_post_meta( $map_id, '_jeo_mapbox_composed_style_error' );
 
-		return $this->build_metadata( $map_id, $hash, $paths, $composed['report'] );
+		return $this->build_metadata( $map_id, $hash, $paths, $composed['report'], $for_storymap );
 	}
 
 	/**
@@ -750,9 +865,12 @@ class Map_Style_Composer {
 	 * @param string     $hash Cache hash.
 	 * @param array      $paths Artifact paths.
 	 * @param array|null $report Optional fresh report.
+	 * @param int        $for_storymap Optional story map post ID propagated to
+	 *                                  the style/manifest URLs so authorized
+	 *                                  story map flows keep the grant.
 	 * @return array
 	 */
-	private function build_metadata( $map_id, $hash, array $paths, $report = null ) {
+	private function build_metadata( $map_id, $hash, array $paths, $report = null, $for_storymap = 0 ) {
 		if ( null === $report && file_exists( $paths['reportPath'] ) ) {
 			$report = $this->read_json_file( $paths['reportPath'] );
 		}
@@ -762,12 +880,15 @@ class Map_Style_Composer {
 			$warnings = $report['warnings'];
 		}
 
+		$for_storymap = absint( $for_storymap );
+		$grant_query  = $for_storymap ? '&for_storymap=' . $for_storymap : '';
+
 		return array(
 			'enabled'      => true,
 			'mapId'        => $map_id,
 			'hash'         => $hash,
-			'style'        => rest_url( sprintf( 'jeo/v1/map-style/%d/style?hash=%s', $map_id, rawurlencode( $hash ) ) ),
-			'manifest'     => rest_url( sprintf( 'jeo/v1/map-style/%d/manifest?hash=%s', $map_id, rawurlencode( $hash ) ) ),
+			'style'        => rest_url( sprintf( 'jeo/v1/map-style/%d/style?hash=%s%s', $map_id, rawurlencode( $hash ), $grant_query ) ),
+			'manifest'     => rest_url( sprintf( 'jeo/v1/map-style/%d/manifest?hash=%s%s', $map_id, rawurlencode( $hash ), $grant_query ) ),
 			'warnings'     => $warnings,
 			'stylePath'    => $paths['stylePath'],
 			'manifestPath' => $paths['manifestPath'],

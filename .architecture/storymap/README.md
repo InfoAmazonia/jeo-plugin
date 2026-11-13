@@ -51,13 +51,19 @@ Storymap blocks are restricted to 1 per post.
 
 ### Composed Mapbox Styles
 
-Storymap renders `mapbox`-type layers via the **Map Style Composer** when available
-(`fetchComposedStyleData(mapId)` → `loadComposedStyleData`). The composite style is set
-as the map's base `style`; per-slide layer visibility delegates to
-`setComposedLayerVisibility` via `getVisibilityLayerRefs()` (returns manifest layers).
-Interactions and the composition-failure warning mirror `JeoMap`. The storymap editor
-(`storymap-editor.js`) uses `useComposedMapPreviewStyle` + `applyComposedVisibilityFromSelection`
-per slide. See [`composed-styles/README.md`](../composed-styles/README.md).
+Storymap renders `mapbox`-type layers via the **Map Style Composer** when available.
+The server-rendered payload embeds `composedStyle` static URLs
+(`Jeo::story_map_dynamic_render_callback()` → `Map_Style_Composer::get_map_style_metadata()`);
+`storymap-display.js::fetchComposedStyleData()` fetches them directly
+(`loadComposedStyleDataFromUrls`), falling back to the REST metadata flow
+(`loadComposedStyleData`, with `for_storymap = postID`) when the payload carries
+no URLs. The composite style is set as the map's base `style`; per-slide layer
+visibility delegates to `setComposedLayerVisibility` via `getVisibilityLayerRefs()`
+(returns manifest layers). Interactions and the composition-failure warning mirror
+`JeoMap`. The storymap editor (`storymap-editor.js`) uses `useComposedMapPreviewStyle`
++ `applyComposedVisibilityFromSelection` per slide (passing the current post ID so
+storymap authors without map-edit caps keep the preview). See
+[`composed-styles/README.md`](../composed-styles/README.md).
 
 ```mermaid
 sequenceDiagram
@@ -88,6 +94,13 @@ is not yet public. Rendering rules:
 - Slides and layers render from the server-side payload regardless of the map's
   status (`get_post_meta` is not status-gated), so a published storymap built on a
   private map is fully visible to every visitor.
+- **Composed Mapbox styles** are delivered through **static upload URLs embedded
+  in the payload** (`composedStyle`), so anonymous visitors never touch the REST
+  API — this works even on sites that block anonymous REST. The REST endpoints
+  additionally accept `for_storymap={storymap_id}` (see
+  [`composed-styles/README.md`](../composed-styles/README.md#delivery)), granting
+  access to the map's composed style for anyone who can view a storymap that
+  uses the map.
 - The "Navigate the map" step is hidden while the source map is not published:
   `Jeo::story_map_dynamic_render_callback()` forces `navigateButton = false` in the
   payload, and the editor hides the checkbox with an explanatory note

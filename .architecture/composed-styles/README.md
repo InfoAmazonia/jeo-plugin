@@ -118,13 +118,47 @@ All under namespace `jeo/v1`. See also [`rest-api/README.md`](../rest-api/README
 
 | Route | Method | Permission | Description |
 |-------|--------|------------|-------------|
-| `/map-style/{id}` | GET | `can_read_map` (published OR `edit_post`) | Metadata (`enabled`, `style`/`manifest` URLs, `warnings`). Arg `refresh` forces regeneration. |
-| `/map-style/{id}/style` | GET | `can_read_map` | Serves `style.json`. With a valid `?hash=` matching an existing artifact: `Cache-Control: public, max-age=31536000, immutable` (content-addressed); otherwise current artifact with `max-age=300` |
-| `/map-style/{id}/manifest` | GET | `can_read_map` | Serves `manifest.json` with the same hash-aware caching as `/style` |
+| `/map-style/{id}` | GET | `can_read_map` (published OR `edit_post`; or `for_storymap` grant) | Metadata (`enabled`, `style`/`manifest` URLs, `warnings`). Args: `refresh` forces regeneration; `for_storymap` propagates to the generated URLs. |
+| `/map-style/{id}/style` | GET | `can_read_map` (or `for_storymap` grant) | Serves `style.json`. With a valid `?hash=` matching an existing artifact: `Cache-Control: public, max-age=31536000, immutable` (content-addressed); otherwise current artifact with `max-age=300` |
+| `/map-style/{id}/manifest` | GET | `can_read_map` (or `for_storymap` grant) | Serves `manifest.json` with the same hash-aware caching as `/style` |
 | `/map-style/compose` | POST | `can_create_virtual` | Compose from a JSON payload (scope/kind/postId/layers/center/zoom). `onetime`=public, `preview`=logged-in + `edit_posts` |
 | `/map-style/layer/{id}/refresh` | POST | `can_refresh_layer` (`map-layer` + `edit_post`) | Force-regenerate all maps referencing a layer. Returns `{mapIds[], refreshed, failed}` |
 | `/map-style/{scope:preview\|onetime}/{hash}/style` | GET | `can_read_virtual` | Virtual artifact `style.json` (`onetime`=open, `preview`=logged-in + `edit_posts`; `max-age=31536000, immutable`) |
 | `/map-style/{scope:preview\|onetime}/{hash}/manifest` | GET | `can_read_virtual` | Virtual artifact `manifest.json` (`max-age=31536000, immutable`) |
+
+> **`for_storymap` grant:** requests carrying `for_storymap={storymap_id}` may
+> read the composed style of a non-published map when the storymap exists, the
+> current visitor may view it (public status, or `read_post` for logged-in
+> users — note `read_post` maps to the primitive `read_storymap`, which
+> anonymous users never hold, so the status check comes first) and the
+> storymap's `jeo/storymap` block payload uses the requested map. The metadata
+> response propagates the parameter into the generated style/manifest URLs.
+
+## Delivery
+
+Frontend consumers load composed artifacts through two complementary paths:
+
+1. **Static upload URLs (storymap payload).** The storymap render callback
+   (`Jeo::story_map_dynamic_render_callback()`) calls
+   `Map_Style_Composer::get_map_style_metadata( $map_id )` and embeds
+   `composedStyle = { style, manifest }` with content-addressed static URLs
+   (`uploads/jeo-mapbox-composed-styles/{map_id}/{hash}/{style,manifest}.json`)
+   in the `data-properties` payload. `storymap-display.js` fetches those URLs
+   directly (`loadComposedStyleDataFromUrls`) — **no REST request at all**, so
+   anonymous visitors work even on sites that lock anonymous REST
+   (`rest_authentication_errors`), and logged-in viewers do not need edit
+   permissions on the map. Embedded whenever composition is available,
+   regardless of the map's status.
+2. **REST flow (fallback + editor).** Without embedded URLs, consumers call the
+   metadata endpoint and follow the returned URLs
+   (`loadComposedStyleData`), optionally with `for_storymap` to authorize
+   non-published maps. The editor preview (`useComposedMapPreviewStyle`)
+   passes the current post ID so storymap authors without map-edit caps keep
+   the composed preview.
+
+The same artifacts are served by both paths; the static path is the
+availability guarantee, the REST path adds composition-on-demand, forced
+refresh and warnings reporting.
 
 > **Preview nonce (3.1.1):** for `preview` scope with a logged-in user, the metadata
 > response appends `_wpnonce=wp_create_nonce('wp_rest')` to style/manifest URLs so

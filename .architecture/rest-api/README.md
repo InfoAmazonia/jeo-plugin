@@ -19,13 +19,21 @@ Registered by `Map_Style_Composer` (`class-map-style-composer.php`). See
 
 | Route | Method | Permission | Description |
 |-------|--------|------------|-------------|
-| `/jeo/v1/map-style/{id}` | GET | `can_read_map` | Composed style metadata (style/manifest URLs, warnings). Arg `refresh` forces regeneration |
-| `/jeo/v1/map-style/{id}/style` | GET | `can_read_map` | Serves `style.json` (composite Mapbox Style v8) |
-| `/jeo/v1/map-style/{id}/manifest` | GET | `can_read_map` | Serves `manifest.json` (layer ID → composite layer ID mapping) |
+| `/jeo/v1/map-style/{id}` | GET | `can_read_map` (or `for_storymap` grant) | Composed style metadata (style/manifest URLs, warnings). Args: `refresh` forces regeneration; `for_storymap={storymap_id}` authorizes non-published maps for viewers of a storymap that uses the map (URLs propagate the parameter) |
+| `/jeo/v1/map-style/{id}/style` | GET | `can_read_map` (or `for_storymap` grant) | Serves `style.json` (composite Mapbox Style v8) |
+| `/jeo/v1/map-style/{id}/manifest` | GET | `can_read_map` (or `for_storymap` grant) | Serves `manifest.json` (layer ID → composite layer ID mapping) |
 | `/jeo/v1/map-style/compose` | POST | `can_create_virtual` | Compose from payload (scope/kind/postId/layers). `onetime`=public, `preview`=`edit_posts` |
 | `/jeo/v1/map-style/layer/{id}/refresh` | POST | `can_refresh_layer` | Force-regenerate all maps referencing a layer |
 | `/jeo/v1/map-style/{scope}/{hash}/style` | GET | `can_read_virtual` | Virtual (preview/onetime) style artifact |
 | `/jeo/v1/map-style/{scope}/{hash}/manifest` | GET | `can_read_virtual` | Virtual (preview/onetime) manifest artifact |
+
+**`for_storymap` grant:** a request carrying `for_storymap={storymap_id}` reads the
+composed style of a non-published map when the storymap post exists, the current
+visitor may view it (public status for anyone; otherwise `read_post`) and the
+storymap's `jeo/storymap` block payload references the requested map as its
+source. The storymap page itself also embeds content-addressed **static URLs**
+(see [`composed-styles/README.md`](../composed-styles/README.md#delivery)) so
+anonymous visitors never depend on the REST API.
 
 ### AI (12+ routes)
 

@@ -39,7 +39,7 @@ msgstr "Mapbox foi selecionado como biblioteca de renderização, mas nenhuma ch
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Mapbox foi selecionado como biblioteca de renderização, mas o SDK externo do Mapbox não pôde ser carregado. Voltando para MapLibre."
 
-#: includes/class-jeo.php:1531
+#: includes/class-jeo.php:1539
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr "Ler mais"
@@ -4542,11 +4542,11 @@ msgstr "Pré-visualização interativa de mapa para o editor do tipo de post Map
 msgid "Unable to retrieve the address for the selected point."
 msgstr "Não foi possível obter o endereço para o ponto selecionado."
 
-#: includes/class-jeo.php:1772
+#: includes/class-jeo.php:1780
 msgid "This JEO embed is not available."
 msgstr "Este embed JEO não está disponível."
 
-#: includes/class-jeo.php:1773
+#: includes/class-jeo.php:1781
 msgid "Embed not available"
 msgstr "Embed indisponível"
 
@@ -4771,61 +4771,61 @@ msgstr "Fonte:"
 msgid "Type an address, then click Search or press Enter. You can also drag the marker across the map."
 msgstr "Digite um endereço, depois clique em Buscar ou pressione Enter. Você também pode arrastar o marcador pelo mapa."
 
-#: includes/maps/class-map-style-composer.php:631
-#: includes/maps/class-map-style-composer.php:700
+#: includes/maps/class-map-style-composer.php:746
+#: includes/maps/class-map-style-composer.php:815
 msgid "Mapbox composed styles are disabled."
 msgstr "Os estilos compostos do Mapbox estão desativados."
 
-#: includes/maps/class-map-style-composer.php:656
-#: includes/maps/class-map-style-composer.php:724
+#: includes/maps/class-map-style-composer.php:771
+#: includes/maps/class-map-style-composer.php:839
 msgid "Could not create the Mapbox composed style cache directory."
 msgstr "Não foi possível criar o diretório de cache dos estilos compostos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:827
+#: includes/maps/class-map-style-composer.php:948
 msgid "Map not found."
 msgstr "Mapa não encontrado."
 
-#: includes/maps/class-map-style-composer.php:837
+#: includes/maps/class-map-style-composer.php:958
 msgid "A Mapbox access token is required to compose Mapbox styles."
 msgstr "Um token de acesso do Mapbox é necessário para compor estilos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:877
+#: includes/maps/class-map-style-composer.php:998
 msgid "Public payload composition is only available for one-time maps."
 msgstr "A composição com dados públicos está disponível apenas para mapas de uso único."
 
-#: includes/maps/class-map-style-composer.php:883
+#: includes/maps/class-map-style-composer.php:1004
 msgid "The map preview payload is too large."
 msgstr "Os dados da prévia do mapa são grandes demais."
 
-#: includes/maps/class-map-style-composer.php:895
+#: includes/maps/class-map-style-composer.php:1016
 msgid "The map preview has too many layers to compose."
 msgstr "A prévia do mapa tem camadas demais para compor."
 
-#: includes/maps/class-map-style-composer.php:902
+#: includes/maps/class-map-style-composer.php:1023
 msgid "The map preview does not include any renderable layers."
 msgstr "A prévia do mapa não inclui nenhuma camada renderizável."
 
-#: includes/maps/class-map-style-composer.php:924
+#: includes/maps/class-map-style-composer.php:1045
 msgid "Map preview"
 msgstr "Prévia do mapa"
 
-#: includes/maps/class-map-style-composer.php:1300
+#: includes/maps/class-map-style-composer.php:1421
 msgid "Invalid composed style hash."
 msgstr "Hash do estilo composto inválido."
 
-#: includes/maps/class-map-style-composer.php:1456
+#: includes/maps/class-map-style-composer.php:1577
 msgid "One or more Mapbox styles could not be fetched."
 msgstr "Não foi possível obter um ou mais estilos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1970
+#: includes/maps/class-map-style-composer.php:2091
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr "A extensão PHP GD é necessária para mesclar sprites do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:2095
+#: includes/maps/class-map-style-composer.php:2216
 msgid "Could not decode a Mapbox sprite image."
 msgstr "Não foi possível decodificar uma imagem de sprite do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:3111
+#: includes/maps/class-map-style-composer.php:3232
 msgid "Composed style artifact was not found."
 msgstr "O artefato do estilo composto não foi encontrado."
 
@@ -4979,12 +4979,12 @@ msgstr "Seu navegador não conseguiu determinar sua localização. Isso pode oco
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr "%d camada(s) adicionada(s) manualmente preservada(s) durante o refinamento da IA."
 
-#: includes/class-jeo.php:2123
+#: includes/class-jeo.php:2131
 msgid "A Mapbox style ID and access token are required."
 msgstr "Um ID de estilo do Mapbox e um token de acesso são obrigatórios."
 
-#: includes/class-jeo.php:2134
-#: includes/class-jeo.php:2172
+#: includes/class-jeo.php:2142
+#: includes/class-jeo.php:2180
 msgid "Unexpected Mapbox style payload."
 msgstr "Resposta de estilo do Mapbox inesperada."
 
@@ -5279,12 +5279,12 @@ msgstr "Estilo da camada"
 msgid "How the GeoJSON features are drawn."
 msgstr "Como as feições do GeoJSON são desenhadas."
 
-#: includes/class-jeo.php:2230
+#: includes/class-jeo.php:2238
 msgid "A valid http(s) style URL is required."
 msgstr "Uma URL de estilo http(s) válida é obrigatória."
 
-#: includes/class-jeo.php:2245
-#: includes/class-jeo.php:2278
+#: includes/class-jeo.php:2253
+#: includes/class-jeo.php:2286
 msgid "Unexpected style JSON payload."
 msgstr "Conteúdo inesperado no style JSON."
 
@@ -5377,23 +5377,23 @@ msgid "Describe the map you want… (Shift+Enter for a line break)"
 msgstr "Descreva o mapa que você quer… (Shift+Enter para nova linha)"
 
 #. translators: %d: number of converted style values.
-#: includes/maps/class-map-style-composer.php:1387
+#: includes/maps/class-map-style-composer.php:1508
 #, php-format
 msgid "Converted %d legacy Mapbox stop-function value(s) to style-spec expressions for MapLibre compatibility."
 msgstr "Convertidos %d valor(es) de função de stops legada do Mapbox em expressões style-spec para compatibilidade com o MapLibre."
 
 #. translators: %d: number of converted style values.
-#: includes/maps/class-map-style-composer.php:1408
+#: includes/maps/class-map-style-composer.php:1529
 #, php-format
 msgid "Converted %d legacy Mapbox token string(s) to style-spec expressions for MapLibre compatibility."
 msgstr "Convertidas %d string(s) de token legada(s) do Mapbox em expressões style-spec para compatibilidade com o MapLibre."
 
-#: includes/maps/class-map-style-composer.php:3137
+#: includes/maps/class-map-style-composer.php:3258
 msgid "Could not encode the composed style artifact as JSON."
 msgstr "Não foi possível codificar o artefato do estilo composto como JSON."
 
 #. translators: %s: artifact file name.
-#: includes/maps/class-map-style-composer.php:3148
+#: includes/maps/class-map-style-composer.php:3269
 #, php-format
 msgid "Could not write the composed style artifact %s. Check that the uploads directory is writable."
 msgstr "Não foi possível gravar o artefato do estilo composto %s. Verifique se o diretório de uploads permite escrita."

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import scrollama from 'scrollama';
 
 import { createMap, MAP_RUNTIME } from '../lib/mapgl-loader';
-import { loadComposedStyleData } from '../shared/composed-style-data';
+import { loadComposedStyleData, loadComposedStyleDataFromUrls } from '../shared/composed-style-data';
 import {
 	addComposedInteractions,
 	hasComposedStyle,
@@ -279,6 +279,36 @@ class StoryMapDisplay extends Component {
 	}
 
 	async fetchComposedStyleData( mapId ) {
+		const embeddedStyle = this.props.composedStyle;
+
+		if ( embeddedStyle?.style && embeddedStyle?.manifest ) {
+			// The server-rendered payload carries content-addressed static
+			// URLs. They are served straight from the uploads directory, so
+			// anonymous visitors never depend on the REST API.
+			try {
+				const { manifest, metadata } = await loadComposedStyleDataFromUrls( {
+					manifestUrl: embeddedStyle.manifest,
+					styleUrl: embeddedStyle.style,
+					emptyManifestMessage: __(
+						'Mapbox style composition did not return renderable layers for this storymap.',
+						'jeowp'
+					),
+				} );
+
+				this.composedStyleMetadata = metadata;
+				this.composedManifest = manifest;
+				this.usingComposedStyle = true;
+				this.composedStyleError = null;
+			} catch ( error ) {
+				this.composedStyleMetadata = null;
+				this.composedManifest = null;
+				this.usingComposedStyle = false;
+				this.composedStyleError = error?.message || __( 'Unable to load composed Mapbox style for this storymap.', 'jeowp' );
+				console.warn( 'Unable to load composed Mapbox style for storymap. Mapbox style layers will be omitted.', error );
+			}
+			return;
+		}
+
 		if (
 			! mapId ||
 			! window.jeoMapVars?.composedStyleUrlBase
@@ -289,6 +319,7 @@ class StoryMapDisplay extends Component {
 		try {
 			const { manifest, metadata } = await loadComposedStyleData( {
 				mapId,
+				forStorymap: this.props.postID || 0,
 				unavailableMessage: __(
 					'Mapbox style composition is unavailable for this storymap.',
 					'jeowp'

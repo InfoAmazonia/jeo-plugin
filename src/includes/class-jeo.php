@@ -1143,7 +1143,7 @@ class Jeo {
 	 * @param string $content Block save output.
 	 * @return string Extracted JSON string.
 	 */
-	private function extract_json_from_block_content( $content ) {
+	public function extract_json_from_block_content( $content ) {
 		$content = trim( $content );
 
 		// If it's already valid JSON, return as-is (legacy format).
@@ -1323,6 +1323,14 @@ class Jeo {
 		if ( $map_id && 'publish' !== get_post_status( $map_id ) ) {
 			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Frontend payload keeps its camelCase contract.
 			$saved_data->navigateButton = false;
+		}
+
+		if ( $map_id ) {
+			$composed_style = \jeo_map_style_composer()->get_map_style_metadata( $map_id );
+			if ( is_array( $composed_style ) ) {
+				// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Frontend payload keeps its camelCase contract.
+				$saved_data->composedStyle = $composed_style;
+			}
 		}
 
 		if ( ! isset( $saved_data->slides ) || ! is_array( $saved_data->slides ) ) {

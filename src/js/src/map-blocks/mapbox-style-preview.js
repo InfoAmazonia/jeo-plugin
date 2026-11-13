@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 import {
 	mapboxToken,
@@ -321,14 +322,23 @@ export function useComposedMapPreviewStyle( {
 	mapId,
 	refreshKey = '',
 } ) {
+	// The current post ID grants composed style access through the story map
+	// that uses the map (`for_storymap`), keeping the editor preview working
+	// for users who may edit the story map but not the source map itself.
+	const currentPostId = useSelect(
+		( select ) => select( 'core/editor' ).getCurrentPostId?.() || 0,
+		[]
+	);
+
 	return useComposedPreviewStyle( {
-		dependencies: [ enabled, forceRefresh, mapId, refreshKey ],
+		dependencies: [ enabled, forceRefresh, mapId, refreshKey, currentPostId ],
 		enabled:
 			enabled &&
 			Boolean( mapId ) &&
 			Boolean( window.jeoMapVars?.composedStyleUrlBase ),
 		loadPreview: ( { signal } ) => loadComposedStyleData( {
 			forceRefresh,
+			forStorymap: currentPostId,
 			includeStyle: true,
 			mapId,
 			signal,
