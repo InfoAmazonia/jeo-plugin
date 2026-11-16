@@ -1,6 +1,6 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import EmbeddedStorymapEditor from './embedded-story-map-editor';
 import LayerEditorPreview from './layer-editor-preview';
 import MapDisplay, { MapSave } from './map-display';
@@ -14,15 +14,28 @@ import OnetimeMapEditor from './onetime-map-editor';
 import StoriesNearYouEditor from './stories-near-you-editor';
 import StorymapEditor from './storymap-editor';
 import MapIcon from '../icons/ion/map';
+import LayersIcon from '../icons/ion/layers';
+import {
+	AiMapIcon,
+	EmbeddedStoryMapIcon,
+	StoryMapIcon,
+} from '../icons/block-icons';
 import { cloneDeep } from 'lodash';
 import { AsyncModeProvider } from '@wordpress/data';
 
+// C2-06: inserter disambiguation kit — each of the 5 map/story blocks gets
+// an intent-first description, distinct search keywords and a distinct icon.
 registerBlockType( 'jeo/map', {
 	apiVersion: 3,
 	title: __( 'JEO Map', 'jeowp' ),
-	description: __( 'Display maps with layers and data', 'jeowp' ),
+	description: __( 'Reuse a saved map in this post.', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
+	keywords: [
+		_x( 'map', 'block keyword', 'jeowp' ),
+		_x( 'layers', 'block keyword', 'jeowp' ),
+		_x( 'saved map', 'block keyword', 'jeowp' ),
+	],
 	supports: {
 		align: true,
 	},
@@ -50,9 +63,17 @@ registerBlockType( 'jeo/map', {
 registerBlockType( 'jeo/onetime-map', {
 	apiVersion: 3,
 	title: __( 'JEO One-time Map', 'jeowp' ),
-	description: __( 'Display maps with layers and data', 'jeowp' ),
+	description: __(
+		'Build a one-off map in this post, choosing layers without saving a reusable map.',
+		'jeowp'
+	),
 	category: 'jeo',
-	icon: MapIcon,
+	icon: LayersIcon,
+	keywords: [
+		_x( 'one-off', 'block keyword', 'jeowp' ),
+		_x( 'custom', 'block keyword', 'jeowp' ),
+		_x( 'temporary', 'block keyword', 'jeowp' ),
+	],
 	supports: {
 		align: true,
 	},
@@ -73,9 +94,17 @@ registerBlockType( 'jeo/onetime-map', {
 
 registerBlockType( 'jeo/ai-minimap', {
 	title: __( 'AI-Assisted Map', 'jeowp' ),
-	description: __( 'Display an AI-generated contextual map with layers and geolocation pins', 'jeowp' ),
+	description: __(
+		"Let AI build a map from this article's content, then refine it by chat.",
+		'jeowp'
+	),
 	category: 'jeo',
-	icon: MapIcon,
+	icon: AiMapIcon,
+	keywords: [
+		_x( 'ai', 'block keyword', 'jeowp' ),
+		_x( 'automatic map', 'block keyword', 'jeowp' ),
+		_x( 'assistant', 'block keyword', 'jeowp' ),
+	],
 	supports: {
 		align: true,
 	},
@@ -143,6 +172,10 @@ registerBlockType( 'jeo/ai-minimap', {
 			default: 'idle',
 		},
 		message: {
+			type: 'string',
+			default: '',
+		},
+		framing_note: {
 			type: 'string',
 			default: '',
 		},
@@ -274,9 +307,17 @@ registerBlockType( 'jeo/storymap', {
 	apiVersion: 3,
 	// translators: Story Map is the name of JEO's storytelling map feature.
 	title: __( 'Story Map', 'jeowp' ),
-	description: __( 'Display maps with storytelling', 'jeowp' ),
+	description: __(
+		'Create a storytelling sequence over a map, slide by slide.',
+		'jeowp'
+	),
 	category: 'jeo',
-	icon: MapIcon,
+	icon: StoryMapIcon,
+	keywords: [
+		_x( 'story', 'block keyword', 'jeowp' ),
+		_x( 'slides', 'block keyword', 'jeowp' ),
+		_x( 'narrative', 'block keyword', 'jeowp' ),
+	],
 	attributes: {
 		map_id: {
 			type: 'number',
@@ -345,9 +386,14 @@ registerBlockType( 'jeo/storymap', {
 registerBlockType( 'jeo/embedded-storymap', {
 	apiVersion: 3,
 	title: __( 'Embedded Story Map', 'jeowp' ),
-	description: __( 'Display maps with storytelling', 'jeowp' ),
+	description: __( 'Embed a saved story map in this post.', 'jeowp' ),
 	category: 'jeo',
-	icon: MapIcon,
+	icon: EmbeddedStoryMapIcon,
+	keywords: [
+		_x( 'embed', 'block keyword', 'jeowp' ),
+		_x( 'story map', 'block keyword', 'jeowp' ),
+		_x( 'saved story', 'block keyword', 'jeowp' ),
+	],
 	attributes: {
 		storyID: {
 			type: 'number',

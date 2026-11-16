@@ -17,6 +17,7 @@ export default function MapPanel( {
 	renderPanel: Panel,
 	setPanLimitsFromMap,
 	isMapBlock = false,
+	normalizationNotes = [],
 } ) {
 	useEffect( () => {
 		const isNewMap = [
@@ -69,6 +70,7 @@ export default function MapPanel( {
 				setAttributes={ setAttributes }
 				setPanLimitsFromMap={ handleSetPanLimitsFromMap }
 				isMapBlock={ isMapBlock }
+				normalizationNotes={ normalizationNotes }
 			/>
 		</Panel>
 	);

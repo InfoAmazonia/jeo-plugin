@@ -12,7 +12,11 @@ import { __ } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
-import PreviewErrorState from './preview-error';
+import PreviewErrorState, { PreviewErrorBoundary } from './preview-error';
+import {
+	getTileLayerPreflightUrls,
+	useTileLayerPreflight,
+} from './tile-preflight';
 import { useRecordsByIds } from '../shared/rest-records';
 import {
 	applyComposedVisibilityFromSettings,
@@ -161,6 +165,25 @@ export default function MapEditorPreview() {
 	const useComposedPreview = Boolean(
 		hasMapboxLayers && composedPreview.style
 	);
+	// R3-G1: tile-based direct layers (tilelayer/MVT) cannot rely on GL
+	// error events alone (MapLibre swallows 404 tiles and errored tiles
+	// still emit `sourcedata` content events). Preflight the concrete tile
+	// URLs so a dead source becomes the error state, never a courtesy map.
+	const tilePreflightUrls = useMemo(
+		() =>
+			useComposedPreview
+				? []
+				: loadedLayers.flatMap( ( record ) =>
+						getTileLayerPreflightUrls( record?.meta || {} )
+				  ),
+		[ loadedLayers, useComposedPreview ]
+	);
+	const tilePreflight = useTileLayerPreflight( tilePreflightUrls, retryCount );
+	useEffect( () => {
+		if ( tilePreflight.error ) {
+			setPreviewError( tilePreflight.error );
+		}
+	}, [ tilePreflight.error ] );
 	const isPreparingLayerPreview = Boolean(
 		layerIds.length > 0 && ( loadingLayers || ! hasResolvedLayers )
 	);
@@ -173,7 +196,8 @@ export default function MapEditorPreview() {
 	const shouldRenderMap =
 		! isPreparingLayerPreview &&
 		! isPreparingComposedPreview &&
-		! previewError;
+		! previewError &&
+		! tilePreflight.checking;
 	const transformRequest = useEditorMapboxTransformRequest( loadedLayers );
 
 	const applyComposedVisibility = useCallback( () => {
@@ -270,6 +294,9 @@ export default function MapEditorPreview() {
 				) }
 				{ ! previewError && ! shouldRenderMap && <Spinner /> }
 				{ shouldRenderMap && (
+					<PreviewErrorBoundary
+						onCatch={ ( error ) => setPreviewError( error ) }
+					>
 					<Map
 						key={ `${ zoomState }:${ layerSettingsKey }:${
 							composedPreview.metadata?.hash || 'default'
@@ -343,6 +370,7 @@ export default function MapEditorPreview() {
 								}
 							} ) }
 					</Map>
+					</PreviewErrorBoundary>
 				) }
 			</div>
 		</div>

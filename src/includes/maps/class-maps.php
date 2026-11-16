@@ -42,6 +42,13 @@ class Maps {
 		add_action( 'add_meta_boxes', array( $this, 'remove_custom_fields_meta_box' ), 99 );
 		add_filter( 'manage_' . $this->post_type . '_posts_columns', array( $this, 'add_admin_list_columns' ) );
 		add_action( 'manage_' . $this->post_type . '_posts_custom_column', array( $this, 'render_admin_list_columns' ), 10, 2 );
+
+		// Visible input normalization (W4 4.1): invalid geographic values are
+		// fixed on save and the adjustment is reported back to the editor.
+		add_filter( 'rest_pre_insert_' . $this->post_type, array( $this, 'normalize_geo_meta' ), 20, 2 );
+		add_action( 'rest_after_insert_' . $this->post_type, array( $this, 'persist_normalization_notes' ), 10, 3 );
+		add_filter( 'rest_prepare_' . $this->post_type, array( $this, 'expose_normalization_notes' ), 20, 3 );
+
 		$this->register_rest_meta_validation();
 	}
 
@@ -170,6 +177,191 @@ class Maps {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Pending normalization notes for the request being processed.
+	 *
+	 * @var array|null
+	 */
+	private $pending_normalization_notes = null;
+
+	/**
+	 * Geo meta fields covered by the visible normalization (W4 4.1).
+	 *
+	 * @var string[]
+	 */
+	const NORMALIZED_GEO_FIELDS = array( 'center_lat', 'center_lon', 'min_zoom', 'max_zoom' );
+
+	/**
+	 * Normalize invalid geographic meta before a REST insert/update (W4 4.1).
+	 *
+	 * Values are adjusted in place on the request (so the stored value is the
+	 * normalized one) and each adjustment is recorded as a note for the
+	 * editor. Rules (audit K-10): longitude clamped to [-180, 180], latitude
+	 * to [-90, 90] — clamping, not wrapping, because an out-of-range entry is
+	 * a typo, and the audited contract is a VISIBLE correction ("adjusted
+	 * from 250.84 to the maximum of 180"), not a silent move to the other
+	 * side of the globe. Negative zero is canonicalized to 0 (no note — the
+	 * value is mathematically identical). Internal precision is otherwise
+	 * untouched: nothing is rounded.
+	 *
+	 * @param array|\WP_Post   $prepared_post Prepared post object or array.
+	 * @param \WP_REST_Request $request       REST request.
+	 * @return array|\WP_Post
+	 */
+	public function normalize_geo_meta( $prepared_post, $request ) {
+		$meta = $request->get_param( 'meta' );
+		if ( ! is_array( $meta ) ) {
+			return $prepared_post;
+		}
+
+		$notes          = array();
+		$present_fields = array();
+
+		foreach ( self::NORMALIZED_GEO_FIELDS as $field ) {
+			if ( ! array_key_exists( $field, $meta ) || ! is_numeric( $meta[ $field ] ) ) {
+				continue;
+			}
+
+			$present_fields[] = $field;
+			$raw              = $meta[ $field ];
+			$value            = (float) $raw;
+
+			// Canonicalize negative zero ("-0", e.g. from tiny negative floats).
+			if ( 0.0 === $value && 0 === strpos( (string) $raw, '-' ) ) {
+				$value = 0.0;
+			}
+
+			switch ( $field ) {
+				case 'center_lon':
+					$limit = 180.0;
+					break;
+				case 'center_lat':
+					$limit = 90.0;
+					break;
+				default:
+					$limit = null;
+			}
+
+			if ( null !== $limit ) {
+				if ( $value > $limit ) {
+					// translators: 1: submitted value, 2: adjusted value (the maximum allowed).
+					$max_message = sprintf( __( 'Adjusted from %1$s to the maximum of %2$s', 'jeowp' ), (string) $raw, (string) $limit );
+					$notes[]     = array(
+						'field'   => $field,
+						'from'    => $value,
+						'to'      => $limit,
+						'message' => $max_message,
+					);
+					$value       = $limit;
+				} elseif ( $value < -$limit ) {
+					// translators: 1: submitted value, 2: adjusted value (the minimum allowed).
+					$min_message = sprintf( __( 'Adjusted from %1$s to the minimum of %2$s', 'jeowp' ), (string) $raw, (string) -$limit );
+					$notes[]     = array(
+						'field'   => $field,
+						'from'    => $value,
+						'to'      => -$limit,
+						'message' => $min_message,
+					);
+					$value       = -$limit;
+				}
+			} elseif ( $value < 0 ) {
+				// Zooms cannot be negative.
+				// translators: 1: submitted value, 2: adjusted value.
+				$zoom_message = sprintf( __( 'Adjusted from %1$s to %2$s (zoom levels cannot be negative)', 'jeowp' ), (string) $raw, '0' );
+				$notes[]      = array(
+					'field'   => $field,
+					'from'    => $value,
+					'to'      => 0,
+					'message' => $zoom_message,
+				);
+				$value        = 0.0;
+			}
+
+			$original = (float) $raw;
+			if ( (string) $value !== (string) $original ) {
+				$meta[ $field ] = $value;
+			}
+		}
+
+		if ( $present_fields ) {
+			$request->set_param( 'meta', $meta );
+			$this->pending_normalization_notes = array(
+				'fields' => $present_fields,
+				'notes'  => $notes,
+			);
+		}
+
+		return $prepared_post;
+	}
+
+	/**
+	 * Persist the visible normalization notes after a REST insert/update.
+	 *
+	 * Notes are stored per-field on the last save that included the field, so
+	 * a later valid save clears the note for that field (no stale warnings).
+	 *
+	 * @param \WP_Post         $post     Inserted or updated post.
+	 * @param \WP_REST_Request $request  REST request.
+	 * @param bool             $creating True when creating.
+	 * @return void
+	 */
+	public function persist_normalization_notes( $post, $request, $creating ) {
+		unset( $request, $creating );
+
+		if ( null === $this->pending_normalization_notes ) {
+			return;
+		}
+
+		$meta_key = '_jeo_map_normalization_notes';
+		$existing = get_post_meta( $post->ID, $meta_key, true );
+		$existing = is_array( $existing ) ? $existing : array();
+
+		// Replace notes for the fields present in this save; keep the others.
+		$present = array_flip( $this->pending_normalization_notes['fields'] );
+		$merged  = array();
+		foreach ( $existing as $note ) {
+			if ( ! isset( $present[ $note['field'] ] ) ) {
+				$merged[] = $note;
+			}
+		}
+
+		foreach ( $this->pending_normalization_notes['notes'] as $note ) {
+			$merged[] = $note;
+		}
+
+		if ( ! empty( $merged ) ) {
+			update_post_meta( $post->ID, $meta_key, $merged );
+		} else {
+			delete_post_meta( $post->ID, $meta_key );
+		}
+
+		$this->pending_normalization_notes = null;
+	}
+
+	/**
+	 * Expose the persisted normalization notes on the map REST response.
+	 *
+	 * Contract with the frontend (W4 4.1): `normalization_notes` is present
+	 * only when a visible adjustment was made — render each note inline next
+	 * to the field (`field`), using `message` (already localized server-side)
+	 * or the raw `from`/`to` values.
+	 *
+	 * @param \WP_REST_Response $response REST response.
+	 * @param \WP_Post          $post     Current post.
+	 * @param \WP_REST_Request  $request  REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function expose_normalization_notes( $response, $post, $request ) {
+		unset( $request );
+
+		$notes = get_post_meta( $post->ID, '_jeo_map_normalization_notes', true );
+		if ( is_array( $notes ) && ! empty( $notes ) ) {
+			$response->data['normalization_notes'] = array_values( $notes );
+		}
+
+		return $response;
 	}
 
 	/**

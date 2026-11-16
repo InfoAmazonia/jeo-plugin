@@ -129,6 +129,7 @@ class Minilayer_Service {
 		);
 
 		update_post_meta( $post_id, 'type', $layer_type );
+		update_post_meta( $post_id, 'provenance', 'ai' );
 		update_post_meta( $post_id, 'layer_type_options', $layer_type_options );
 
 		$default_style = array();
@@ -207,6 +208,7 @@ class Minilayer_Service {
 		}
 
 		update_post_meta( $post_id, 'type', 'mapbox' );
+		update_post_meta( $post_id, 'provenance', 'ai' );
 		update_post_meta(
 			$post_id,
 			'layer_type_options',

@@ -27,7 +27,13 @@
 
 ## Registered Blocks
 
-Registered in `class-jeo.php` on `init` hook:
+Registered in `class-jeo.php` on `init` hook. Since W2 (C2-06) the 5
+user-facing map/story blocks carry an **inserter disambiguation kit**:
+intent-first descriptions ("reuse a saved map" / "build a one-off map in this
+post" / "let AI build it from the article" / "create a storytelling sequence" /
+"embed a saved story map"), distinct search keywords and distinct icons
+(`icons/block-icons.js` + the existing map/layers icons) — they used to share
+one generic description and one icon.
 
 | Block | Render | Description |
 |-------|--------|-------------|
@@ -91,7 +97,10 @@ error is classified client-side from the HTTP status. Publish locking never depe
 render success — it derives from `validateLayerFormData`/`validateMapFormData`
 (`layers-sidebar/form-validation.js`) and is applied by `FormGuard`
 (`shared/form-guard.js`), mounted from the sidebar plugins so it also works when the
-preview block is not mounted. Drafts of render-broken layers stay savable.
+preview block is not mounted. Drafts of render-broken layers stay savable. The
+`EmptyCanvasGuide`'s "Save draft" assigns the default `tilelayer` type when a
+`map-layer` draft has none — the server rejects a layer draft without a registered
+type (r3b — R3-G3).
 
 Source-attributed error fatality (Gate 2 — RISK-01): the "loaded" guards
 (`loadedRef`/`mapLoadedRef`) only count the layer's **own** GL source — the base
@@ -103,6 +112,29 @@ symptom). Errors attributed to a JEO layer source (`source_{instance.id}`, see
 Style-type layers keep the previous semantics — for them the base style IS the
 layer. In the map editor the zoom controls (Initial/Min/Max) are hidden while the
 error state replaces the preview.
+
+Tile failure preflight (Gate r3b — R3-G1): GL error semantics cannot be trusted
+for tile failures (MapLibre swallows 404 tile errors; errored tiles still emit
+`sourcedata` content events), so tile-based direct layers (`tilelayer`, `mvt`)
+get their concrete z0 tile URL prefetched (`map-blocks/tile-preflight.js`) before
+the preview map renders, on all three surfaces. A failed preflight maps to the
+single error state (network → "server unreachable", HTTP status → status-based
+message); `mapbox://` tilesets skip the preflight (token/API path, covered by
+source-level GL errors). Error lifecycle on commits (r3b-final, R3B-G1): commits
+are compared by CONTENT (`getPreviewAttemptKey`), never by reference, and a real
+change while a `kind:'source'` error shows triggers `resolveAttemptTransition` →
+auto-retry (the preflight re-runs and the error comes back honestly if the
+source is still bad — never a courtesy map). Complementing it, the layers
+sidebar sanitizes mount-injected schema defaults on the commit boundary
+(`layers-sidebar/commit-sanitize.js`): non-required keys absent from the server
+meta at mount carrying exactly the schema default (e.g. `scheme:'xyz'`) are
+stripped from meta commits while untouched — the post is no longer dirtied by
+the SchemaForm normalization. Additionally, `map-preview-layer.js` never mounts
+a GL
+`<Source>`/`<Layer>` with an incomplete spec (missing url/type/source_layer/
+style_source_type — GAP-A/R3-G5), and each preview map is wrapped in
+`PreviewErrorBoundary` (`preview-error.js`) so a synchronous render crash surfaces
+as the single error pattern instead of the sticky core block boundary.
 
 The same Contract A payload is also honored on the **save surface** (Gate 2 —
 BUG-01): `shared/save-error-notice.js` watches `core.getLastEntitySaveError` after

@@ -224,7 +224,17 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 													/>
 													<span style={ { fontSize: '14px', fontWeight: '600', color: '#1e1e1e' } }>
 														{ loc._geocode_full_address }
-														{ loc._is_enriched && <span title={ __( 'Enriched via Geocoder', 'jeowp' ) } style={ { marginLeft: '4px', fontSize: '12px' } }>✅</span> }
+														{ /* W4 §2.3: textual badge with an accessible
+														     name — never a bare emoji. */ }
+														{ loc._is_enriched && (
+															<span
+																className="jeo-enriched-badge"
+																title={ __( 'Enriched via Geocoder', 'jeowp' ) }
+																style={ { marginLeft: '4px', fontSize: '12px', color: '#50575e', border: '1px solid #c3c4c7', borderRadius: '3px', padding: '0 4px' } }
+															>
+																{ __( 'Enriched', 'jeowp' ) }
+															</span>
+														) }
 														{ isPrimary && <span title={ __( 'AI flagged this as primary location', 'jeowp' ) } style={ { marginLeft: '4px', fontSize: '11px', background: '#e0f0fa', color: '#005a9e', padding: '1px 6px', borderRadius: '10px', fontWeight: '600' } }>★ { __( 'Primary', 'jeowp' ) }</span> }
 													</span>
 												</div>

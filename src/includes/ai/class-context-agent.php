@@ -78,7 +78,7 @@ Every article used to build the paragraph must also appear in the `references` a
 
 ### 4. Language
 
-Respond in the same language as the article being edited.
+Follow the site's unified AI language policy: when a language is configured in JEO AI Settings, write every user-visible output in that language; when set to "Automatic", respond in the same language as the article being edited.
 
 ### 5. Recency Tie-Breaking
 
@@ -188,6 +188,11 @@ RULES;
 			$prompt .= "\n\n## Additional Context\n" . $initial_context;
 		}
 
+		// Unified output language policy (W3 3.4): append the RESOLVED
+		// language section so the abstract policy rules become actionable
+		// (same injection as the minimap agent).
+		$prompt .= "\n\n" . \Jeo::get_ai_language_prompt_section();
+
 		return $prompt;
 	}
 
@@ -244,7 +249,7 @@ You MUST respond with a valid Context_Generation_Output JSON object:
 - Ensure factual consistency with the post content and retrieved references.
 - When citing references, prefer linking to existing site articles over external sources. Only use external links when no relevant internal article is available.
 - When no relevant articles are found in the knowledge base, still suggest paragraphs based on the post content and user's instructions, and set `references` to an empty array.
-- Always write in the same language as the article.
+- Language: follow the site's unified AI language policy — a configured language wins over the article language; "Automatic" matches the article.
 
 ## Off-Topic Handling
 

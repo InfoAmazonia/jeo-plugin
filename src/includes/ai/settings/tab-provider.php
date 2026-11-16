@@ -70,7 +70,7 @@
 				</td>
 			</tr>
 			<tr class="jeo-ai-provider-settings" data-provider="<?php echo esc_attr( $slug ); ?>" style="display: <?php echo \jeo_settings()->get_option( 'ai_default_provider' ) === $slug ? 'table-row' : 'none'; ?>;">
-				<th scope="row"><label for="<?php echo esc_attr( $slug ); ?>_model"><?php esc_html_e( 'Model', 'jeowp' ); ?></label></th>
+				<th scope="row"><label for="<?php echo esc_attr( $slug ); ?>_model_readonly"><?php esc_html_e( 'Model', 'jeowp' ); ?></label></th>
 				<td>
 					<div style="display: flex; gap: 10px; align-items: center;" class="jeo-ai-model-container">
 						<input type="text" id="<?php echo esc_attr( $slug ); ?>_model_readonly" value="<?php echo esc_html( \jeo_settings()->get_option( $slug . '_model' ) ); ?>" class="regular-text" readonly>
@@ -87,20 +87,26 @@
 			<th scope="row"><label for="ai_use_custom_prompt"><?php esc_html_e( 'System Prompt Configuration', 'jeowp' ); ?></label></th>
 			<td>
 				<div style="margin-bottom: 10px;">
-					<input type="checkbox" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_use_custom_prompt' ) ); ?>" id="ai_use_custom_prompt" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_use_custom_prompt' ) ); ?> />
+					<label for="ai_use_custom_prompt">
+						<input type="checkbox" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_use_custom_prompt' ) ); ?>" id="ai_use_custom_prompt" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_use_custom_prompt' ) ); ?> />
+						<?php esc_html_e( 'Use a custom prompt', 'jeowp' ); ?>
+					</label>
 					<span class="description"><?php esc_html_e( 'Check this to override the default behavior. Uncheck to temporarily disable and return to the optimized default prompt.', 'jeowp' ); ?></span>
 				</div>
 				<div style="margin-bottom: 10px;">
-					<input type="checkbox" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_include_taxonomies' ) ); ?>" id="ai_include_taxonomies" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_include_taxonomies' ) ); ?> />
+					<label for="ai_include_taxonomies">
+						<input type="checkbox" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_include_taxonomies' ) ); ?>" id="ai_include_taxonomies" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_include_taxonomies' ) ); ?> />
+						<?php esc_html_e( 'Include taxonomies in the AI request', 'jeowp' ); ?>
+					</label>
 					<span class="description"><?php esc_html_e( 'Include post categories and tags in the AI georeferencing request to improve location accuracy.', 'jeowp' ); ?></span>
 				</div>
 
 				<div id="ai_system_prompt_wrapper" style="display: <?php echo \jeo_settings()->get_option( 'ai_use_custom_prompt' ) ? 'block' : 'none'; ?>;">
 					<textarea name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_system_prompt' ) ); ?>" id="ai_system_prompt" placeholder="<?php echo esc_attr( jeo_ai_handler()->get_default_system_prompt() ); ?>"><?php echo esc_textarea( \jeo_settings()->get_option( 'ai_system_prompt' ) ); ?></textarea>
-					<button type="button" class="button jeo-ai-sys-collapse-btn" id="jeo-ai-sys-collapse-btn">⛶ <?php esc_html_e( 'Back', 'jeowp' ); ?></button>
+					<button type="button" class="button jeo-ai-sys-collapse-btn" id="jeo-ai-sys-collapse-btn"><?php esc_html_e( 'Back', 'jeowp' ); ?></button>
 					
 					<div style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
-						<button type="button" class="button button-secondary" id="jeo-ai-sys-expand-btn">⛶ <?php esc_html_e( 'Expand', 'jeowp' ); ?></button>
+						<button type="button" class="button button-secondary" id="jeo-ai-sys-expand-btn"><?php esc_html_e( 'Expand', 'jeowp' ); ?></button>
 						<button type="button" class="button button-secondary" id="jeo-ai-validate-prompt-btn"><?php esc_html_e( 'Validate Custom Prompt', 'jeowp' ); ?></button>
 						<button type="button" class="button button-link" id="jeo-ai-clear-prompt-btn" style="color: #d63638;"><?php esc_html_e( 'Clear Text', 'jeowp' ); ?></button>
 						<span id="jeo-ai-validate-status" style="font-style:italic; font-weight: 500;"></span>
@@ -113,7 +119,7 @@
 </table>
 
 <div id="jeo-prompt-generator-wrapper" style="margin-top: 30px; background: #fff; padding: 25px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 900px;">
-	<h3 style="margin-top: 0;">✨ <?php esc_html_e( 'AI Prompt Engineer Assistant', 'jeowp' ); ?></h3>
+	<h2 style="margin-top: 0;"><?php esc_html_e( 'AI Prompt Engineer Assistant', 'jeowp' ); ?></h2>
 	<p style="font-size: 14px; color: #50575e;"><?php esc_html_e( 'Describe how you want the AI to behave (e.g., "Only map cities in Brazil" or "Ignore street names"). The active LLM will generate a highly optimized System Prompt for you, strictly adhering to JEO formatting rules.', 'jeowp' ); ?></p>
 
 	<style>
@@ -220,7 +226,6 @@
 		.jeo-ai-calibration h4 {
 			margin: 0 0 12px 0;
 			font-size: 13px;
-			text-transform: uppercase;
 			letter-spacing: 0.5px;
 			color: #1d2327;
 		}
@@ -267,25 +272,22 @@
 			opacity: 0.5;
 		}
 		.jeo-ai-lang-box {
-			background: #f0f6fb;
-			padding: 15px;
-			border-radius: 6px;
-			border-left: 4px solid #72aee6;
+			padding: 5px 15px 15px 15px;
 			margin-top: 16px;
 		}
 	</style>
 
 	<div style="position: relative;">
 		<textarea id="jeo-ai-chat-input" placeholder="<?php esc_attr_e( 'Ex: I want to map only locations inside Europe. Press Shift+Enter for new line, or Enter to generate.', 'jeowp' ); ?>"></textarea>
-		<button type="button" class="button jeo-ai-collapse-btn" id="jeo-ai-collapse-btn">⛶ <?php esc_html_e( 'Back', 'jeowp' ); ?></button>
+		<button type="button" class="button jeo-ai-collapse-btn" id="jeo-ai-collapse-btn"><?php esc_html_e( 'Back', 'jeowp' ); ?></button>
 		<div class="jeo-ai-toolbar">
-			<button type="button" class="button button-secondary" id="jeo-ai-expand-btn">⛶ <?php esc_html_e( 'Expand', 'jeowp' ); ?></button>
+			<button type="button" class="button button-secondary" id="jeo-ai-expand-btn"><?php esc_html_e( 'Expand', 'jeowp' ); ?></button>
 			<span style="font-size: 12px; color: #646970;"><?php esc_html_e( 'Shift+Enter for new line', 'jeowp' ); ?></span>
 		</div>
 	</div>
 
 	<div class="jeo-ai-calibration">
-		<h4>⚙️ <?php esc_html_e( 'Georeferencing Calibration', 'jeowp' ); ?></h4>
+		<h3><?php esc_html_e( 'Georeferencing Calibration', 'jeowp' ); ?></h3>
 		<div class="jeo-ai-cal-row">
 			<label class="jeo-ai-cal-toggle-label">
 				<input type="checkbox" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_use_granularity' ) ); ?>" id="jeo-ai-cal-use-granularity" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_cal_use_granularity' ) ); ?> />
@@ -373,15 +375,15 @@
 			<span id="jeo-ai-token-thermo-label" style="font-size: 11px; font-weight: 600; color: #2271b1; min-width: 55px; text-align: right;"><?php esc_html_e( 'Balanced', 'jeowp' ); ?></span>
 		</div>
 		<div class="jeo-ai-cal-row jeo-ai-unlimited-msg" style="margin-bottom: 0; display: none;">
-			<div style="flex: 1; font-size: 12px; color: #996b00; background: #fcf9e8; padding: 8px 12px; border-radius: 4px; border-left: 3px solid #f0c33c;">
-				⚠️ <?php esc_html_e( 'No token limit set. The LLM will use as many tokens as it deems necessary to produce the result.', 'jeowp' ); ?>
+			<div class="notice notice-warning inline" style="margin: 0; font-size: 12px; padding: 8px 12px;">
+				<?php esc_html_e( 'No token limit set. The LLM will use as many tokens as it deems necessary to produce the result.', 'jeowp' ); ?>
 			</div>
 		</div>
 	</div>
 
 
-	<div class="jeo-ai-lang-box">
-		<p style="margin: 0 0 10px 0; font-weight: 600; font-size: 13px; color: #2c3338;">🌍 <?php esc_html_e( 'Output Language', 'jeowp' ); ?></p>
+	<div class="notice notice-info inline jeo-ai-lang-box">
+		<p style="margin: 0 0 10px 0; font-weight: 600; font-size: 13px; color: #2c3338;"><?php esc_html_e( 'Output Language', 'jeowp' ); ?></p>
 		<select id="jeo-ai-chat-lang" style="width: 100%; max-width: 250px; margin-bottom: 10px;">
 			<option value="en"><?php esc_html_e( 'English (Optimized)', 'jeowp' ); ?></option>
 			<option value="site"><?php /* translators: %s: site language */ printf( esc_html__( 'Site Language (%s)', 'jeowp' ), esc_html( get_bloginfo( 'language' ) ) ); ?></option>

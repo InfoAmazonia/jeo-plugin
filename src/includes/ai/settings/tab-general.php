@@ -11,6 +11,21 @@
 <table class="form-table">
 	<tbody>
 		<tr>
+			<th scope="row"><label for="ai_output_language"><?php esc_html_e( 'AI Output Language', 'jeowp' ); ?></label></th>
+			<td>
+				<select name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_output_language' ) ); ?>" id="ai_output_language">
+					<option value="auto" <?php selected( 'auto', \jeo_settings()->get_option( 'ai_output_language' ) ); ?>><?php esc_html_e( 'Automatic (match the editor and the article)', 'jeowp' ); ?></option>
+					<option value="site" <?php selected( 'site', \jeo_settings()->get_option( 'ai_output_language' ) ); ?>><?php /* translators: %s: site language tag. */ printf( esc_html__( 'Site language (%s)', 'jeowp' ), esc_html( get_bloginfo( 'language' ) ) ); ?></option>
+					<option value="en" <?php selected( 'en', \jeo_settings()->get_option( 'ai_output_language' ) ); ?>><?php esc_html_e( 'English', 'jeowp' ); ?></option>
+					<option value="pt" <?php selected( 'pt', \jeo_settings()->get_option( 'ai_output_language' ) ); ?>><?php esc_html_e( 'Portuguese', 'jeowp' ); ?></option>
+					<option value="es" <?php selected( 'es', \jeo_settings()->get_option( 'ai_output_language' ) ); ?>><?php esc_html_e( 'Spanish', 'jeowp' ); ?></option>
+					<option value="fr" <?php selected( 'fr', \jeo_settings()->get_option( 'ai_output_language' ) ); ?>><?php esc_html_e( 'French', 'jeowp' ); ?></option>
+				</select>
+				<p class="description"><?php esc_html_e( 'Applies to every AI output: minimap chat and notices, context assistant suggestions, and inserted paragraphs. The chosen language takes precedence over the article language; "Automatic" follows the editor and the article.', 'jeowp' ); ?></p>
+			</td>
+		</tr>
+
+<tr>
 			<th scope="row"><label for="ai_debug_mode"><?php esc_html_e( 'Debug Mode', 'jeowp' ); ?></label></th>
 			<td>
 				<input type="checkbox" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_debug_mode' ) ); ?>" id="ai_debug_mode" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_debug_mode' ) ); ?> />

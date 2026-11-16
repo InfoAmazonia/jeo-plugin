@@ -16,12 +16,16 @@ import {
 	useState,
 } from '@wordpress/element';
 import { debounce } from 'lodash';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
 import { Map, Marker } from '../lib/mapgl-react';
 import LayersSettingsModal from './layers-settings-modal';
 import { MemoizedRenderLayer } from './map-preview-layer';
-import PreviewErrorState from './preview-error';
+import PreviewErrorState, { PreviewErrorBoundary } from './preview-error';
+import {
+	getTileLayerPreflightUrls,
+	useTileLayerPreflight,
+} from './tile-preflight';
 import {
 	applyStyleLayerFiltering,
 	findStyleLayer,
@@ -35,6 +39,20 @@ import {
 	useEditorMapboxTransformRequest,
 } from './mapbox-style-preview';
 import { coerceMinimapAttributes } from './minimap-config';
+import {
+	deriveMinimapStatus,
+	minimapContentKey,
+} from './minimap-status';
+import { MinimapWaitNote, useElapsedSeconds } from './minimap-wait';
+import {
+	MinimapAiGate,
+	MinimapPrePublishGateWarning,
+} from './minimap-ai-gate';
+import MinimapVersionsPanel, {
+	buildRestoreConfirmation,
+} from './minimap-versions';
+import { buildRestoreMessage } from './minimap-api';
+import { fetchMinimapState } from './minimap-api';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
 import { useRecordsByIds } from '../shared/rest-records';
@@ -45,6 +63,7 @@ import {
 	TextareaControl,
 } from '../shared/wp-form-controls';
 import './onetime-map-editor.css';
+import './minimap-editor.css';
 
 const { map_defaults: mapDefaults } = globalThis.jeo_settings;
 
@@ -60,6 +79,13 @@ const LOADING_MESSAGES = [
 	__( 'Searching for map layers…', 'jeowp' ),
 	__( 'Generating map configuration…', 'jeowp' ),
 ];
+
+// V1 race guard notice — shown when an AI response arrives after the user
+// changed the map content mid-flight (e.g. via undo).
+const PREEMPTED_MESSAGE = __(
+	'The map changed while the AI was thinking — its edits were discarded to protect yours. The answer is still in the chat.',
+	'jeowp'
+);
 
 function generateUUID() {
 	if (
@@ -176,18 +202,114 @@ export default function MinimapEditor( {
 	const attrsRef = useRef( attributes );
 	attrsRef.current = attributes;
 
+	// Transient UI state (W2 — 2.2/V1): `loading`/`error` never reach the
+	// attributes, so the undo history can never land on a persisted spinner
+	// state (the bricked-block bug). Only `ready` is written back, because
+	// the frontend save renders nothing when a legacy `error` survives.
+	// The status is derived from the persisted content on mount/reload and
+	// re-derived when the attributes change externally (undo/redo) while no
+	// request is in flight.
+	const [ uiStatus, setUiStatus ] = useState( () =>
+		deriveMinimapStatus( attributes )
+	);
+	const [ uiError, setUiError ] = useState( '' );
+	// Race guard (V1): fingerprint of the map content captured when a
+	// request is dispatched. If the content changes mid-flight (the user
+	// undid/redid or edited), the response must not write attributes over
+	// the user's edits.
+	const inFlightRef = useRef( null );
+	const [ preemptedNotice, setPreemptedNotice ] = useState( '' );
+	// Base variant switch failure (W3 — 3.7/G-C): never silent.
+	const [ baseNotice, setBaseNotice ] = useState( '' );
+	// Wait contract (2.2): elapsed time for the generation and chat waits.
+	const generationElapsed = useElapsedSeconds( uiStatus === 'loading' );
+	const chatElapsed = useElapsedSeconds( chatLoading );
+	// Contrato F (C2-32): the conversation lives server-side; attributes are
+	// only the legacy fallback. Hydrated on mount, appended locally per turn.
+	const [ conversation, setConversation ] = useState(
+		() => attributes.conversation || []
+	);
+	// Contrato F: the notice message also migrates server-side — local state
+	// initialized from the legacy attribute, hydrated/updated per turn.
+	const [ uiMessage, setUiMessage ] = useState( () => attributes.message || '' );
+	const [ versionsRefreshKey, setVersionsRefreshKey ] = useState( 0 );
+
 	useEffect( () => {
 		messagesEndRef.current?.scrollIntoView( { behavior: 'smooth' } );
-	}, [ attributes.conversation ] );
+	}, [ conversation ] );
 
 	useEffect( () => {
-		if ( 'ready' === attributes.status && ! attributes.conversation_id ) {
+		if ( 'ready' === uiStatus && ! attributes.conversation_id ) {
 			setAttributes( { conversation_id: generateUUID() } );
 		}
-	}, [ attributes.status, attributes.conversation_id, setAttributes ] );
+	}, [ uiStatus, attributes.conversation_id, setAttributes ] );
+
+	// Undo/redo sync: re-derive the status from the content whenever the
+	// attributes change without an in-flight request.
+	const attributesContentKey = minimapContentKey( attributes );
+	useEffect( () => {
+		if ( inFlightRef.current !== null ) {
+			return;
+		}
+		setUiStatus( deriveMinimapStatus( attributes ) );
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by the content fingerprint only
+	}, [ attributesContentKey, attributes.status ] );
+
+	// Contrato F (C2-32): hydrate the conversation and notice message from
+	// the server-side storage. A non-empty server copy wins; the attribute
+	// copy is the legacy fallback (empty server history never wipes it).
+	// While the endpoint is absent, the block keeps working with attributes.
+	useEffect( () => {
+		const conversationId = attrsRef.current.conversation_id;
+		if ( ! postId || ! conversationId ) {
+			return undefined;
+		}
+		let cancelled = false;
+		fetchMinimapState( postId, conversationId )
+			.then( ( response ) => {
+				if ( cancelled ) {
+					return;
+				}
+				if (
+					Array.isArray( response?.conversation ) &&
+					response.conversation.length > 0
+				) {
+					setConversation( response.conversation );
+				}
+				if (
+					typeof response?.message === 'string' &&
+					response.message !== ''
+				) {
+					setUiMessage( response.message );
+				}
+			} )
+			.catch( () => {
+				// Endpoint not available yet (or fetch failed): keep the
+				// legacy attribute conversation.
+			} );
+		return () => {
+			cancelled = true;
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate once per conversation
+	}, [ postId, attributes.conversation_id ] );
+
+	const beginRequest = useCallback( () => {
+		inFlightRef.current = minimapContentKey( attrsRef.current );
+	}, [] );
+	const endRequest = useCallback( () => {
+		inFlightRef.current = null;
+	}, [] );
+	// True when the map content changed while the request was in flight —
+	// the response must then discard its attribute writes (V1 race guard).
+	const requestWasPreempted = useCallback( () => {
+		return (
+			inFlightRef.current !== null &&
+			inFlightRef.current !== minimapContentKey( attrsRef.current )
+		);
+	}, [] );
 
 	useEffect( () => {
-		if ( attributes.status !== 'loading' ) {
+		if ( uiStatus !== 'loading' ) {
 			setLoadingMsgIndex( 0 );
 			return;
 		}
@@ -195,7 +317,7 @@ export default function MinimapEditor( {
 			setLoadingMsgIndex( ( i ) => ( i + 1 ) % LOADING_MESSAGES.length );
 		}, 3000 );
 		return () => clearInterval( timer );
-	}, [ attributes.status ] );
+	}, [ uiStatus ] );
 
 	const normalizedAttributes = useMemo( () => {
 		return coerceMinimapAttributes( attributes, {
@@ -282,6 +404,25 @@ export default function MinimapEditor( {
 	const useComposedPreview = Boolean(
 		hasMapboxLayers && composedPreview.style
 	);
+	// R3-G1: tile-based direct layers (tilelayer/MVT) cannot rely on GL
+	// error events alone (MapLibre swallows 404 tiles and errored tiles
+	// still emit `sourcedata` content events). Preflight the concrete tile
+	// URLs so a dead source becomes the error state, never a courtesy map.
+	const tilePreflightUrls = useMemo(
+		() =>
+			useComposedPreview
+				? []
+				: loadedLayers.flatMap( ( record ) =>
+						getTileLayerPreflightUrls( record?.meta || {} )
+				  ),
+		[ loadedLayers, useComposedPreview ]
+	);
+	const tilePreflight = useTileLayerPreflight( tilePreflightUrls, retryCount );
+	useEffect( () => {
+		if ( tilePreflight.error ) {
+			setPreviewError( tilePreflight.error );
+		}
+	}, [ tilePreflight.error ] );
 	const isPreparingComposedPreview = Boolean(
 		! loadingLayers &&
 			hasMapboxLayers &&
@@ -310,17 +451,16 @@ export default function MinimapEditor( {
 			console.error(
 				'[JEO Minimap] Cannot generate: post ID is not available yet. Save the post first.'
 			);
-			setAttributes( {
-				status: 'error',
-				message: __(
-					'Save the post before generating the map.',
-					'jeowp'
-				),
-			} );
+			setUiStatus( 'error' );
+			setUiError(
+				__( 'Save the post before generating the map.', 'jeowp' )
+			);
 			return;
 		}
 
-		setAttributes( { status: 'loading' } );
+		setUiStatus( 'loading' );
+		setUiError( '' );
+		beginRequest();
 
 		const convId = attrsRef.current.conversation_id || generateUUID();
 
@@ -332,6 +472,13 @@ export default function MinimapEditor( {
 			} )
 				.then( ( response ) => {
 					if ( response.success ) {
+						if ( requestWasPreempted() ) {
+							// The user edited/undid while the AI was thinking:
+							// keep the user's content, drop the AI map state.
+							setUiStatus( deriveMinimapStatus( attrsRef.current ) );
+							setPreemptedNotice( PREEMPTED_MESSAGE );
+							return;
+						}
 						const updates = {
 							status: 'ready',
 							layers: response.layers || [],
@@ -340,35 +487,38 @@ export default function MinimapEditor( {
 							center_lon: response.center_lon,
 							initial_zoom: response.initial_zoom,
 							pins: response.pins || [],
-							message: response.message || '',
 							conversation_id: convId,
-							conversation: [
-								...( attrsRef.current.conversation || [] ),
-								{
-									role: 'assistant',
-									text:
-										response.message ||
-										__(
-											'Map generated from post content.',
-											'jeowp'
-										),
-									ts: new Date().toISOString(),
-								},
-							],
 						};
+							// BUG-C1: always rewrite — a turn without a note clears the previous one.
+							updates.framing_note = response.framing_note || '';
 
 						if ( response.base_layer?.variant ) {
 							setBaseVariant( response.base_layer.variant );
 						}
 
 						setAttributes( updates );
+						setConversation( ( current ) => [
+							...current,
+							{
+								role: 'assistant',
+								text:
+									response.message ||
+									__(
+										'Map generated from post content.',
+										'jeowp'
+									),
+								ts: new Date().toISOString(),
+							},
+						] );
+						setUiStatus( 'ready' );
+						setUiMessage( response.message || '' );
+						setVersionsRefreshKey( ( key ) => key + 1 );
 					} else {
-						setAttributes( {
-							status: 'error',
-							message:
-								response.message ||
-								__( 'Failed to suggest layers.', 'jeowp' ),
-						} );
+						setUiStatus( 'error' );
+						setUiError(
+							response.message ||
+								__( 'Failed to suggest layers.', 'jeowp' )
+						);
 					}
 				} )
 				.catch( ( error ) => {
@@ -377,26 +527,26 @@ export default function MinimapEditor( {
 						'[JEO Minimap] Setup request failed:',
 						error
 					);
-					setAttributes( {
-						status: 'error',
-						message:
-							error.message || __( 'Request failed.', 'jeowp' ),
-					} );
-				} );
+					setUiStatus( 'error' );
+					setUiError(
+						error.message || __( 'Request failed.', 'jeowp' )
+					);
+				} )
+				.finally( endRequest );
 		} catch ( syncError ) {
 			// eslint-disable-next-line no-console
 			console.error(
 				'[JEO Minimap] Synchronous error during setup:',
 				syncError
 			);
-			setAttributes( {
-				status: 'error',
-				message:
-					syncError.message ||
-					__( 'Could not start map generation.', 'jeowp' ),
-			} );
+			endRequest();
+			setUiStatus( 'error' );
+			setUiError(
+				syncError.message ||
+					__( 'Could not start map generation.', 'jeowp' )
+			);
 		}
-	}, [ setAttributes ] );
+	}, [ setAttributes, beginRequest, endRequest, requestWasPreempted, PREEMPTED_MESSAGE ] );
 
 	const sendChat = useCallback(
 		( message, type = 'text', payload = {} ) => {
@@ -415,6 +565,7 @@ export default function MinimapEditor( {
 			}
 
 			setChatLoading( true );
+			beginRequest();
 
 			try {
 				apiFetch( {
@@ -458,27 +609,43 @@ export default function MinimapEditor( {
 								ts: new Date().toISOString(),
 							} );
 
-							setAttributes( {
-								layers: response.layers || attrs.layers,
-								base_layer:
-									response.base_layer || attrs.base_layer,
-								center_lat:
-									response.center_lat ?? attrs.center_lat,
-								center_lon:
-									response.center_lon ?? attrs.center_lon,
-								initial_zoom:
-									response.initial_zoom ?? attrs.initial_zoom,
-								pins: response.pins || attrs.pins,
-								message: response.message || '',
-								conversation: [
-									...( attrs.conversation || [] ),
-									...convUpdates,
-								],
-							} );
+							if ( requestWasPreempted() ) {
+								// The user edited/undid while the AI was
+								// thinking: keep the answer in the chat but
+								// never overwrite the user's content.
+								setPreemptedNotice( PREEMPTED_MESSAGE );
+							} else {
+								const contentUpdates = {
+									layers: response.layers || attrs.layers,
+									base_layer:
+										response.base_layer || attrs.base_layer,
+									center_lat:
+										response.center_lat ?? attrs.center_lat,
+									center_lon:
+										response.center_lon ?? attrs.center_lon,
+									initial_zoom:
+										response.initial_zoom ??
+										attrs.initial_zoom,
+									pins: response.pins || attrs.pins,
+								};
+						// BUG-C1: always rewrite — a turn without a note
+						// clears the previous one (no stale framing).
+						contentUpdates.framing_note = response.framing_note || '';
+								setAttributes( contentUpdates );
+								setUiMessage( response.message || '' );
 
-							if ( response.base_layer?.variant ) {
-								setBaseVariant( response.base_layer.variant );
+								if ( response.base_layer?.variant ) {
+									setBaseVariant(
+										response.base_layer.variant
+									);
+									if ( 'base_variant' === type ) {
+										setBaseNotice( '' );
+									}
+								}
 							}
+							// The server appended a version for this turn
+							// even when the client discards the content.
+							setVersionsRefreshKey( ( key ) => key + 1 );
 						} else {
 							convUpdates.push( {
 								role: 'assistant',
@@ -487,16 +654,27 @@ export default function MinimapEditor( {
 									__( 'Failed to update map.', 'jeowp' ),
 								ts: new Date().toISOString(),
 							} );
-							setAttributes( {
-								conversation: [
-									...( attrs.conversation || [] ),
-									...convUpdates,
-								],
-							} );
+							// 3.7 (G-C): a failed base switch must not be
+							// silent — revert the select to the base that is
+							// actually active and say what happened.
+							if ( 'base_variant' === type ) {
+								setBaseVariant(
+									attrs.base_layer?.variant || 'none'
+								);
+								setBaseNotice(
+									__(
+										'The selected base could not be loaded; the previous base was kept. Check your connection and try again.',
+										'jeowp'
+									)
+								);
+							}
 						}
+						setConversation( ( current ) => [
+							...current,
+							...convUpdates,
+						] );
 					} )
 					.catch( ( error ) => {
-						const attrs = attrsRef.current;
 						const convUpdates = [];
 						if ( text.trim() && 'regenerate' !== type ) {
 							convUpdates.push( {
@@ -512,16 +690,26 @@ export default function MinimapEditor( {
 								__( 'Request failed.', 'jeowp' ),
 							ts: new Date().toISOString(),
 						} );
-						setAttributes( {
-							conversation: [
-								...( attrs.conversation || [] ),
-								...convUpdates,
-							],
-						} );
+						setConversation( ( current ) => [
+							...current,
+							...convUpdates,
+						] );
+						if ( 'base_variant' === type ) {
+							setBaseVariant(
+								attrsRef.current.base_layer?.variant || 'none'
+							);
+							setBaseNotice(
+								__(
+									'The selected base could not be loaded; the previous base was kept. Check your connection and try again.',
+									'jeowp'
+								)
+							);
+						}
 					} )
 					.finally( () => {
 						setChatLoading( false );
 						setChatInput( '' );
+						endRequest();
 					} );
 			} catch ( syncError ) {
 				// eslint-disable-next-line no-console
@@ -529,7 +717,6 @@ export default function MinimapEditor( {
 					'[JEO Minimap] Synchronous error during chat:',
 					syncError
 				);
-				const currentAttrs = attrsRef.current;
 				const convUpdates = [];
 				if ( text.trim() && 'regenerate' !== type ) {
 					convUpdates.push( {
@@ -545,17 +732,16 @@ export default function MinimapEditor( {
 						__( 'Could not send message.', 'jeowp' ),
 					ts: new Date().toISOString(),
 				} );
-				setAttributes( {
-					conversation: [
-						...( currentAttrs.conversation || [] ),
-						...convUpdates,
-					],
-				} );
+				setConversation( ( current ) => [
+					...current,
+					...convUpdates,
+				] );
 				setChatLoading( false );
 				setChatInput( '' );
+				endRequest();
 			}
 		},
-		[ chatLoading, setAttributes ]
+		[ chatLoading, setAttributes, beginRequest, endRequest, requestWasPreempted, PREEMPTED_MESSAGE ]
 	);
 
 	const generateFromChatPrompt = useCallback( () => {
@@ -569,18 +755,16 @@ export default function MinimapEditor( {
 
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
 		if ( ! postId ) {
-			setAttributes( {
-				status: 'error',
-				message: __(
-					'Save the post before generating the map.',
-					'jeowp'
-				),
-			} );
+			setUiStatus( 'error' );
+			setUiError(
+				__( 'Save the post before generating the map.', 'jeowp' )
+			);
 			return;
 		}
 
 		setChatLoading( true );
 		setChatPromptVisible( false );
+		beginRequest();
 
 		try {
 			apiFetch( {
@@ -593,7 +777,6 @@ export default function MinimapEditor( {
 				},
 			} )
 				.then( ( response ) => {
-					const currentAttrs = attrsRef.current;
 					const convUpdates = [
 						{
 							role: 'user',
@@ -612,23 +795,31 @@ export default function MinimapEditor( {
 							ts: new Date().toISOString(),
 						} );
 
-						setAttributes( {
-							layers: response.layers || [],
-							base_layer: response.base_layer || null,
-							center_lat: response.center_lat,
-							center_lon: response.center_lon,
-							initial_zoom: response.initial_zoom,
-							pins: response.pins || currentAttrs.pins,
-							message: response.message || '',
-							conversation_id: convId,
-							conversation: [
-								...( currentAttrs.conversation || [] ),
-								...convUpdates,
-							],
-						} );
+						if ( requestWasPreempted() ) {
+							setPreemptedNotice( PREEMPTED_MESSAGE );
+							setVersionsRefreshKey( ( key ) => key + 1 );
+						} else {
+							const contentUpdates = {
+								status: 'ready',
+								layers: response.layers || [],
+								base_layer: response.base_layer || null,
+								center_lat: response.center_lat,
+								center_lon: response.center_lon,
+								initial_zoom: response.initial_zoom,
+								pins: response.pins || attrsRef.current.pins,
+								conversation_id: convId,
+							};
+						// BUG-C1: always rewrite — a turn without a note
+						// clears the previous one (no stale framing).
+						contentUpdates.framing_note = response.framing_note || '';
+							setAttributes( contentUpdates );
 
-						if ( response.base_layer?.variant ) {
-							setBaseVariant( response.base_layer.variant );
+							if ( response.base_layer?.variant ) {
+								setBaseVariant( response.base_layer.variant );
+							}
+							setUiStatus( 'ready' );
+							setUiMessage( response.message || '' );
+							setVersionsRefreshKey( ( key ) => key + 1 );
 						}
 					} else {
 						convUpdates.push( {
@@ -641,37 +832,33 @@ export default function MinimapEditor( {
 								),
 							ts: new Date().toISOString(),
 						} );
-						setAttributes( {
-							conversation: [
-								...( currentAttrs.conversation || [] ),
-								...convUpdates,
-							],
-						} );
 					}
+					setConversation( ( current ) => [
+						...current,
+						...convUpdates,
+					] );
 				} )
 				.catch( ( error ) => {
-					const currentAttrs = attrsRef.current;
-					setAttributes( {
-						conversation: [
-							...( currentAttrs.conversation || [] ),
-							{
-								role: 'user',
-								text: userMsg,
-								ts: new Date().toISOString(),
-							},
-							{
-								role: 'assistant',
-								text:
-									error.message ||
-									__( 'Request failed.', 'jeowp' ),
-								ts: new Date().toISOString(),
-							},
-						],
-					} );
+					setConversation( ( current ) => [
+						...current,
+						{
+							role: 'user',
+							text: userMsg,
+							ts: new Date().toISOString(),
+						},
+						{
+							role: 'assistant',
+							text:
+								error.message ||
+								__( 'Request failed.', 'jeowp' ),
+							ts: new Date().toISOString(),
+						},
+					] );
 				} )
 				.finally( () => {
 					setChatLoading( false );
 					setChatPrompt( '' );
+					endRequest();
 				} );
 		} catch ( syncError ) {
 			// eslint-disable-next-line no-console
@@ -679,28 +866,26 @@ export default function MinimapEditor( {
 				'[JEO Minimap] Synchronous error during chat prompt:',
 				syncError
 			);
-			const currentAttrs = attrsRef.current;
-			setAttributes( {
-				conversation: [
-					...( currentAttrs.conversation || [] ),
-					{
-						role: 'user',
-						text: userMsg,
-						ts: new Date().toISOString(),
-					},
-					{
-						role: 'assistant',
-						text:
-							syncError.message ||
-							__( 'Could not generate from prompt.', 'jeowp' ),
-						ts: new Date().toISOString(),
-					},
-				],
-			} );
+			setConversation( ( current ) => [
+				...current,
+				{
+					role: 'user',
+					text: userMsg,
+					ts: new Date().toISOString(),
+				},
+				{
+					role: 'assistant',
+					text:
+						syncError.message ||
+						__( 'Could not generate from prompt.', 'jeowp' ),
+					ts: new Date().toISOString(),
+				},
+			] );
 			setChatLoading( false );
 			setChatPrompt( '' );
+			endRequest();
 		}
-	}, [ chatPrompt, chatLoading, setAttributes ] );
+	}, [ chatPrompt, chatLoading, setAttributes, beginRequest, endRequest, requestWasPreempted, PREEMPTED_MESSAGE ] );
 
 	const resuggest = useCallback( () => {
 		if ( attrsRef.current.conversation_id ) {
@@ -710,18 +895,17 @@ export default function MinimapEditor( {
 
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
 		if ( ! postId ) {
-			setAttributes( {
-				status: 'error',
-				message: __(
-					'Save the post before generating the map.',
-					'jeowp'
-				),
-			} );
+			setUiStatus( 'error' );
+			setUiError(
+				__( 'Save the post before generating the map.', 'jeowp' )
+			);
 			return;
 		}
 
 		const convId = generateUUID();
-		setAttributes( { status: 'loading', message: '' } );
+		setUiStatus( 'loading' );
+		setUiError( '' );
+		beginRequest();
 
 		try {
 			apiFetch( {
@@ -731,6 +915,11 @@ export default function MinimapEditor( {
 			} )
 				.then( ( response ) => {
 					if ( response.success ) {
+						if ( requestWasPreempted() ) {
+							setUiStatus( deriveMinimapStatus( attrsRef.current ) );
+							setPreemptedNotice( PREEMPTED_MESSAGE );
+							return;
+						}
 						const updates = {
 							status: 'ready',
 							layers: response.layers || [],
@@ -739,34 +928,37 @@ export default function MinimapEditor( {
 							center_lon: response.center_lon,
 							initial_zoom: response.initial_zoom,
 							pins: response.pins || [],
-							message: response.message || '',
 							conversation_id: convId,
-							conversation: [
-								{
-									role: 'assistant',
-									text:
-										response.message ||
-										__(
-											'Map regenerated from post content.',
-											'jeowp'
-										),
-									ts: new Date().toISOString(),
-								},
-							],
 						};
+							// BUG-C1: always rewrite — a turn without a note clears the previous one.
+							updates.framing_note = response.framing_note || '';
 
 						if ( response.base_layer?.variant ) {
 							setBaseVariant( response.base_layer.variant );
 						}
 
 						setAttributes( updates );
+						setConversation( [
+							{
+								role: 'assistant',
+								text:
+									response.message ||
+									__(
+										'Map regenerated from post content.',
+										'jeowp'
+									),
+								ts: new Date().toISOString(),
+							},
+						] );
+						setUiStatus( 'ready' );
+						setUiMessage( response.message || '' );
+						setVersionsRefreshKey( ( key ) => key + 1 );
 					} else {
-						setAttributes( {
-							status: 'error',
-							message:
-								response.message ||
-								__( 'Failed to suggest layers.', 'jeowp' ),
-						} );
+						setUiStatus( 'error' );
+						setUiError(
+							response.message ||
+								__( 'Failed to suggest layers.', 'jeowp' )
+						);
 					}
 				} )
 				.catch( ( error ) => {
@@ -775,26 +967,26 @@ export default function MinimapEditor( {
 						'[JEO Minimap] Resuggest request failed:',
 						error
 					);
-					setAttributes( {
-						status: 'error',
-						message:
-							error.message || __( 'Request failed.', 'jeowp' ),
-					} );
-				} );
+					setUiStatus( 'error' );
+					setUiError(
+						error.message || __( 'Request failed.', 'jeowp' )
+					);
+				} )
+				.finally( endRequest );
 		} catch ( syncError ) {
 			// eslint-disable-next-line no-console
 			console.error(
 				'[JEO Minimap] Synchronous error during resuggest:',
 				syncError
 			);
-			setAttributes( {
-				status: 'error',
-				message:
-					syncError.message ||
-					__( 'Could not start map generation.', 'jeowp' ),
-			} );
+			endRequest();
+			setUiStatus( 'error' );
+			setUiError(
+				syncError.message ||
+					__( 'Could not start map generation.', 'jeowp' )
+			);
 		}
-	}, [ sendChat, setAttributes ] );
+	}, [ sendChat, setAttributes, beginRequest, endRequest, requestWasPreempted, PREEMPTED_MESSAGE ] );
 
 	const generateFromPrompt = useCallback( () => {
 		if ( ! attributes.prompt?.trim() ) {
@@ -803,17 +995,16 @@ export default function MinimapEditor( {
 
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
 		if ( ! postId ) {
-			setAttributes( {
-				status: 'error',
-				message: __(
-					'Save the post before generating the map.',
-					'jeowp'
-				),
-			} );
+			setUiStatus( 'error' );
+			setUiError(
+				__( 'Save the post before generating the map.', 'jeowp' )
+			);
 			return;
 		}
 
-		setAttributes( { status: 'loading' } );
+		setUiStatus( 'loading' );
+		setUiError( '' );
+		beginRequest();
 
 		const convId = attrsRef.current.conversation_id || generateUUID();
 
@@ -845,6 +1036,16 @@ export default function MinimapEditor( {
 							},
 						];
 
+						if ( requestWasPreempted() ) {
+							setUiStatus( deriveMinimapStatus( attrsRef.current ) );
+							setPreemptedNotice( PREEMPTED_MESSAGE );
+							setConversation( ( current ) => [
+								...current,
+								...convUpdates,
+							] );
+							return;
+						}
+
 						const updates = {
 							status: 'ready',
 							layers: response.layers || [],
@@ -853,29 +1054,29 @@ export default function MinimapEditor( {
 							center_lon: response.center_lon,
 							initial_zoom: response.initial_zoom,
 							pins: response.pins || [],
-							message: response.message || '',
 							conversation_id: convId,
-							conversation: [
-								...( attrsRef.current.conversation || [] ),
-								...convUpdates,
-							],
 						};
+							// BUG-C1: always rewrite — a turn without a note clears the previous one.
+							updates.framing_note = response.framing_note || '';
 
 						if ( response.base_layer?.variant ) {
 							setBaseVariant( response.base_layer.variant );
 						}
 
 						setAttributes( updates );
+						setConversation( ( current ) => [
+							...current,
+							...convUpdates,
+						] );
+						setUiStatus( 'ready' );
+						setUiMessage( response.message || '' );
+						setVersionsRefreshKey( ( key ) => key + 1 );
 					} else {
-						setAttributes( {
-							status: 'error',
-							message:
-								response.message ||
-								__(
-									'Failed to generate from prompt.',
-									'jeowp'
-								),
-						} );
+						setUiStatus( 'error' );
+						setUiError(
+							response.message ||
+								__( 'Failed to generate from prompt.', 'jeowp' )
+						);
 					}
 				} )
 				.catch( ( error ) => {
@@ -884,60 +1085,61 @@ export default function MinimapEditor( {
 						'[JEO Minimap] Prompt request failed:',
 						error
 					);
-					setAttributes( {
-						status: 'error',
-						message:
-							error.message || __( 'Request failed.', 'jeowp' ),
-						conversation: [
-							...( attrsRef.current.conversation || [] ),
-							{
-								role: 'user',
-								text: attributes.prompt,
-								ts: new Date().toISOString(),
-							},
-							{
-								role: 'assistant',
-								text:
-									error.message ||
-									__( 'Request failed.', 'jeowp' ),
-								ts: new Date().toISOString(),
-							},
-						],
-					} );
-				} );
+					setUiStatus( 'error' );
+					setUiError(
+						error.message || __( 'Request failed.', 'jeowp' )
+					);
+					setConversation( ( current ) => [
+						...current,
+						{
+							role: 'user',
+							text: attributes.prompt,
+							ts: new Date().toISOString(),
+						},
+						{
+							role: 'assistant',
+							text:
+								error.message ||
+								__( 'Request failed.', 'jeowp' ),
+							ts: new Date().toISOString(),
+						},
+					] );
+				} )
+				.finally( endRequest );
 		} catch ( syncError ) {
 			// eslint-disable-next-line no-console
 			console.error(
 				'[JEO Minimap] Synchronous error during prompt setup:',
 				syncError
 			);
-			setAttributes( {
-				status: 'error',
-				message:
-					syncError.message ||
-					__( 'Could not start map generation.', 'jeowp' ),
-				conversation: [
-					...( attrsRef.current.conversation || [] ),
-					{
-						role: 'user',
-						text: attributes.prompt,
-						ts: new Date().toISOString(),
-					},
-					{
-						role: 'assistant',
-						text:
-							syncError.message ||
-							__( 'Could not start map generation.', 'jeowp' ),
-						ts: new Date().toISOString(),
-					},
-				],
-			} );
+			endRequest();
+			setUiStatus( 'error' );
+			setUiError(
+				syncError.message ||
+					__( 'Could not start map generation.', 'jeowp' )
+			);
+			setConversation( ( current ) => [
+				...current,
+				{
+					role: 'user',
+					text: attributes.prompt,
+					ts: new Date().toISOString(),
+				},
+				{
+					role: 'assistant',
+					text:
+						syncError.message ||
+						__( 'Could not start map generation.', 'jeowp' ),
+					ts: new Date().toISOString(),
+				},
+			] );
 		}
-	}, [ attributes.prompt, setAttributes ] );
+	}, [ attributes.prompt, setAttributes, beginRequest, endRequest, requestWasPreempted, PREEMPTED_MESSAGE ] );
 
 	const handleBaseVariantChange = useCallback(
 		( newVariant ) => {
 			setBaseVariant( newVariant );
+			setBaseNotice( '' );
 
 			if ( attrsRef.current.conversation_id ) {
 				sendChat(
@@ -953,47 +1155,97 @@ export default function MinimapEditor( {
 				return;
 			}
 
+			// 3.7 (G-C): a failed base switch is never silent — revert the
+			// select to the base that is actually active (so the shown
+			// attribution keeps matching the rendered base) and say what
+			// happened.
+			const failBaseSwitch = () => {
+				setBaseVariant(
+					attrsRef.current.base_layer?.variant || 'none'
+				);
+				setBaseNotice(
+					__(
+						'The selected base could not be loaded; the previous base was kept. Check your connection and try again.',
+						'jeowp'
+					)
+				);
+			};
+
 			try {
 				apiFetch( {
 					path: '/jeo/v1/minimap/setup',
 					method: 'POST',
 					data: { post_id: postId },
-				} ).then( ( response ) => {
-					if ( response.success && response.base_layer ) {
-						const chosen = response.base_layer;
+				} )
+					.then( ( response ) => {
+						if ( response.success && response.base_layer ) {
+							const chosen = response.base_layer;
 
-						if (
-							newVariant !== 'none' &&
-							response.base_layer.variant !== newVariant
-						) {
-							apiFetch( {
-								path: '/jeo/v1/minimap/setup',
-								method: 'POST',
-								data: {
-									post_id: postId,
-									base_variant: newVariant,
-								},
-							} ).then( ( r2 ) => {
-								if ( r2.success && r2.base_layer ) {
-									setAttributes( {
-										base_layer: r2.base_layer,
-									} );
-								}
-							} );
+							if (
+								newVariant !== 'none' &&
+								response.base_layer.variant !== newVariant
+							) {
+								apiFetch( {
+									path: '/jeo/v1/minimap/setup',
+									method: 'POST',
+									data: {
+										post_id: postId,
+										base_variant: newVariant,
+									},
+								} )
+									.then( ( r2 ) => {
+										if ( r2.success && r2.base_layer ) {
+											setAttributes( {
+												base_layer: r2.base_layer,
+											} );
+											setBaseNotice( '' );
+										} else {
+											failBaseSwitch();
+										}
+									} )
+									.catch( failBaseSwitch );
+							} else {
+								setAttributes( { base_layer: chosen } );
+								setBaseNotice( '' );
+							}
 						} else {
-							setAttributes( { base_layer: chosen } );
+							failBaseSwitch();
 						}
-					}
-				} );
+					} )
+					.catch( failBaseSwitch );
 			} catch ( syncError ) {
 				// eslint-disable-next-line no-console
 				console.error(
 					'[JEO Minimap] Synchronous error during base variant change:',
 					syncError
 				);
+				failBaseSwitch();
 			}
 		},
 		[ sendChat, setAttributes ]
+	);
+
+	// C2-01 (Contrato G): version restore stays on the existing chat
+	// channel (the list is read-only) — the confirmation lives here in the
+	// button, stating what is discarded and that the current version stays
+	// in the history (git-revert semantics on the server).
+	const handleRestoreVersion = useCallback(
+		( version, current ) => {
+			if ( chatLoading || ! attrsRef.current.conversation_id ) {
+				return;
+			}
+
+			// eslint-disable-next-line no-alert
+			const confirmed = window.confirm(
+				buildRestoreConfirmation( version, current )
+			);
+			if ( ! confirmed ) {
+				return;
+			}
+
+			sendChat( buildRestoreMessage( version.n ) );
+		},
+		[ chatLoading, sendChat ]
 	);
 
 	const closeModal = useCallback( () => setModal( false ), [] );
@@ -1065,10 +1317,15 @@ export default function MinimapEditor( {
 	const debouncedOnMove = useMemo(
 		() =>
 			debounce( ( { viewState } ) => {
-				setAttributes( {
+				const updates = {
 					center_lat: viewState.latitude,
 					center_lon: viewState.longitude,
-				} );
+				};
+				// BUG-C1: a manual reframe makes a stored framing note stale.
+				if ( attrsRef.current.framing_note ) {
+					updates.framing_note = '';
+				}
+				setAttributes( updates );
 			}, 300 ),
 		[ setAttributes ]
 	);
@@ -1077,7 +1334,11 @@ export default function MinimapEditor( {
 		() =>
 			debounce( ( { viewState } ) => {
 				const zoom = Math.round( viewState.zoom * 10 ) / 10;
-				setAttributes( { [ zoomState ]: zoom } );
+				const updates = { [ zoomState ]: zoom };
+				if ( attrsRef.current.framing_note ) {
+					updates.framing_note = '';
+				}
+				setAttributes( updates );
 			}, 300 ),
 		[ setAttributes, zoomState ]
 	);
@@ -1101,7 +1362,7 @@ export default function MinimapEditor( {
 		}
 	}, [ generationMode, generate, generateFromPrompt ] );
 
-	if ( attributes.status === 'loading' ) {
+	if ( uiStatus === 'loading' ) {
 		return (
 			<div { ...blockProps }>
 				<Placeholder
@@ -1116,20 +1377,37 @@ export default function MinimapEditor( {
 							{ LOADING_MESSAGES[ loadingMsgIndex ] }
 						</span>
 					</div>
+					{ /* Wait contract (2.2/A5): phase + elapsed + recovery.
+					     No Cancel — the server persists the turn as it
+					     processes, so an abort would diverge the block from
+					     the stored conversation; waiting is the safe path. */ }
+					<MinimapWaitNote
+						phase={ __( 'Generating the map…', 'jeowp' ) }
+						elapsed={ generationElapsed }
+						recovery={ __(
+							'This can take a couple of minutes. If it takes too long, reload the page — the block offers to generate again and nothing already saved is lost.',
+							'jeowp'
+						) }
+					/>
 				</Placeholder>
 			</div>
 		);
 	}
 
-	if ( attributes.status === 'idle' || attributes.status === 'error' ) {
+	if ( uiStatus === 'idle' || uiStatus === 'error' ) {
 		return (
 			<div { ...blockProps }>
+				{ ! AI_CONFIGURED && <MinimapPrePublishGateWarning /> }
 				<Placeholder
 					icon="map"
 					label={ __( 'AI-Assisted Map', 'jeowp' ) }
 					isColumnLayout={ true }
 					className="jeo-minimap-placeholder"
 				>
+					{ /* 2.1 (K-3): without a configured AI provider the
+					     placeholder shows the gate (two capability-aware
+					     texts, Contrato D) instead of the dead empty state. */ }
+					{ ! AI_CONFIGURED && <MinimapAiGate /> }
 					{ AI_CONFIGURED && (
 						<p className="jeo-minimap-placeholder__description">
 							{ __(
@@ -1138,14 +1416,16 @@ export default function MinimapEditor( {
 							) }
 						</p>
 					) }
-					{ attributes.status === 'error' && (
-						<Notice
-							status="error"
-							isDismissible={ false }
-							className="jeo-minimap-placeholder__error"
-						>
-							{ attributes.message }
-						</Notice>
+					{ uiStatus === 'error' && (
+						<div role="alert">
+							<Notice
+								status="error"
+								isDismissible={ false }
+								className="jeo-minimap-placeholder__error"
+							>
+								{ uiError }
+							</Notice>
+						</div>
 					) }
 					{ AI_CONFIGURED && (
 						<>
@@ -1272,6 +1552,19 @@ export default function MinimapEditor( {
 						] }
 						onChange={ handleBaseVariantChange }
 					/>
+					{ /* 3.7 (G-C): a failed base switch is announced, and the
+					     select already points back at the base that is actually
+					     active (attribution matches the rendered base). */ }
+					{ baseNotice && (
+						<Notice
+							status="warning"
+							isDismissible={ true }
+							onRemove={ () => setBaseNotice( '' ) }
+							className="jeo-minimap-base-notice"
+						>
+							{ baseNotice }
+						</Notice>
+					) }
 				</PanelBody>
 				<PanelBody
 					name="minimap-pins"
@@ -1289,6 +1582,20 @@ export default function MinimapEditor( {
 							setAttributes( { show_pins: v === 'yes' } )
 						}
 					/>
+					{ /* W4 §4: the control communicates when there is
+					     nothing to show. */ }
+					{ attributes.show_pins &&
+						( attributes.pins || [] ).length === 0 && (
+							<p
+								className="jeo-minimap-pins-empty"
+								role="status"
+							>
+								{ __(
+									'No pins were generated for this map.',
+									'jeowp'
+								) }
+							</p>
+						) }
 				</PanelBody>
 				{ AI_CONFIGURED && (
 					<PanelBody
@@ -1297,9 +1604,9 @@ export default function MinimapEditor( {
 						className="jeo-minimap-chat-panel"
 						initialOpen={ true }
 					>
-						{ attributes.conversation?.length > 0 && (
+						{ conversation.length > 0 && (
 							<div className="jeo-chat-messages">
-								{ attributes.conversation.map( ( msg, i ) => (
+								{ conversation.map( ( msg, i ) => (
 									<div
 										key={ i }
 										className={ `jeo-chat-message jeo-chat-message--${ msg.role }` }
@@ -1335,6 +1642,20 @@ export default function MinimapEditor( {
 								<div ref={ messagesEndRef } />
 							</div>
 						) }
+						{ /* Wait contract (2.2/A5) for chat turns: phase + elapsed
+						     + recovery. No Cancel — the server persists the turn
+						     as it processes, so aborting would diverge the block
+						     from the stored conversation. */ }
+						{ chatLoading && (
+							<MinimapWaitNote
+								phase={ __( 'Waiting for the AI…', 'jeowp' ) }
+								elapsed={ chatElapsed }
+								recovery={ __(
+									'If it takes too long, reload the page — everything already generated stays saved.',
+									'jeowp'
+								) }
+							/>
+						) }
 						<div className="jeo-chat-input-row">
 							<TextareaControl
 								value={ chatInput }
@@ -1361,7 +1682,34 @@ export default function MinimapEditor( {
 						<div className="jeo-chat-actions">
 							<Button
 								variant="secondary"
-								onClick={ () => sendChat( '', 'regenerate' ) }
+								onClick={ () => {
+									// C2-01 faceta Regenerate: warn before
+									// discarding manually added layers (the
+									// server regenerates from scratch).
+									const manualCount = (
+										attributes.layers || []
+									).filter(
+										( layer ) =>
+											layer.provenance === 'manual'
+									).length;
+									if (
+										manualCount > 0 &&
+										// eslint-disable-next-line no-alert
+										! window.confirm(
+											sprintf(
+												/* translators: %d: number of manually added layers. */
+												__(
+													'Regenerating the map discards the %d layer(s) you added manually. The conversation and the version history are kept. Continue?',
+													'jeowp'
+												),
+												manualCount
+											)
+										)
+									) {
+										return;
+									}
+									sendChat( '', 'regenerate' );
+								} }
 								disabled={ chatLoading }
 								isSmall
 							>
@@ -1408,15 +1756,55 @@ export default function MinimapEditor( {
 						) }
 					</PanelBody>
 				) }
+				{ /* C2-01 (Contrato G): version history, one entry per accepted
+				     AI turn; restore is deterministic with an explicit confirm. */ }
+				{ AI_CONFIGURED && attributes.conversation_id && (
+					<MinimapVersionsPanel
+						postId={ postId }
+						conversationId={ attributes.conversation_id }
+						onRestore={ handleRestoreVersion }
+						refreshKey={ versionsRefreshKey }
+						busy={ chatLoading }
+					/>
+				) }
 			</InspectorControls>
 
-			{ attributes.message && (
+			{ uiMessage && (
 				<Notice
 					status="warning"
 					isDismissible={ false }
 					className="jeo-minimap-notice"
 				>
-					{ attributes.message }
+					{ uiMessage }
+				</Notice>
+			) }
+
+			{ /* 3.6 (G-B): when the AI declares the real framing, the map
+			     "confesses" it next to the map. */ }
+			{ attributes.framing_note && (
+				<Notice
+					status="info"
+					isDismissible={ false }
+					className="jeo-minimap-framing-note"
+				>
+					{ sprintf(
+						/* translators: %s: humanized framing note from the AI. */
+						__( 'Map framing: %s', 'jeowp' ),
+						attributes.framing_note
+					) }
+				</Notice>
+			) }
+
+			{ /* V1 race guard: the AI answer arrived after the user changed
+			     the map (e.g. undo) — its attribute writes were discarded. */ }
+			{ preemptedNotice && (
+				<Notice
+					status="warning"
+					isDismissible={ true }
+					onRemove={ () => setPreemptedNotice( '' ) }
+					className="jeo-minimap-notice"
+				>
+					{ preemptedNotice }
 				</Notice>
 			) }
 
@@ -1435,7 +1823,12 @@ export default function MinimapEditor( {
 						{ __( 'Vector style preview', 'jeowp' ) }
 					</div>
 				) }
-				{ ! isPreparingComposedPreview && ! previewError && (
+				{ ! isPreparingComposedPreview &&
+					! previewError &&
+					! tilePreflight.checking && (
+					<PreviewErrorBoundary
+						onCatch={ ( error ) => setPreviewError( error ) }
+					>
 					<Map
 						key={ `${
 							styleBase
@@ -1537,6 +1930,7 @@ export default function MinimapEditor( {
 								/>
 							) ) }
 					</Map>
+					</PreviewErrorBoundary>
 				) }
 			</div>
 

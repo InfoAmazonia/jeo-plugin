@@ -14,6 +14,10 @@
 
 ## Custom Post Type: `map-layer`
 
+### Layer Origin (W4 4.7)
+
+`Layers::resolve_layer_origin( $post_id )` resolves each layer's origin **read-only**: stored `provenance` meta (`'ai'` set at creation by `Minilayer_Service` and `Place_Polygon_Service`; `'manual'` default) → legacy fallback `_jeo_boundary_source` (deterministic boundary-tool marker) → `'manual'`. The layers list table shows the textual **Origin** column ("AI-generated"/"Manual" — never color-only), and the layer REST responses (`/wp/v2/map-layer`, entity and collections) carry the always-present top-level `layer_origin` field. Legacy audit layers are never written to — the fallback resolves them.
+
 ### Block Editor Template (W1)
 
 The `map-layer` post type declares its block template in the `register_post_type()`
@@ -195,6 +199,18 @@ resyncs it from the preserved form data. Style-definition requests
 (`_getStyleDefinition`/`getStyleLayers`) only fire when the form is complete,
 so an incomplete form no longer produces failing Mapbox requests (and console
 errors).
+
+### Schema-default injection sanitizer (r3b-final)
+
+The SchemaForm (RJSF) writes schema defaults into the form data when a layer
+loads (e.g. `scheme: 'xyz'`). `layers-sidebar/commit-sanitize.js` strips those
+mount-injected defaults from **meta commits** (`learnInjectedDefaults` runs
+once at the first commit; `stripInjectedDefaults` applies to every commit in
+`layer-settings.js`): a non-required key absent from the server meta at mount
+is only persisted once the user actually changes it. Render state keeps the
+defaults (the form needs them); required keys are never stripped (the publish
+lock and renderers depend on them). Side effect: the post is no longer dirtied
+by the SchemaForm mount normalization.
 
 ## Layer Usage Modes
 

@@ -37,6 +37,23 @@
 All map meta is registered with `revisions_enabled => true` — WordPress stores it
 in autosaves and revisions (WP 6.4+) and restores it with the revision.
 
+### Visible Input Normalization (W4 4.1)
+
+Invalid geographic values are fixed **on save** and the adjustment is reported back (`Maps::normalize_geo_meta`, hooked on `rest_pre_insert_map`):
+
+- `center_lon` clamped to [-180, 180]; `center_lat` to [-90, 90] — **clamp, not wrap**: an out-of-range entry is a typo, and the contract is a visible correction, not a silent jump to the other side of the globe.
+- `min_zoom`/`max_zoom`: negatives (including `-0`) → `0`.
+- Negative zero is canonicalized to `0` on all four fields (silently — mathematically identical).
+- **Internal precision is untouched**: nothing is rounded (valid exotic values pass through; the 14-digit float serialization is core REST behavior, unchanged).
+
+The adjustments are stored per-field in `_jeo_map_normalization_notes` (a later valid save of the field clears its note) and exposed on the map REST response as `normalization_notes` (only when non-empty):
+
+```json
+{ "normalization_notes": [ { "field": "center_lon", "from": 250.84, "to": 180, "message": "Adjusted from 250.84 to the maximum of 180" } ] }
+```
+
+The frontend renders each note inline next to the field (`message` is already localized server-side; `from`/`to` are the raw numbers).
+
 #### `layers` Item Schema (REST-validated)
 
 Each item is an object declared in `class-maps.php::register_post_meta()`: `id` (required), `use` (required — `fixed`/`switchable`/`swappable`), `load_as_style`, `style_layers`, `default`, `show_legend`, `style`, and the optional `provenance` (`'manual'` | `'ai'`, enum-validated; missing means `'manual'`). `provenance` is stamped by the **shared** layer library modal (`map-blocks/layers-settings.js`, also used by the `map` CPT sidebar) — see [minimap provenance](../minimap/README.md). The REST schema rejects undeclared keys (core injects `additionalProperties: false` into object meta schemas), so any new layer field produced by the shared modal **must** be declared here, otherwise publishing a `map` post fails with "X is not a valid property of Object".

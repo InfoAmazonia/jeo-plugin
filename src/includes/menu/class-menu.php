@@ -22,6 +22,7 @@ class Menu {
 	protected function init() {
 		add_action( 'admin_menu', array( $this, 'add_main_menu' ), 5 ); // Priority 5 to run before CPTs if possible.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_dashboard_assets' ) );
+		add_action( 'admin_head', array( $this, 'print_menu_separator_styles' ) );
 	}
 
 	/**
@@ -62,19 +63,40 @@ class Menu {
 			array( $this, 'render_dashboard_page' )
 		);
 
-		// 4. Submenu AI (new) - Posicionado após Dashboard e antes dos CPTs (Maps, Layers)
+		// 4. Submenu AI Settings - Posicionado após Dashboard e antes dos CPTs (Maps, Layers)
 		add_submenu_page(
 			'jeo-main-menu',
-			__( 'AI (new)', 'jeowp' ),
-			__( 'AI (new)', 'jeowp' ),
+			__( 'AI Settings', 'jeowp' ),
+			__( 'AI Settings', 'jeowp' ),
 			'manage_options',
 			'jeo-ai-settings',
 			array( \jeo_ai_settings(), 'render_settings_page' )
 		);
 
+		// 5. Separator between the JEO utility pages (Welcome, Dashboard, AI
+		// Settings) and the content types (Maps, Layers, Story Maps) — pure
+		// CSS on the first CPT entry (a11y B-9: no focusable stub link in the
+		// tab order; the previous `add_submenu_page` separator was an empty,
+		// focusable anchor).
 		// Nota: Maps, Layers e Story Maps são injetados via seus respectivos arquivos class-*.php
 		// usando o slug 'jeo-main-menu' como 'show_in_menu'.
-		// Para garantir a ordem, precisamos ajustar as prioridades nesses arquivos.
+	}
+
+	/**
+	 * Print the minimal styles for the admin menu separator.
+	 *
+	 * @return void
+	 */
+	public function print_menu_separator_styles() {
+		?>
+		<style id="jeo-menu-separator">
+			#adminmenu .wp-submenu li a[href$="post_type=map"] {
+				border-top: 1px solid rgba(255, 255, 255, 0.2);
+				margin-top: 6px;
+				padding-top: 10px;
+			}
+		</style>
+		<?php
 	}
 
 	/**

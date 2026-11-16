@@ -12,7 +12,16 @@ import { useDebounce } from 'use-debounce';
 
 import { Map } from '../lib/mapgl-react';
 import { MemoizedRenderLayer } from './map-preview-layer';
-import PreviewErrorState, { buildPreviewErrorInfo } from './preview-error';
+import PreviewErrorState, {
+	buildPreviewErrorInfo,
+	PreviewErrorBoundary,
+} from './preview-error';
+import {
+	getPreviewAttemptKey,
+	getTileLayerPreflightUrls,
+	resolveAttemptTransition,
+	useTileLayerPreflight,
+} from './tile-preflight';
 import { isStyleLayerType } from '../shared/style-layer-types';
 import { validateLayerFormData } from '../layers-sidebar/form-validation';
 import {
@@ -109,6 +118,28 @@ export default function LayerEditorPreview() {
 		{ meta: debouncedPostMeta },
 	] );
 
+	// R3-G1: tile-based sources (tilelayer/MVT) cannot rely on GL error
+	// events alone — MapLibre swallows 404 tiles and errored tiles still
+	// emit `sourcedata` content events. Preflight the concrete tile URL so
+	// a dead source always becomes the error state, never a courtesy map.
+	const tilePreflightUrls = useMemo(
+		() =>
+			formValidation.complete && ! isStyleType
+				? getTileLayerPreflightUrls( debouncedPostMeta )
+				: [],
+		[ debouncedPostMeta, formValidation.complete, isStyleType ]
+	);
+	const tilePreflight = useTileLayerPreflight( tilePreflightUrls, retryCount );
+
+	useEffect( () => {
+		if ( tilePreflight.error ) {
+			setPreviewError( {
+				error: tilePreflight.error,
+				kind: 'source',
+			} );
+		}
+	}, [ tilePreflight.error ] );
+
 	// Surface style fetch failures as the error state — never fall back to
 	// the default base map ("courtesy map") when the source failed.
 	useEffect( () => {
@@ -142,17 +173,6 @@ export default function LayerEditorPreview() {
 		}
 	}, [ inlineStyleError ] );
 
-	// New form data means a new attempt: clear the error state.
-	useEffect( () => {
-		setPreviewError( null );
-		loadedRef.current = false;
-		layerContentRef.current = false;
-	}, [
-		debouncedPostMeta.layer_type_options,
-		debouncedPostMeta.type,
-		retryCount,
-	] );
-
 	useEffect( () => {
 		if ( mapboxStylePreview.viewState ) {
 			setViewState( ( currentViewState ) => ( {
@@ -181,9 +201,48 @@ export default function LayerEditorPreview() {
 		setKey( ( prev ) => prev + 1 );
 	}, [] );
 
+	// Error lifecycle on data commits (R3B-G1, final (c)): a commit is only
+	// a new attempt when the CONTENT key changed — reference-only commits
+	// (SchemaForm re-normalization) never touch the error. A REAL change
+	// while a source error shows never clears it silently (that resurrected
+	// the courtesy map): the surface auto-retries, re-running the preflight
+	// so the error comes back honestly if the source is still bad — and
+	// clearing normally when the fix is genuine.
+	const lastAttemptKeyRef = useRef( null );
+	const previewErrorRef = useRef( null );
+	previewErrorRef.current = previewError;
+	useEffect( () => {
+		const attemptKey = getPreviewAttemptKey( debouncedPostMeta, 0 );
+		const dataChanged =
+			lastAttemptKeyRef.current !== null &&
+			lastAttemptKeyRef.current !== attemptKey;
+		lastAttemptKeyRef.current = attemptKey;
+		const transition = resolveAttemptTransition( {
+			dataChanged,
+			hasSourceError: previewErrorRef.current?.kind === 'source',
+		} );
+		if ( 'keep' === transition ) {
+			return;
+		}
+		if ( 'redecide' === transition ) {
+			retry();
+			return;
+		}
+		setPreviewError( null );
+		loadedRef.current = false;
+		layerContentRef.current = false;
+	}, [ debouncedPostMeta, retryCount, retry ] );
+
+	const isPreflightingTiles =
+		formValidation.complete &&
+		! previewError &&
+		! isStyleType &&
+		tilePreflightUrls.length > 0 &&
+		tilePreflight.checking;
 	const shouldRenderMap =
 		formValidation.complete &&
 		! previewError &&
+		! isPreflightingTiles &&
 		( ! isStyleType ||
 			Boolean( mapboxStylePreview.style ) ||
 			Boolean( styleJsonStyle ) );
@@ -227,8 +286,16 @@ export default function LayerEditorPreview() {
 						</p>
 					</div>
 				) }
-				{ isPreparingPreview && <Spinner /> }
+				{ ( isPreparingPreview || isPreflightingTiles ) && <Spinner /> }
 				{ shouldRenderMap && (
+					<PreviewErrorBoundary
+						onCatch={ ( error ) =>
+							setPreviewError( {
+								error,
+								kind: isStyleType ? 'style' : 'source',
+							} )
+						}
+					>
 					<Map
 						key={ `${ key }:${
 							mapboxStyleUrl || styleJsonStyle || 'default'
@@ -298,6 +365,7 @@ export default function LayerEditorPreview() {
 							/>
 						) }
 					</Map>
+					</PreviewErrorBoundary>
 				) }
 			</div>
 		</div>

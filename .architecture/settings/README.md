@@ -28,9 +28,12 @@ All config in a single array option `jeo-settings`.
 
 ### AI Settings (Separate tab under Jeo → AI)
 
+All six tabs render in one navigation (`AI_Settings::get_tabs()`): AI Provider, Knowledge Base, Bulk Geolocation, Context Assistant, **Embedded Data** (in the nav since W4 — it was previously reachable only via direct URL) and Settings.
+
 | Tab | Keys |
 |-----|------|
 | Provider | `ai_provider`, `ai_{provider}_key`, `ai_{provider}_model` |
+| General | `ai_output_language` (`auto`\|`site`\|ISO code — unified AI output language; see `ai/README.md`), `ai_debug_mode`, `ai_debug_console` (default `false`), `ai_use_structured_output` |
 | Knowledge Base | `rag_auto_index`, `rag_post_types` |
 | Context Assistant | `ai_use_context_custom_prompt`, `ai_context_prompt` |
 | Bulk | `bulk_ai_enabled`, `bulk_ai_post_types`, `bulk_confidence_threshold` |
@@ -70,12 +73,22 @@ array.
 Jeo
 ├── Welcome           (submenu: welcome)
 ├── Dashboard         (submenu: dashboard)
-├── AI                (submenu: ai-settings)
-│   └── AI Debug Logs (submenu: ai-logs)
+├── AI Settings       (submenu: ai-settings; renamed from "AI (new)" in W2)
+├── ───               (hairline separator, `jeo-menu-separator` — splits JEO utility pages from content types)
 ├── Maps              (CPT: map)
 ├── Layers            (CPT: map-layer)
-└── Storymaps         (CPT: storymap)
+├── Storymaps         (CPT: storymap)
+├── Settings          (submenu: settings)
+└── AI Debug Logs     (submenu: ai-logs)
 ```
+
+The separator is a `add_submenu_page` stub (`__return_false`) styled into a
+1px hairline via `Menu::print_menu_separator_styles()` (`admin_head`);
+pointer-events are disabled so the stub is never clickable.
+
+## AI Debug Logs (destructive action pattern)
+
+"Clear All Logs" follows the wp-admin interstitial pattern for destructive actions (W3 C2-12): the trigger is a low-weight `button-link-delete` link at the bottom of the table; clicking it reloads the page with `jeo_confirm_clear=1` + a `_wpnonce` (`jeo_confirm_clear_logs`), which renders a `notice-warning` with the log count and two actions — a red "Yes, delete all logs" button (posts the unchanged `jeo_clear_logs` handler) and "Cancel". Never use the browser's OS-styled `confirm()` on wp-admin screens.
 
 ## Geographic Dashboard
 
@@ -141,3 +154,7 @@ Consumers that publish styles resolve the token via
 `jeo_settings()->get_mapbox_publish_token()` (secret wins, fallback to public).
 The secret participates in the masked-sensitive-keys loop (submissions
 containing `********` keep the stored value) and is trimmed/sanitized on save.
+
+## Admin Datetime Format (W4 4.5)
+
+Plugin-controlled wp-admin lists render datetimes through `Jeo::admin_datetime()` — `date_i18n` with the single canonical format `Jeo::ADMIN_DATETIME_FORMAT` (`Y-m-d H:i:s`). Machine-facing payloads (REST responses, minimap version timestamps) keep raw MySQL datetimes for the frontend to localize. Applied today to the AI Debug Logs table and modal.

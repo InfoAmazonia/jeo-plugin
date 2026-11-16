@@ -168,7 +168,16 @@ class Jeo {
 		$readmes = array();
 
 		if ( empty( $unique_files ) ) {
-			return new \WP_REST_Response( array( 'error' => 'No README files found' ), 404 );
+			$payload = \Jeo\Error_Presenter::wrap(
+				__( 'The onboarding documentation could not be loaded.', 'jeowp' ),
+				__( 'Try again in a few moments. If the problem persists, reinstall the JEO plugin — the welcome guide file is missing from the plugin folder.', 'jeowp' ),
+				'No README files found (searched: ' . implode( ', ', $paths ) . ')'
+			);
+
+			return new \WP_REST_Response(
+				array_merge( array( 'success' => false ), $payload ),
+				404
+			);
 		}
 
 		foreach ( $unique_files as $file_name => $file_path ) {
@@ -371,6 +380,99 @@ class Jeo {
 			$language = ICL_LANGUAGE_CODE;
 		}
 		return apply_filters( 'wpml_current_language', $language );
+	}
+
+	/**
+	 * Resolve the configured AI output language.
+	 *
+	 * Unified language policy (W3 3.4): configuration takes precedence over
+	 * the article language. Returns 'auto' (follow the editor and the
+	 * article) or a resolved ISO language code ('site' resolves to the site
+	 * language's primary tag).
+	 *
+	 * @return string
+	 */
+	public static function get_configured_ai_language(): string {
+		$value = strtolower( (string) \jeo_settings()->get_option( 'ai_output_language', 'auto' ) );
+
+		if ( 'site' === $value ) {
+			$site    = strtolower( sanitize_text_field( get_bloginfo( 'language' ) ) );
+			$primary = substr( $site, 0, strpos( $site . '-', '-' ) );
+
+			return $primary ? $primary : 'en';
+		}
+
+		if ( preg_match( '/^[a-z]{2,3}$/', $value ) ) {
+			return $value;
+		}
+
+		return 'auto';
+	}
+
+	/**
+	 * Build the "## Output Language" prompt section for AI agents.
+	 *
+	 * The section enforces the unified language policy in every agent
+	 * system prompt (minimap, context assistant): the configured language
+	 * wins; 'auto' follows the editor's conversation and the article.
+	 *
+	 * @return string
+	 */
+	public static function get_ai_language_prompt_section(): string {
+		$language = self::get_configured_ai_language();
+
+		if ( 'auto' === $language ) {
+			return "## Output Language\n\nFollow the editor's language: reply in the language the user writes in. Write content destined for the article (suggested paragraphs, notices that quote or summarize article content) in the article's own language. When the two differ, keep chat replies in the user's language and article-bound content in the article's language.";
+		}
+
+		$names = array(
+			'en' => 'English',
+			'pt' => 'Portuguese',
+			'es' => 'Spanish',
+			'fr' => 'French',
+			'de' => 'German',
+			'it' => 'Italian',
+		);
+		$name  = $names[ $language ] ?? $language;
+
+		return "## Output Language\n\nAlways write EVERY user-visible output — chat replies, notices, suggested paragraphs and any content destined for the article — in {$name} (configured site policy; ISO code: {$language}). This configured language takes precedence over the article's language.";
+	}
+
+	/**
+	 * Format a post (or MySQL) date in the site's admin datetime format (W4 4.5).
+	 *
+	 * Machine-facing payloads (REST responses, version timestamps) keep raw
+	 * MySQL datetimes for the frontend to localize; anything the plugin
+	 * renders in wp-admin lists uses the SITE's configured date/time formats
+	 * (Gate W4 decision), localized via date_i18n.
+	 *
+	 * @param string|\WP_Post|null $value MySQL datetime or post object (null = now).
+	 * @return string
+	 */
+	public static function admin_datetime( $value = null ) {
+		$format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+
+		if ( $value instanceof \WP_Post ) {
+			$timestamp = get_post_timestamp( $value );
+
+			return false !== $timestamp
+				? date_i18n( $format, $timestamp )
+				: date_i18n( $format );
+		}
+
+		if ( is_string( $value ) && '' !== $value ) {
+			// Stored MySQL datetimes are site-local (current_time( 'mysql' ));
+			// neutralize the GMT offset date_i18n() applies so the stored
+			// wall-clock time is preserved with localized text.
+			$offset    = (int) round( (float) get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+			$timestamp = strtotime( $value );
+
+			return false !== $timestamp
+				? date_i18n( $format, $timestamp - $offset )
+				: date_i18n( $format );
+		}
+
+		return date_i18n( $format );
 	}
 
 	/**
@@ -873,8 +975,11 @@ class Jeo {
 			'jeo-context-sidebar',
 			'jeoContext',
 			array(
-				'rest_url' => rest_url( 'jeo/v1' ),
-				'nonce'    => wp_create_nonce( 'wp_rest' ),
+				'rest_url'         => rest_url( 'jeo/v1' ),
+				'nonce'            => wp_create_nonce( 'wp_rest' ),
+				'ai_configured'    => \jeo_ai_handler()->is_configured(),
+				'can_configure_ai' => current_user_can( 'manage_options' ),
+				'ai_language'      => $this->get_configured_ai_language(),
 			)
 		);
 
@@ -927,6 +1032,7 @@ class Jeo {
 				'ajax_url'         => admin_url( 'admin-ajax.php' ),
 				'ai_provider_name' => $ai_provider_name,
 				'ai_configured'    => \jeo_ai_handler()->is_configured(),
+				'can_configure_ai' => current_user_can( 'manage_options' ),
 				'map_runtime'      => $map_runtime_requested,
 				'mapbox_key'       => $mapbox_key,
 				'default_lat'      => $default_lat,
@@ -1055,6 +1161,7 @@ class Jeo {
 				'nonce'                      => $this->get_rest_nonce(),
 				'currentLang'                => $this->get_current_language(),
 				'ai_configured'              => \jeo_ai_handler()->is_configured(),
+				'can_configure_ai'           => current_user_can( 'manage_options' ),
 			)
 		);
 	}
@@ -1457,10 +1564,11 @@ class Jeo {
 			wp_enqueue_script( 'jeo-js' );
 			wp_enqueue_style( 'jeo-js' );
 
-			if ( \jeo_ai_handler()->is_configured() ) {
-				wp_enqueue_script( 'jeo-context-sidebar' );
-				wp_enqueue_style( 'jeo-context-sidebar' );
-			}
+			// Always enqueued for enabled post types: the panel renders an
+			// explanatory gate (via `ai_configured`/`can_configure_ai`) when
+			// no AI provider is configured, instead of disappearing.
+			wp_enqueue_script( 'jeo-context-sidebar' );
+			wp_enqueue_style( 'jeo-context-sidebar' );
 		}
 	}
 

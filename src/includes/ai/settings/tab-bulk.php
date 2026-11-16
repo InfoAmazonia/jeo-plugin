@@ -59,19 +59,19 @@
 			<th scope="row"><?php esc_html_e( 'Execution Logs', 'jeowp' ); ?></th>
 			<td>
 				<div style="background: #f6f7f7; border: 1px solid #ccd0d4; border-radius: 4px; padding: 15px; max-width: 800px;">
-					<h5 style="margin: 0 0 10px 0;"><?php esc_html_e( 'Recent Background Activity', 'jeowp' ); ?></h5>
+					<h2 style="margin: 0 0 10px 0;"><?php esc_html_e( 'Recent background activity', 'jeowp' ); ?></h2>
 					<?php
 					$bulk_logs = get_option( 'jeo_bulk_ai_cron_logs', array() );
 					if ( empty( $bulk_logs ) || ! is_array( $bulk_logs ) ) :
 						?>
-						<p style="font-size: 11px; color: #8c8f94; font-style: italic; margin: 0;">
+						<p style="font-size: 11px; color: #50575e; font-style: italic; margin: 0;">
 							<?php esc_html_e( 'No recent activity recorded.', 'jeowp' ); ?>
 						</p>
 					<?php else : ?>
 						<ul style="margin: 0; padding: 0; list-style: none; font-size: 11px; font-family: monospace;">
 							<?php foreach ( $bulk_logs as $log ) : ?>
 								<li style="margin-bottom: 5px; padding: 5px 8px; background: #fff; border-left: 2px solid #ccc; border-radius: 3px;">
-									<span style="color: #8c8f94;">[<?php echo esc_html( $log['time'] ); ?>]</span> 
+									<span style="color: #646970;">[<?php echo esc_html( \Jeo::admin_datetime( $log['time'] ) ); ?>]</span> 
 									<strong><?php echo esc_html( $log['source'] ); ?>:</strong> 
 									<?php echo esc_html( $log['status'] ); ?> - 
 									<?php echo esc_html( $log['message'] ); ?>
@@ -88,13 +88,13 @@
 			<td>
 				<div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
 					<button type="button" class="button button-primary" id="jeo-bulk-run-manual-btn">
-						🚀 <?php esc_html_e( 'Process 1 Batch Now', 'jeowp' ); ?>
+						<?php esc_html_e( 'Process 1 Batch Now', 'jeowp' ); ?>
 					</button>
 					<button type="button" class="button button-secondary" id="jeo-bulk-clear-batch-btn">
-						🧹 <?php esc_html_e( 'Clear 1 Batch', 'jeowp' ); ?>
+						<?php esc_html_e( 'Clear 1 Batch', 'jeowp' ); ?>
 					</button>
 					<button type="button" class="button button-link-delete" id="jeo-bulk-clear-all-btn" style="color: #d63638;">
-						🗑️ <?php esc_html_e( 'Reset All Posts', 'jeowp' ); ?>
+						<?php esc_html_e( 'Reset All Posts', 'jeowp' ); ?>
 					</button>
 				</div>
 				<p class="description"><?php esc_html_e( 'Manual Batch: Processes legacy posts immediately. Clear Batch: Resets the "processed" flag for a small group. Reset All: Schedules a background task to clear all posts (Double confirmation required).', 'jeowp' ); ?></p>

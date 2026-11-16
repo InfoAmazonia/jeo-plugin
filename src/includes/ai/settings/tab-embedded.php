@@ -6,8 +6,12 @@
  */
 
 ?>
+<style>
+	/* W4 a11y: code contrast >= 4.5:1 */
+	.jeo-tab-content-wrapper code { color: #1d2327; }
+</style>
 <div class="card" style="max-width: 100%; padding: 20px; border-radius: 8px;">
-	<h3 style="margin-top: 0;">🇧🇷 <?php esc_html_e( 'Embedded Brazilian Territories', 'jeowp' ); ?></h3>
+	<h2 style="margin-top: 0;"><?php esc_html_e( 'Embedded Brazilian territories', 'jeowp' ); ?></h2>
 	<p class="description"><?php esc_html_e( 'The following geographic dictionaries are available locally to improve AI precision:', 'jeowp' ); ?></p>
 	
 	<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-top: 20px;">

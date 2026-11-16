@@ -1,0 +1,82 @@
+/* Minimap editor additions (W2/W3): wait contract, AI gate, framing note,
+   versions panel. Kept in a dedicated file so the shared
+   onetime-map-editor.css stays untouched (track boundaries). */
+
+.jeo-minimap-wait {
+	margin: 8px 0 0;
+	font-size: 12px;
+	color: #646970;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 8px;
+	align-items: baseline;
+}
+
+.jeo-minimap-wait__phase {
+	font-weight: 600;
+	color: #3c434a;
+}
+
+.jeo-minimap-wait__elapsed {
+	font-variant-numeric: tabular-nums;
+}
+
+.jeo-minimap-wait__recovery {
+	flex-basis: 100%;
+	font-style: italic;
+}
+
+.jeo-minimap-framing-note {
+	margin: 0 0 8px;
+}
+
+.jeo-minimap-versions {
+	margin: 0;
+	padding-left: 18px;
+}
+
+.jeo-minimap-version {
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.jeo-minimap-version:last-child {
+	border-bottom: 0;
+}
+
+.jeo-minimap-version__meta {
+	display: flex;
+	gap: 6px;
+	align-items: baseline;
+}
+
+.jeo-minimap-version__date {
+	color: #646970;
+	font-size: 12px;
+}
+
+.jeo-minimap-version__badge {
+	background: #f0f0f1;
+	border-radius: 3px;
+	padding: 1px 6px;
+	font-size: 11px;
+	color: #3c434a;
+}
+
+.jeo-minimap-version__label {
+	font-size: 12px;
+	color: #3c434a;
+	margin: 2px 0 4px;
+}
+
+.jeo-minimap-gate-prepublish p {
+	margin: 0;
+}
+
+/* W4 G4b — gate title inside the block Placeholder (KB-gate pattern). */
+.jeo-minimap-gate__title {
+	margin: 0;
+	font-size: 1.15em;
+	font-weight: 600;
+}

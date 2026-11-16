@@ -169,6 +169,7 @@ export function EmptyCanvasGuide( { postType, message, saveLockKeys = [] } ) {
 	const { createNotice, removeNotice } = useDispatch( 'core/notices' );
 	const {
 		savePost,
+		editPost,
 		lockPostSaving,
 		unlockPostSaving,
 		lockPostAutosaving,
@@ -181,7 +182,22 @@ export function EmptyCanvasGuide( { postType, message, saveLockKeys = [] } ) {
 	// defensively around the call in case a future Gutenberg version
 	// enforces the lock inside the action.
 	const handleSaveDraft = useCallback( () => {
-		const wasLocked = select( 'core/editor' ).isPostSavingLocked();
+		const editorSelect = select( 'core/editor' );
+		// R3-G3: the server rejects a layer draft without a valid `type`
+		// ("Layer type not registered") — assign the simplest registered
+		// type first so the draft save promised by this notice works. The
+		// form then opens incomplete (missing fields), which is the
+		// intended starting state.
+		if ( postType === 'map-layer' ) {
+			const currentMeta =
+				editorSelect.getEditedPostAttribute( 'meta' ) || {};
+			if ( ! currentMeta.type ) {
+				editPost( {
+					meta: { ...currentMeta, type: 'tilelayer' },
+				} );
+			}
+		}
+		const wasLocked = editorSelect.isPostSavingLocked();
 		if ( wasLocked ) {
 			saveLockKeys.forEach( ( key ) => {
 				unlockPostSaving( key );
@@ -199,7 +215,7 @@ export function EmptyCanvasGuide( { postType, message, saveLockKeys = [] } ) {
 			}
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- dispatchers are stable
-	}, [ savePost, saveLockKeys.join( ':' ) ] );
+	}, [ savePost, editPost, postType, saveLockKeys.join( ':' ) ] );
 
 	useEffect( () => {
 		if ( isVisible ) {

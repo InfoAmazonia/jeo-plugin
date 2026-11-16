@@ -70,6 +70,20 @@ function MapsSidebar( { postId, postMeta = {}, relatedPosts, setPostMeta } ) {
 	);
 	const { createNotice, removeNotice } = useDispatch( 'core/notices' );
 
+	// Contrato N (W4 §6.2): normalization notes travel on the map's REST
+	// record (top-level, only when a save adjusted a field).
+	const normalizationNotes = useSelect(
+		( select2 ) =>
+			postId
+				? select2( 'core' ).getEditedEntityRecord(
+						'postType',
+						'map',
+						postId
+				  )?.normalization_notes || []
+				: [],
+		[ postId ]
+	);
+
 	const showNoLayersWarning = Boolean(
 		postId &&
 			postStatus === 'publish' &&
@@ -176,6 +190,7 @@ function MapsSidebar( { postId, postMeta = {}, relatedPosts, setPostMeta } ) {
 				setAttributes={ setPostMeta }
 				renderPanel={ PluginDocumentSettingPanel }
 				setPanLimitsFromMap={ setPanLimitsFromMap }
+				normalizationNotes={ normalizationNotes }
 			/>
 
 			<PostsSelector

@@ -20,6 +20,10 @@ import {
 	getEditorLayerTypeSchema,
 } from './layer-type-definitions';
 import { validateLayerFormData } from './form-validation';
+import {
+	learnInjectedDefaults,
+	stripInjectedDefaults,
+} from './commit-sanitize';
 
 const baseLayerSchema = {
 	type: 'object',
@@ -136,6 +140,37 @@ const LayerSettings = ( { postId, postMeta, sendNotice, setPostMeta } ) => {
 	// the RJSF select keeps its own internal state (Gate 2 — G2).
 	const [ formResetKey, setFormResetKey ] = useState( 0 );
 
+	// R3B-G1 (a): the SchemaForm injects schema defaults into the meta on
+	// mount (e.g. `scheme: 'xyz'`), dirtying the post and racing the preview
+	// error lifecycle. The server meta at mount is the baseline; injected
+	// defaults are stripped from COMMITS only (render keeps them).
+	const initialServerMetaRef = useRef( null );
+	if ( initialServerMetaRef.current === null ) {
+		initialServerMetaRef.current = normalizeLayerFormData( postMeta );
+	}
+	const injectedDefaultsRef = useRef( new Set() );
+	const injectionCapturedRef = useRef( false );
+
+	// Strip untouched schema-default injections before persisting. Required
+	// keys are never stripped (the publish lock depends on them).
+	const sanitizeForCommit = useCallback( ( data ) => {
+		const commitSchema = getEditorLayerTypeSchema( data );
+		if ( ! injectionCapturedRef.current ) {
+			learnInjectedDefaults( {
+				formData: data,
+				initialFormData: initialServerMetaRef.current,
+				schema: commitSchema,
+				injectedKeys: injectedDefaultsRef.current,
+			} );
+			injectionCapturedRef.current = true;
+		}
+		return stripInjectedDefaults( {
+			formData: data,
+			schema: commitSchema,
+			injectedKeys: injectedDefaultsRef.current,
+		} );
+	}, [] );
+
 	const getLayerTypeLabel = useCallback(
 		( slug ) =>
 			layerTypeOptions.find( ( option ) => option.value === slug )
@@ -207,14 +242,14 @@ const LayerSettings = ( { postId, postMeta, sendNotice, setPostMeta } ) => {
 				};
 				typeSwitchHandledRef.current = true;
 				setFormData( switchedFormData );
-				debouncedSetPostMeta( switchedFormData );
+				debouncedSetPostMeta( sanitizeForCommit( switchedFormData ) );
 				return;
 			}
 
 			setFormData( nextFormData );
-			debouncedSetPostMeta( nextFormData );
+			debouncedSetPostMeta( sanitizeForCommit( nextFormData ) );
 		},
-		[ formData, debouncedSetPostMeta, getLayerTypeLabel, hasFilledOptions ]
+		[ formData, debouncedSetPostMeta, getLayerTypeLabel, hasFilledOptions, sanitizeForCommit ]
 	);
 
 	const schema = useMemo(
@@ -316,9 +351,9 @@ const LayerSettings = ( { postId, postMeta, sendNotice, setPostMeta } ) => {
 				},
 			};
 			setFormData( nextFormData );
-			setPostMeta( nextFormData );
+			setPostMeta( sanitizeForCommit( nextFormData ) );
 		},
-		[ formData, setPostMeta ]
+		[ formData, setPostMeta, sanitizeForCommit ]
 	);
 
 	useEffect( () => {

@@ -77,6 +77,12 @@ export function renderLayer( { layer, instance } ) {
 
 	switch ( layer.type ) {
 		case 'mapbox-tileset-raster': {
+			// R3-G5/GAP-A: meta written outside the form (API/CLI/legacy) may
+			// lack required keys — never hand GL an incomplete spec (it throws
+			// synchronously and crashes the block into the core boundary).
+			if ( ! options.tileset_id || ! options.style_source_type ) {
+				return null;
+			}
 			const tilesetId = options.tileset_id ?? '';
 			const tilesetUrl = tilesetId.includes( 'mapbox://' )
 				? tilesetId
@@ -101,6 +107,9 @@ export function renderLayer( { layer, instance } ) {
 		}
 
 		case 'mapbox-tileset-vector': {
+			if ( ! options.tileset_id || ! options.style_source_type ) {
+				return null;
+			}
 			const tilesetId = options.tileset_id ?? '';
 			const tilesetUrl = tilesetId.includes( 'mapbox://' )
 				? tilesetId
@@ -128,6 +137,13 @@ export function renderLayer( { layer, instance } ) {
 		}
 
 		case 'mvt': {
+			// R3-G5/GAP-A: only url and source_layer are genuinely required.
+			// style_source_type ('vector') and type ('fill') carry schema
+			// defaults and may be absent from meta written outside the UI —
+			// fall back to the defaults instead of crashing the block.
+			if ( ! options.url || ! options.source_layer ) {
+				return null;
+			}
 			const effectiveStyle = applyOpacity(
 				resolveStyle( instance, layer ),
 				instance.opacity
@@ -137,12 +153,12 @@ export function renderLayer( { layer, instance } ) {
 				<Source
 					key={ options.url }
 					id={ sourceId }
-					type={ options.style_source_type }
+					type={ options.style_source_type || 'vector' }
 					tiles={ [ options.url ] }
 				>
 					<Layer
 						id={ layerId }
-						type={ options.type }
+						type={ options.type || 'fill' }
 						source-layer={ options.source_layer }
 						{ ...getStyleProps( effectiveStyle ) }
 					/>
@@ -151,6 +167,10 @@ export function renderLayer( { layer, instance } ) {
 		}
 
 		case 'tilelayer': {
+			// GAP-A: a missing/empty URL must not reach the GL source.
+			if ( ! options.url ) {
+				return null;
+			}
 			const opacity =
 				typeof instance.opacity === 'number' ? instance.opacity : 1;
 			return (

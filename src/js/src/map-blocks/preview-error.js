@@ -1,5 +1,5 @@
 import { Button } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { Component, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import './preview-error.css';
@@ -287,4 +287,37 @@ export default function PreviewErrorState( {
  */
 export function buildPreviewErrorInfo( message, detail ) {
 	return { message, actionLabel: null, actionUrl: null, detail };
+}
+
+/**
+ * Render-error boundary for the preview maps (Gate r3b — GAP-A, defense in
+ * depth): a synchronous GL/render crash (e.g. a malformed source spec that
+ * slipped past the renderer guards) must surface as the single error
+ * pattern, never leak into the core block boundary ("This block has
+ * encountered an error…"), which is sticky and unexplained.
+ *
+ * The boundary reports through `onCatch` — the surfaces replace the map
+ * with `PreviewErrorState`, so the boundary itself renders nothing on
+ * error and unmounts together with the map (a retry remounts it fresh).
+ */
+export class PreviewErrorBoundary extends Component {
+	constructor( props ) {
+		super( props );
+		this.state = { crashed: false };
+	}
+
+	static getDerivedStateFromError() {
+		return { crashed: true };
+	}
+
+	componentDidCatch( error ) {
+		this.props.onCatch?.( error );
+	}
+
+	render() {
+		if ( this.state.crashed ) {
+			return null;
+		}
+		return this.props.children;
+	}
 }

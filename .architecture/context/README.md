@@ -17,13 +17,18 @@ The AI Context Assistant is a Gutenberg sidebar plugin that suggests new paragra
 
 ### Frontend (JS)
 
-The sidebar asset (`jeo-context-sidebar`) is only enqueued when the AI integration is correctly configured — see the gate in `class-jeo.php::enqueue_blocks_assets()` (`AI_Handler::is_configured()`). With no provider/key set, the "AI Context" panel does not exist in the editor at all.
+The sidebar asset (`jeo-context-sidebar`) is enqueued for enabled post types regardless of AI configuration (the asset gate in `class-jeo.php::enqueue_blocks_assets()` was removed in W2). When `ai_configured` is false, the panel renders the **gate pattern** instead of the chat UI (see `context-gate.js`).
 
 | File | Role |
 |------|------|
-| `src/js/src/context-sidebar/index.js` | Entry point — `registerPlugin('jeo-context-sidebar')` with `PluginDocumentSettingPanel` |
-| `src/js/src/context-sidebar/context-chat-panel.js` | Chat UI, state management, API calls, expand modal |
-| `src/js/src/context-sidebar/suggested-paragraphs.js` | Renders suggested paragraphs with inline HTML support. "Insert" creates `core/paragraph` block; "Copy" uses triple-fallback rich-text clipboard |
+| `src/js/src/context-sidebar/index.js` | Entry point — `registerPlugin('jeo-context-sidebar')` with `PluginDocumentSettingPanel`; branches between the gate (no AI configured) and the chat panel |
+| `src/js/src/context-sidebar/gate.js` | Contract-D helpers: defensive reads of `ai_configured` / `can_configure_ai` across the `jeo`/`jeoMapVars`/`jeoContext` localizes + AI settings URL derivation |
+| `src/js/src/context-sidebar/context-gate.js` | "AI Provider Required" gate (Knowledge Base tone): CTA "Configure AI Provider" (new tab) for `manage_options`, plain "ask the site administrator" message otherwise. Never blocks saving |
+| `src/js/src/context-sidebar/context-chat-panel.js` | Chat UI, state management, API calls, expand modal; Clear has a two-step inline confirmation |
+| `src/js/src/context-sidebar/suggested-paragraphs.js` | Renders suggested paragraphs with inline HTML support. "Insert" creates `core/paragraph` block; "Copy" uses triple-fallback rich-text clipboard. "References used" always renders (explanatory empty state). "Inserted" derives from article content detection. Non-blocking language-mismatch warning on insert |
+| `src/js/src/context-sidebar/text-repair.js` | Display-boundary repair of corrupted `\n` escapes ("support.nnAll") — display/insert/copy only, stored content never modified |
+| `src/js/src/context-sidebar/content-detection.js` | Plain-text normalization + containment check used by the durable "Inserted" state (K-6) |
+| `src/js/src/context-sidebar/language-detection.js` | Stopword/diacritics heuristic (pt/en/es) for the insert language warning (3.4) + Contract-H configured-language readers |
 | `src/includes/ai/class-neuron-agent.php` | Base `Neuron_Agent` extending `NeuronAI\Agent\Agent`; reused by the prompt engineering assistant |
 | `src/js/src/context-sidebar/context-sidebar.css` | Styles for panel, chat, suggestions, modal |
 | `src/includes/ai/class-context-validator.php` | Post-generation link/reference validation *(planned)* |
@@ -376,7 +381,7 @@ State management and API interaction:
 | Generate Suggestions | `/context/setup` | `runSetup()` | Creates initial suggestions from post content |
 | Send | `/context/chat` | `sendMessage()` | Submits user message, receives updated suggestions |
 | Retry | `/context/chat` | `handleRetry()` | Sends implicit "Generate new editorial suggestions..." message |
-| Clear | `/context/clear` | `handleClear()` | Deletes all state, generates new UUID |
+| Clear | `/context/clear` | `handleClear()` | Two-step inline confirmation ("Clear everything?" → "Yes, clear"/"Cancel"); disabled while the AI processes; deletes all state (client + server), generates new UUID |
 
 ### `suggested-paragraphs.js` — Paragraph Cards
 
@@ -384,11 +389,18 @@ Renders each suggested paragraph with inline HTML support:
 
 - **HTML Sanitization**: `sanitizeHtml()` uses DOM parser walk. Whitelist: `strong`, `b`, `em`, `i`, `br`, `a` (with href). All other tags stripped but text preserved.
 - **Entity Decoding**: `decodeHtmlEntities()` handles escaped HTML from structured output.
-- **Insert**: Creates `core/paragraph` block with `content: sanitizedHtml` via `wp.data.dispatch('core/block-editor').insertBlocks()`. Tracks inserted indices to prevent duplicates.
+- **Escape repair (G-E)**: `repairCorruptedText()` runs before sanitize on display, insert and copy — fixes literal `\n` sequences and stripped-backslash artifacts ("support.nnAll" → `support.\n\nAll`). The stored content is never modified, so a restored conversation renders like a fresh one.
+- **Insert**: Creates `core/paragraph` block with `content: sanitizedHtml` via `wp.data.dispatch('core/block-editor').insertBlocks()`. Appended at the end of the document.
+- **Durable "Inserted" (K-6)**: the button state derives from content detection (`isTextInContent()` against the live post content via `useSelect`), never a blind flag — it survives reloads and reverts to "Insert into article" when the user removes the paragraph. The needle is the **repaired** suggestion text (the same text that reaches the article). Matching is two-tier and conservative: exact containment of the normalized text first, then an **anchor match** for long paragraphs — both the 24-char prefix AND suffix anchors must be present — so mid-paragraph user edits keep the "Inserted" state while edited beginnings/ends still revert (a false "Inserted" is worse than a false "Insert").
+- **Language warning (3.4)**: after insert, a non-blocking warning appears when the detected suggestion language differs from the article language (stopword/diacritics heuristic for pt/en/es; configured output language via Contract H is the tie-breaker when detection is inconclusive). Insert always proceeds. Delivered through the global `core/notices` store (snackbar, fixed id `jeo-context-language-mismatch`) — an inline panel Notice would die on unmount, because inserting auto-selects the new block and the sidebar switches Document→Block (R3-G2).
 - **Copy**: Triple-fallback rich-text clipboard:
   1. `navigator.clipboard.write()` with `ClipboardItem` (`text/html` + `text/plain`)
   2. DOM selection + `document.execCommand('copy')` (most reliable in Gutenberg iframe)
   3. `navigator.clipboard.writeText()` (plain text only)
+
+### `suggested-paragraphs.js` — References Section (K-5)
+
+"References used" is always rendered once suggestions exist. With references: normal linked list. Without: an explanatory empty state ("No references available — the knowledge base is empty or disabled…") plus, for users who can configure AI, a link to the Knowledge Base settings tab.
 
 ### User Badge
 
@@ -429,5 +441,7 @@ Below the prompt editor, an **AI Context Prompt Engineer Assistant** card mirror
 - **Retry with backoff**: Up to 3 attempts with exponential sleep on transient errors.
 - **Post type gate**: Only loads for post types in `enabled_post_types` (same filter as geolocation and minimap).
 - **Expand modal**: Compact panel with expand button for better chat UX in a full modal.
-- **Insert tracking**: Frontend tracks inserted paragraph indices to prevent duplicate block insertion.
+- **Insert tracking**: "Inserted" derives from article content detection (K-6) — never a blind flag; survives reloads and reverts when the paragraph is removed.
+- **AI gate (2.1)**: With no AI provider configured, the panel renders the gate pattern (Knowledge Base tone) via `context-gate.js` — CTA for `manage_options`, "ask the administrator" otherwise; never blocks saving. Flags read defensively across localizes (Contract D).
+- **Destructive Clear (G-A)**: two-step inline confirmation + disabled while the AI processes; the clear itself still wipes client + server state.
 - **State restoration**: On mount, `GET /context/state` restores the previous session so closing/reopening the panel or refreshing the page does not lose context.

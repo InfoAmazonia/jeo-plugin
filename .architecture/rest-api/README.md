@@ -44,6 +44,8 @@ See [`ai/README.md`](../ai/README.md) for full details.
 | `/jeo/v1/minimap/setup` | POST | `api_setup` | Generate map from post content (RAG + post geopoints) |
 | `/jeo/v1/minimap/setup-prompt` | POST | `api_setup_prompt` | Generate map from text prompt via AI agent |
 | `/jeo/v1/minimap/chat` | POST | `api_chat` | Multi-turn map refinement via AI agent (requires `conversation_id`) |
+| `/jeo/v1/minimap/state` | GET | `api_get_state` | Server-side conversation state (Contract F — clean chat, terminal status, notice; `edit_posts`) |
+| `/jeo/v1/minimap/versions` | GET | `api_get_versions` | Version list `{n, timestamp, label, is_current}` for the versions panel (Contract G; `edit_posts`) |
 
 ### AI Context (Editorial Suggestions)
 

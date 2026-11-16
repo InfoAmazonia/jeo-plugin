@@ -110,9 +110,51 @@ class Minimap {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_setup' ),
-				'permission_callback' => function () {
-					return current_user_can( 'edit_posts' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::edit_posts(),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/minimap/state',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'api_get_state' ),
+				'permission_callback' => AI\AI_REST_Permissions::edit_posts(),
+				'args'                => array(
+					'post_id'         => array(
+						'required'          => true,
+						'type'              => 'integer',
+						'sanitize_callback' => 'absint',
+					),
+					'conversation_id' => array(
+						'required'          => true,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_title',
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/minimap/versions',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'api_get_versions' ),
+				'permission_callback' => AI\AI_REST_Permissions::edit_posts(),
+				'args'                => array(
+					'post_id'         => array(
+						'required'          => true,
+						'type'              => 'integer',
+						'sanitize_callback' => 'absint',
+					),
+					'conversation_id' => array(
+						'required'          => true,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_title',
+					),
+				),
 			)
 		);
 
@@ -323,6 +365,13 @@ class Minimap {
 				)
 			);
 
+			// Mirror the failure into the clean server-side conversation
+			// (Contract F): the user message survives the reload.
+			$failure_note = __( 'The previous request could not be processed. Please try again.', 'jeowp' );
+			$this->append_clean_chat_message( $post_id, $conversation_id, 'user', $prompt, wp_get_current_user()->user_login );
+			$this->append_clean_chat_message( $post_id, $conversation_id, 'assistant', $failure_note );
+			$this->persist_conversation_state( $post_id, $conversation_id, 'error', $e->getMessage(), $failure_note );
+
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
@@ -331,6 +380,100 @@ class Minimap {
 				500
 			);
 		}
+	}
+
+	/**
+	 * REST callback: read the server-side conversation state of a minimap.
+	 *
+	 * Contract F (C2-32): clean UI transcript, terminal status and notice for
+	 * a conversation — the editor restores chat context from here instead of
+	 * from block attributes (which keep only the visual map output).
+	 *
+	 * @param \WP_REST_Request $request REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_get_state( $request ) {
+		$post_id         = (int) $request->get_param( 'post_id' );
+		$conversation_id = sanitize_title( (string) $request->get_param( 'conversation_id' ) );
+
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'Post not found.', 'jeowp' ),
+				),
+				404
+			);
+		}
+
+		$chat  = get_post_meta( $post_id, $this->chat_meta_key( $conversation_id ), true );
+		$state = get_post_meta( $post_id, $this->state_meta_key( $conversation_id ), true );
+
+		$versions = $this->load_versions( $post_id, $conversation_id );
+
+		return new \WP_REST_Response(
+			array(
+				'success'        => true,
+				'conversation'   => is_array( $chat ) ? array_values( $chat ) : array(),
+				'status'         => is_array( $state ) && ! empty( $state['status'] ) ? $state['status'] : 'idle',
+				'message'        => is_array( $state ) && isset( $state['message'] ) ? $state['message'] : '',
+				'versions_count' => count( $versions ),
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST callback: list the stored map versions of a minimap conversation.
+	 *
+	 * Contract G (C2-01): lightweight list for the editor panel. `n` is the
+	 * 1-based index over the stored window — the same numbering the agent sees
+	 * in its state context and that `restore_version` refers to.
+	 *
+	 * @param \WP_REST_Request $request REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_get_versions( $request ) {
+		$post_id         = (int) $request->get_param( 'post_id' );
+		$conversation_id = sanitize_title( (string) $request->get_param( 'conversation_id' ) );
+
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'Post not found.', 'jeowp' ),
+				),
+				404
+			);
+		}
+
+		$versions = $this->load_versions( $post_id, $conversation_id );
+		$count    = count( $versions );
+
+		$list = array();
+		foreach ( $versions as $index => $version ) {
+			if ( ! is_array( $version ) ) {
+				continue;
+			}
+
+			$list[] = array(
+				'n'          => (int) $index + 1,
+				'timestamp'  => ! empty( $version['timestamp'] ) ? $version['timestamp'] : '',
+				'label'      => ! empty( $version['label'] ) ? $version['label'] : '',
+				'is_current' => ( (int) $index + 1 ) === $count,
+			);
+		}
+
+		return new \WP_REST_Response(
+			array(
+				'success'  => true,
+				'count'    => count( $list ),
+				'versions' => $list,
+			),
+			200
+		);
 	}
 
 	/**
@@ -443,6 +586,12 @@ class Minimap {
 						),
 					)
 				);
+
+				// Mirror the failure into the clean server-side conversation (Contract F).
+				$failure_note = __( 'The previous request could not be processed. Please try again.', 'jeowp' );
+				$this->append_clean_chat_message( $post_id, $conversation_id, 'user', $resolved_message, wp_get_current_user()->user_login );
+				$this->append_clean_chat_message( $post_id, $conversation_id, 'assistant', $failure_note );
+				$this->persist_conversation_state( $post_id, $conversation_id, 'error', $e->getMessage(), $failure_note );
 			}
 
 			return new \WP_REST_Response(
@@ -519,9 +668,13 @@ class Minimap {
 
 		$result->layers = $this->enrich_layer_metadata( $result->layers );
 
-		// On restore the stored provenance is authoritative — skip re-tagging.
-		if ( ! empty( $previous_state ) && ! $is_restore ) {
-			$result->layers = $this->tag_layer_provenance( $previous_state, $result->layers );
+		// Provenance tagging (BUG-R9-2): also runs on the FIRST generation —
+		// with no previous state there are no manual layers to preserve, so
+		// `tag_layer_provenance()` tags every AI-returned layer as 'ai' (the
+		// definition of a first generation). Only restores skip re-tagging
+		// (the stored snapshot's provenance is authoritative).
+		if ( ! $is_restore ) {
+			$result->layers = $this->tag_layer_provenance( $previous_state ?? array(), $result->layers );
 		}
 
 		if ( ! empty( $result->removed_layers ) ) {
@@ -568,6 +721,9 @@ class Minimap {
 		// Append the final state as a new version (timeline semantics — a
 		// restore creates a new entry, like a git revert).
 		$this->append_version( $post_id, $conversation_id, $result, $message );
+
+		// Persist the clean server-side conversation (Contract F).
+		$this->persist_clean_turn( $post_id, $conversation_id, $user_id, $message, $result );
 
 		return $result;
 	}
@@ -835,6 +991,110 @@ class Minimap {
 		);
 
 		update_post_meta( $post_id, $meta_key, $summary );
+	}
+
+	/**
+	 * Build the meta key used to store the clean UI chat of a conversation.
+	 *
+	 * @param string $conversation_id Conversation UUID.
+	 * @return string
+	 */
+	private function chat_meta_key( string $conversation_id ): string {
+		return "_jeo_minimap_chat_{$conversation_id}";
+	}
+
+	/**
+	 * Build the meta key used to store the terminal conversation state.
+	 *
+	 * @param string $conversation_id Conversation UUID.
+	 * @return string
+	 */
+	private function state_meta_key( string $conversation_id ): string {
+		return "_jeo_minimap_state_{$conversation_id}";
+	}
+
+	/**
+	 * Append a clean UI message pair to the server-side conversation (Contract F).
+	 *
+	 * @param int    $post_id         Post ID.
+	 * @param string $conversation_id Conversation UUID.
+	 * @param string $role            Message role ('user' or 'assistant').
+	 * @param string $text            Message text.
+	 * @param string $username        Author username (empty for the assistant).
+	 * @return void
+	 */
+	private function append_clean_chat_message( int $post_id, string $conversation_id, string $role, string $text, string $username = '' ): void {
+		if ( '' === trim( $text ) ) {
+			return;
+		}
+
+		$meta_key = $this->chat_meta_key( $conversation_id );
+		$chat     = get_post_meta( $post_id, $meta_key, true );
+		$chat     = is_array( $chat ) ? $chat : array();
+
+		$chat[] = array(
+			'role'       => 'assistant' === $role ? 'assistant' : 'user',
+			'text'       => $text,
+			'username'   => '' !== $username ? $username : null,
+			'created_at' => current_time( 'mysql' ),
+		);
+
+		// Keep the clean transcript bounded (same window as the version history).
+		if ( count( $chat ) > 2 * self::VERSIONS_LIMIT ) {
+			$chat = array_slice( $chat, -2 * self::VERSIONS_LIMIT );
+		}
+
+		update_post_meta( $post_id, $meta_key, array_values( $chat ) );
+	}
+
+	/**
+	 * Persist the terminal conversation state (Contract F).
+	 *
+	 * Only terminal statuses are ever stored — 'loading' is transient editor
+	 * state and must never survive a reload (undo-brick regression, V1).
+	 *
+	 * @param int    $post_id         Post ID.
+	 * @param string $conversation_id Conversation UUID.
+	 * @param string $status          Terminal status ('success' or 'error').
+	 * @param string $message         Notice text shown above the map.
+	 * @param string $assistant_message Last assistant chat message.
+	 * @return void
+	 */
+	private function persist_conversation_state( int $post_id, string $conversation_id, string $status, string $message = '', string $assistant_message = '' ): void {
+		update_post_meta(
+			$post_id,
+			$this->state_meta_key( $conversation_id ),
+			array(
+				'status'            => 'error' === $status ? 'error' : 'success',
+				'message'           => $message,
+				'assistant_message' => $assistant_message,
+				'updated_at'        => current_time( 'mysql' ),
+			)
+		);
+	}
+
+	/**
+	 * Persist the server-side conversation state of a successful turn (Contract F).
+	 *
+	 * @param int    $post_id         Post ID.
+	 * @param string $conversation_id Conversation UUID.
+	 * @param int    $user_id         Author user ID.
+	 * @param string $message         User message that produced this turn.
+	 * @param object $result          Agent output.
+	 * @return void
+	 */
+	private function persist_clean_turn( int $post_id, string $conversation_id, int $user_id, string $message, object $result ): void {
+		$username = '';
+		if ( $user_id ) {
+			$user = get_userdata( $user_id );
+			if ( $user ) {
+				$username = $user->user_login;
+			}
+		}
+
+		$this->append_clean_chat_message( $post_id, $conversation_id, 'user', $message, $username );
+		$this->append_clean_chat_message( $post_id, $conversation_id, 'assistant', (string) ( $result->assistant_message ?? '' ) );
+		$this->persist_conversation_state( $post_id, $conversation_id, 'success', (string) ( $result->message ?? '' ), (string) ( $result->assistant_message ?? '' ) );
 	}
 
 	/**

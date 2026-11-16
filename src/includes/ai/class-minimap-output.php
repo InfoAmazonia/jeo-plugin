@@ -160,6 +160,21 @@ class Minimap_Output {
 	public ?int $restore_version = null;
 
 	/**
+	 * Humanized note declaring the framing actually applied, or null.
+	 *
+	 * Populated by the AI whenever the effective framing (center/zoom/scope)
+	 * differs from what the user asked for — or to confirm a requested
+	 * framing was applied — so the interface never claims one thing while
+	 * rendering another (audit item G-B / W3 3.6).
+	 *
+	 * @var string|null
+	 */
+	#[SchemaProperty(
+		description: 'Optional one-sentence note declaring the framing (geographic scope / center / zoom) you ACTUALLY applied. REQUIRED when it differs from what the user asked (e.g. "Kept the whole Amazon because the requested layer only covers the state of Pará") — explain why in plain language. Also set it to confirm the requested framing when the user asks for a specific scope. Leave null when no framing was discussed.',
+	)]
+	public ?string $framing_note = null;
+
+	/**
 	 * Version actually restored by the backend (post-validation), or null.
 	 *
 	 * Backend-populated; not part of the AI schema. Null when the declared
@@ -208,6 +223,10 @@ class Minimap_Output {
 
 		if ( null !== $this->base_variant ) {
 			$response['base_variant'] = $this->base_variant;
+		}
+
+		if ( null !== $this->framing_note && '' !== $this->framing_note ) {
+			$response['framing_note'] = $this->framing_note;
 		}
 
 		return $response;
