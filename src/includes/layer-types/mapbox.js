@@ -193,17 +193,23 @@
 			const layerTypeOptions = attributes.layer_type_options || {};
 			const accessToken = layerTypeOptions.access_token || jeo_settings.mapbox_key;
 
-			if ( accessToken && layerTypeOptions.style_id ) {
-				const styleId = layerTypeOptions.style_id?.replace( 'mapbox://styles/', '' );
-
-				jQuery.get(
-					`https://api.mapbox.com/styles/v1/${ styleId }?access_token=${ accessToken }`,
-					function ( data ) {
-						self._styleDefinitions[ attributes.layer_id ] = data;
-						resolve( data );
-					}
-				);
+			if ( ! accessToken || ! layerTypeOptions.style_id ) {
+				// Always settle: a pending promise here used to leave callers
+				// hanging (and their .then chains to die silently).
+				return resolve( null );
 			}
+
+			const styleId = layerTypeOptions.style_id?.replace( 'mapbox://styles/', '' );
+
+			jQuery.get(
+				`https://api.mapbox.com/styles/v1/${ styleId }?access_token=${ accessToken }`,
+				function ( data ) {
+					self._styleDefinitions[ attributes.layer_id ] = data;
+					resolve( data );
+				}
+			).fail( function () {
+				resolve( null );
+			} );
 		} );
 	},
 
@@ -222,10 +228,9 @@
 			self
 				._getStyleDefinition( attributes )
 				.then( function ( styleDefinition ) {
-					const composite =
-						self._styleDefinitions[ attributes.layer_id ].sources.composite;
+					const composite = styleDefinition?.sources?.composite;
 
-					if ( typeof composite === 'object' ) {
+					if ( composite && typeof composite === 'object' ) {
 						const layers = composite.url.replace( 'mapbox://', '' );
 						if ( layers && accessToken ) {
 							jQuery.get(
@@ -234,8 +239,12 @@
 									self._styleLayers[ attributes.layer_id ] = data;
 									resolve( data );
 								}
-							);
+							).fail( function () {
+								resolve( null );
+							} );
+							return;
 						}
+						resolve( null );
 					} else {
 						reject( 'No composite source' );
 					}

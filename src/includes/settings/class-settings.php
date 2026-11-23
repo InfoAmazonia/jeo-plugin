@@ -47,7 +47,8 @@ class Settings {
 		'ai_system_prompt'                => '',
 		'ai_use_custom_prompt'            => false,
 		'ai_debug_mode'                   => false,
-		'ai_debug_console'                => true,
+		'ai_debug_console'                => false,
+		'ai_output_language'              => 'auto',
 		'ai_use_structured_output'        => true,
 		'ai_include_taxonomies'           => false,
 		'ai_context_prompt'               => '',
@@ -343,6 +344,12 @@ class Settings {
 				$input['ai_cal_granularity'] = 'balanced';
 			}
 		}
+		if ( isset( $input['ai_output_language'] ) ) {
+			$input['ai_output_language'] = strtolower( sanitize_text_field( $input['ai_output_language'] ) );
+			if ( ! in_array( $input['ai_output_language'], array( 'auto', 'site' ), true ) && ! preg_match( '/^[a-z]{2,3}$/', $input['ai_output_language'] ) ) {
+				$input['ai_output_language'] = 'auto';
+			}
+		}
 		if ( isset( $input['ai_cal_confidence'] ) ) {
 			$input['ai_cal_confidence'] = absint( $input['ai_cal_confidence'] );
 			if ( $input['ai_cal_confidence'] < 0 || $input['ai_cal_confidence'] > 100 ) {
@@ -588,12 +595,12 @@ class Settings {
 						'type_description'       => __( 'Please type a description first.', 'jeowp' ),
 						'asking_llm'             => __( 'Asking AI...', 'jeowp' ),
 						'generating'             => __( 'Generating...', 'jeowp' ),
-						'applied_above'          => __( '✨ Applied above.', 'jeowp' ),
+						'applied_above'          => __( 'Applied above.', 'jeowp' ),
 						'error_generating'       => __( 'Error generating prompt.', 'jeowp' ),
 						'generate_prompt'        => __( 'Generate Prompt', 'jeowp' ),
 						'testing'                => __( 'Testing...', 'jeowp' ),
-						'valid'                  => __( '✅ Valid', 'jeowp' ),
-						'invalid_prompt'         => __( '❌ Invalid', 'jeowp' ),
+						'valid'                  => __( 'Valid', 'jeowp' ),
+						'invalid_prompt'         => __( 'Invalid', 'jeowp' ),
 						'validate_prompt'        => __( 'Validate Prompt', 'jeowp' ),
 						'loading_backups'        => __( 'Loading backups...', 'jeowp' ),
 						'file'                   => __( 'File', 'jeowp' ),

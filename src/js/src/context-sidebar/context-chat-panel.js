@@ -1,9 +1,18 @@
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { Button, TextareaControl, Modal, Spinner, Notice } from '@wordpress/components';
+import {
+	Button,
+	TextareaControl,
+	Modal,
+	Spinner,
+	Notice,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import SuggestedParagraphs from './suggested-paragraphs';
+import { repairCorruptedText } from './text-repair';
 import { handleChatKeyDown } from '../shared/chat-input-keys';
+import { formatSiteDateTime } from '../shared/datetime';
+import '../map-blocks/modals.css';
 
 /**
  * Generate a simple UUID v4.
@@ -24,8 +33,8 @@ const generateUUID = () => {
 /**
  * ContextChatPanel component — compact sidebar panel and expanded modal.
  *
- * @param {Object} props         Component props.
- * @param {number} props.postId  Current post ID.
+ * @param {Object} props        Component props.
+ * @param {number} props.postId Current post ID.
  * @return {JSX.Element}
  */
 const ContextChatPanel = ( { postId } ) => {
@@ -40,6 +49,8 @@ const ContextChatPanel = ( { postId } ) => {
 	const [ suggestionHistory, setSuggestionHistory ] = useState( [] );
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ hasStarted, setHasStarted ] = useState( false );
+	// 3.3 (G-A): lightweight two-step confirmation before the destructive Clear.
+	const [ isConfirmingClear, setIsConfirmingClear ] = useState( false );
 	const messagesEndRef = useRef( null );
 
 	const scrollToBottom = () => {
@@ -125,12 +136,18 @@ const ContextChatPanel = ( { postId } ) => {
 				);
 				if ( response.assistant_message ) {
 					setMessages( [
-						{ role: 'assistant', content: response.assistant_message },
+						{
+							role: 'assistant',
+							content: response.assistant_message,
+						},
 					] );
 				}
 				setHasStarted( true );
 			} else {
-				setError( response.message || __( 'Failed to generate suggestions.', 'jeowp' ) );
+				setError(
+					response.message ||
+						__( 'Failed to generate suggestions.', 'jeowp' )
+				);
 			}
 		} catch ( err ) {
 			setError( err.message || __( 'Error contacting AI.', 'jeowp' ) );
@@ -153,7 +170,10 @@ const ContextChatPanel = ( { postId } ) => {
 		if ( ! explicitMessage ) {
 			setInputValue( '' );
 		}
-		setMessages( ( prev ) => [ ...prev, { role: 'user', content: userMessage } ] );
+		setMessages( ( prev ) => [
+			...prev,
+			{ role: 'user', content: userMessage },
+		] );
 		setIsLoading( true );
 		setError( null );
 
@@ -175,14 +195,27 @@ const ContextChatPanel = ( { postId } ) => {
 			if ( response.success ) {
 				setSuggestedParagraphs( response.paragraphs || [] );
 				setReferences( response.references || [] );
-				archiveVersion( userMessage, response.paragraphs, response.references );
+				archiveVersion(
+					userMessage,
+					response.paragraphs,
+					response.references
+				);
 				setMessages( ( prev ) => [
 					...prev,
-					{ role: 'assistant', content: response.assistant_message || response.message || '' },
+					{
+						role: 'assistant',
+						content:
+							response.assistant_message ||
+							response.message ||
+							'',
+					},
 				] );
 				setHasStarted( true );
 			} else {
-				setError( response.message || __( 'Failed to process message.', 'jeowp' ) );
+				setError(
+					response.message ||
+						__( 'Failed to process message.', 'jeowp' )
+				);
 			}
 		} catch ( err ) {
 			setError( err.message || __( 'Error contacting AI.', 'jeowp' ) );
@@ -210,7 +243,7 @@ const ContextChatPanel = ( { postId } ) => {
 				label,
 				paragraphs,
 				references: refs || [],
-				timestamp: new Date().toLocaleString(),
+				timestamp: new Date().toISOString(),
 			},
 		] );
 	};
@@ -229,7 +262,12 @@ const ContextChatPanel = ( { postId } ) => {
 	 * Retry: ask the AI to generate new suggestions without explicit user input.
 	 */
 	const handleRetry = () => {
-		sendMessage( __( 'Generate new editorial suggestions based on the current post content.', 'jeowp' ) );
+		sendMessage(
+			__(
+				'Generate new editorial suggestions based on the current post content.',
+				'jeowp'
+			)
+		);
 	};
 
 	/**
@@ -239,6 +277,7 @@ const ContextChatPanel = ( { postId } ) => {
 		if ( ! postId || isLoading ) {
 			return;
 		}
+		setIsConfirmingClear( false );
 		setIsLoading( true );
 		setError( null );
 
@@ -256,7 +295,9 @@ const ContextChatPanel = ( { postId } ) => {
 			setSuggestionHistory( [] );
 			setHasStarted( false );
 		} catch ( err ) {
-			setError( err.message || __( 'Failed to clear conversation.', 'jeowp' ) );
+			setError(
+				err.message || __( 'Failed to clear conversation.', 'jeowp' )
+			);
 		} finally {
 			setIsLoading( false );
 		}
@@ -273,7 +314,9 @@ const ContextChatPanel = ( { postId } ) => {
 	 * @return {JSX.Element}
 	 */
 	const renderChat = ( isModal = false ) => (
-		<div className={ `jeo-context-chat ${ isModal ? 'jeo-context-chat--modal' : 'jeo-context-chat--compact' }` }>
+		<div
+			className={ `jeo-context-chat ${ isModal ? 'jeo-context-chat--modal' : 'jeo-context-chat--compact' }` }
+		>
 			{ isRestoring && (
 				<div className="jeo-context-chat__loading">
 					<Spinner />
@@ -281,22 +324,28 @@ const ContextChatPanel = ( { postId } ) => {
 				</div>
 			) }
 
-			{ ! isRestoring && ! hasStarted && messages.length === 0 && ! isLoading && (
-				<div className="jeo-context-chat__intro">
-					<p className="jeo-context-chat__placeholder">
-						{ __( 'Use the AI Context Assistant to generate editorial suggestions based on your article and the site\'s knowledge base.', 'jeowp' ) }
-					</p>
-					<Button
-						variant="primary"
-						onClick={ runSetup }
-						disabled={ isLoading }
-						isBusy={ isLoading }
-						className="jeo-context-chat__start"
-					>
-						{ __( 'Generate Suggestions', 'jeowp' ) }
-					</Button>
-				</div>
-			) }
+			{ ! isRestoring &&
+				! hasStarted &&
+				messages.length === 0 &&
+				! isLoading && (
+					<div className="jeo-context-chat__intro">
+						<p className="jeo-context-chat__placeholder">
+							{ __(
+								"Use the AI Context Assistant to generate editorial suggestions based on your article and the site's knowledge base.",
+								'jeowp'
+							) }
+						</p>
+						<Button
+							variant="primary"
+							onClick={ runSetup }
+							disabled={ isLoading }
+							isBusy={ isLoading }
+							className="jeo-context-chat__start"
+						>
+							{ __( 'Generate Suggestions', 'jeowp' ) }
+						</Button>
+					</div>
+				) }
 
 			{ ! isRestoring && (
 				<SuggestedParagraphs
@@ -308,41 +357,53 @@ const ContextChatPanel = ( { postId } ) => {
 			{ ! isRestoring && suggestionHistory.length > 1 && (
 				<details className="jeo-context-history">
 					<summary className="jeo-context-history__summary">
-						{ __( 'Previous suggestions', 'jeowp' ) } ({ suggestionHistory.length })
+						{ __( 'Previous suggestions', 'jeowp' ) } (
+						{ suggestionHistory.length })
 					</summary>
 					<ul className="jeo-context-history__list">
 						{ suggestionHistory
 							.map( ( version, index ) => ( { version, index } ) )
 							.reverse()
 							.map( ( { version, index } ) => {
-								const firstText =
-									version.paragraphs?.[ 0 ]?.text?.replace( /<[^>]+>/g, '' ) || '';
+								const firstText = repairCorruptedText(
+									version.paragraphs?.[ 0 ]?.text || ''
+								).replace( /<[^>]+>/g, '' );
 								const preview =
 									firstText.length > 120
 										? firstText.slice( 0, 120 ) + '…'
 										: firstText;
 								return (
-									<li key={ index } className="jeo-context-history__item">
+									<li
+										key={ index }
+										className="jeo-context-history__item"
+									>
 										<div className="jeo-context-history__meta">
 											<span className="jeo-context-history__label">
 												{ version.label }
 											</span>
 											{ version.timestamp && (
 												<span className="jeo-context-history__timestamp">
-													{ version.timestamp }
+													{ formatSiteDateTime( version.timestamp ) }
 												</span>
 											) }
 										</div>
 										{ preview && (
-											<p className="jeo-context-history__preview">{ preview }</p>
+											<p className="jeo-context-history__preview">
+												{ preview }
+											</p>
 										) }
 										<Button
 											variant="secondary"
 											size="small"
-											onClick={ () => restoreVersion( version ) }
+											onClick={ () =>
+												restoreVersion( version )
+											}
 											className="jeo-context-history__restore"
 										>
-											{ __( 'View this version', 'jeowp' ) }
+											{ __(
+												'View this version',
+												'jeowp'
+											) }
 										</Button>
 									</li>
 								);
@@ -352,28 +413,32 @@ const ContextChatPanel = ( { postId } ) => {
 			) }
 
 			<div className="jeo-context-chat__messages">
-				{ ! isRestoring && messages.map( ( msg, index ) => (
-					<div
-						key={ index }
-						className={ `jeo-context-chat__message jeo-context-chat__message--${ msg.role }` }
-					>
-						<div className="jeo-context-chat__message-content">
-							{ msg.content }
+				{ ! isRestoring &&
+					messages.map( ( msg, index ) => (
+						<div
+							key={ index }
+							className={ `jeo-context-chat__message jeo-context-chat__message--${ msg.role }` }
+						>
+							<div className="jeo-context-chat__message-content">
+								{ /* 3.5 (G-E): repair broken escapes at the display
+								boundary only — stored messages stay untouched, so a
+								restored conversation renders like a fresh one. */ }
+								{ repairCorruptedText( msg.content ) }
+							</div>
+							<div className="jeo-context-chat__message-meta">
+								{ msg.timestamp && (
+									<span className="jeo-context-chat__timestamp">
+										{ formatSiteDateTime( msg.timestamp ) }
+									</span>
+								) }
+								{ 'user' === msg.role && msg.username && (
+									<span className="jeo-context-chat__user-badge">
+										{ msg.username }
+									</span>
+								) }
+							</div>
 						</div>
-						<div className="jeo-context-chat__message-meta">
-							{ msg.timestamp && (
-								<span className="jeo-context-chat__timestamp">
-									{ msg.timestamp }
-								</span>
-							) }
-							{ 'user' === msg.role && msg.username && (
-								<span className="jeo-context-chat__user-badge">
-									{ msg.username }
-								</span>
-							) }
-						</div>
-					</div>
-				) ) }
+					) ) }
 
 				{ ! isRestoring && isLoading && (
 					<div className="jeo-context-chat__loading">
@@ -401,7 +466,10 @@ const ContextChatPanel = ( { postId } ) => {
 					value={ inputValue }
 					onChange={ setInputValue }
 					onKeyDown={ handleKeyDown }
-					placeholder={ __( 'Ask for changes or new paragraphs... (Shift+Enter for a line break)', 'jeowp' ) }
+					placeholder={ __(
+						'Ask for changes or new paragraphs... (Shift+Enter for a line break)',
+						'jeowp'
+					) }
 					className="jeo-context-chat__textarea"
 					disabled={ isLoading || isRestoring }
 					rows={ isModal ? 4 : 3 }
@@ -410,7 +478,9 @@ const ContextChatPanel = ( { postId } ) => {
 					<Button
 						variant="primary"
 						onClick={ () => sendMessage() }
-						disabled={ isLoading || isRestoring || ! inputValue.trim() }
+						disabled={
+							isLoading || isRestoring || ! inputValue.trim()
+						}
 						className="jeo-context-chat__send"
 					>
 						{ __( 'Send', 'jeowp' ) }
@@ -420,20 +490,54 @@ const ContextChatPanel = ( { postId } ) => {
 							variant="secondary"
 							size="small"
 							onClick={ handleRetry }
-							disabled={ isLoading || isRestoring || ! hasStarted }
+							disabled={
+								isLoading || isRestoring || ! hasStarted
+							}
 							className="jeo-context-chat__retry"
 						>
 							{ __( 'Retry', 'jeowp' ) }
 						</Button>
-						<Button
-							variant="tertiary"
-							size="small"
-							onClick={ handleClear }
-							disabled={ isLoading || isRestoring }
-							className="jeo-context-chat__clear"
-						>
-							{ __( 'Clear', 'jeowp' ) }
-						</Button>
+						{ isConfirmingClear ? (
+							<span
+								className="jeo-context-chat__clear-confirm"
+								role="alert"
+							>
+								<span className="jeo-context-chat__clear-confirm-text">
+									{ __( 'Clear everything?', 'jeowp' ) }
+								</span>
+								<Button
+									variant="tertiary"
+									size="small"
+									isDestructive
+									onClick={ handleClear }
+									disabled={ isLoading }
+									className="jeo-context-chat__clear"
+								>
+									{ __( 'Yes, clear', 'jeowp' ) }
+								</Button>
+								<Button
+									variant="tertiary"
+									size="small"
+									onClick={ () =>
+										setIsConfirmingClear( false )
+									}
+									disabled={ isLoading }
+									className="jeo-context-chat__clear-cancel"
+								>
+									{ __( 'Cancel', 'jeowp' ) }
+								</Button>
+							</span>
+						) : (
+							<Button
+								variant="tertiary"
+								size="small"
+								onClick={ () => setIsConfirmingClear( true ) }
+								disabled={ isLoading || isRestoring }
+								className="jeo-context-chat__clear"
+							>
+								{ __( 'Clear', 'jeowp' ) }
+							</Button>
+						) }
 					</div>
 				</div>
 			</div>
@@ -451,8 +555,20 @@ const ContextChatPanel = ( { postId } ) => {
 					size="small"
 					onClick={ () => setIsExpanded( true ) }
 					icon={
-						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path d="M4 8V4M4 4H8M4 4L9 9M20 8V4M20 4H16M20 4L15 9M4 16V20M4 20H8M4 20L9 15M20 16V20M20 20H16M20 20L15 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M4 8V4M4 4H8M4 4L9 9M20 8V4M20 4H16M20 4L15 9M4 16V20M4 20H8M4 20L9 15M20 16V20M20 20H16M20 20L15 15"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							/>
 						</svg>
 					}
 					label={ __( 'Expand', 'jeowp' ) }
@@ -467,6 +583,7 @@ const ContextChatPanel = ( { postId } ) => {
 					title={ __( 'AI Context Assistant', 'jeowp' ) }
 					onRequestClose={ () => setIsExpanded( false ) }
 					className="jeo-context-modal"
+					overlayClassName="jeo-opaque-overlay"
 					isFullScreen={ false }
 				>
 					{ renderChat( true ) }

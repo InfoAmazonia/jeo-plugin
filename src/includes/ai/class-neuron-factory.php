@@ -42,6 +42,22 @@ class Neuron_Factory {
 	 * @throws \Exception If the provider is not supported.
 	 */
 	public static function create_provider( $provider_name, $api_key, $model, bool $agent_mode = false ): AIProviderInterface {
+		return Sanitized_Message_Mapper::install(
+			self::create_raw_provider( $provider_name, $api_key, $model, $agent_mode )
+		);
+	}
+
+	/**
+	 * Create the raw AIProviderInterface instance for the given provider slug.
+	 *
+	 * @param string $provider_name AI provider slug (e.g. 'gemini', 'openai').
+	 * @param string $api_key       API key for the provider.
+	 * @param string $model         Model identifier to use.
+	 * @param bool   $agent_mode    True to skip responseMimeType (needed for Gemini tool calling).
+	 * @return AIProviderInterface
+	 * @throws \Exception If the provider is not supported.
+	 */
+	private static function create_raw_provider( $provider_name, $api_key, $model, bool $agent_mode = false ): AIProviderInterface {
 		$temperature_param = array( 'temperature' => 0.1 );
 		switch ( $provider_name ) {
 			case 'gemini':

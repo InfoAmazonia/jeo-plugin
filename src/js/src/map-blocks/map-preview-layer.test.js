@@ -383,3 +383,69 @@ describe( 'renderLayer style layer types', () => {
 		).toBeNull();
 	} );
 } );
+
+describe( 'renderLayer incomplete-spec guards (R3-G5/GAP-A)', () => {
+	const mvtBase = {
+		url: 'https://example.com/tiles/{z}/{x}/{y}.pbf',
+		source_layer: 'waterway',
+		type: 'line',
+		style_source_type: 'vector',
+	};
+
+	it( 'falls back to schema defaults for MVT without style_source_type/type', () => {
+		for ( const key of [ 'style_source_type', 'type' ] ) {
+			const options = { ...mvtBase };
+			delete options[ key ];
+			const element = renderLayer( {
+				layer: { type: 'mvt', layer_type_options: options },
+				instance: { id: 1, use: 'fixed' },
+			} );
+			expect( element ).not.toBeNull();
+			// The GL source type falls back to the 'vector' schema default.
+			expect( element.props.type ).toBe( 'vector' );
+		}
+	} );
+
+	it( 'returns null for MVT without url or source_layer (no defaults)', () => {
+		for ( const key of [ 'url', 'source_layer' ] ) {
+			const options = { ...mvtBase };
+			delete options[ key ];
+			expect(
+				renderLayer( {
+					layer: { type: 'mvt', layer_type_options: options },
+					instance: { id: 1, use: 'fixed' },
+				} )
+			).toBeNull();
+		}
+	} );
+
+	it( 'returns null for tilelayer without a URL', () => {
+		expect(
+			renderLayer( {
+				layer: { type: 'tilelayer', layer_type_options: {} },
+				instance: { id: 1, use: 'fixed' },
+			} )
+		).toBeNull();
+	} );
+
+	it( 'returns null for mapbox tilesets without tileset_id or source type', () => {
+		expect(
+			renderLayer( {
+				layer: {
+					type: 'mapbox-tileset-raster',
+					layer_type_options: { tileset_id: 'a.b' },
+				},
+				instance: { id: 1, use: 'fixed' },
+			} )
+		).toBeNull();
+		expect(
+			renderLayer( {
+				layer: {
+					type: 'mapbox-tileset-vector',
+					layer_type_options: { style_source_type: 'vector' },
+				},
+				instance: { id: 1, use: 'fixed' },
+			} )
+		).toBeNull();
+	} );
+} );

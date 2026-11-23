@@ -12,7 +12,11 @@
 
 ## Custom Post Type: `storymap`
 
-- Template lock: uses `jeo/storymap` as mandatory block
+- Template lock: uses `jeo/storymap` as mandatory block — `template` and
+  `template_lock: 'all'` are declared in the `register_post_type()` args, so the
+  lock applies in every context (new posts included). Blocks cannot be added,
+  removed or moved on the storymap canvas (W1: previously the lock was assigned
+  in a later `init` hook that ran before CPT registration and never applied).
 - Archives: optionally included in general archives (`pre_get_posts`)
 - REST: enriched with co-author data
 

@@ -68,7 +68,7 @@
 				<div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 6px; border-left: 5px solid #2271b1; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
 					<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
 						<div>
-							<div style="font-size: 14px; color: #1d2327; font-weight: 700; text-transform: uppercase;">' . esc_html( $provider_name ) . '</div>
+							<div style="font-size: 14px; color: #1d2327; font-weight: 700; ">' . esc_html( $provider_name ) . '</div>
 							<div style="font-size: 12px; color: #646970; font-family: monospace;">' . esc_html( $model_name ) . '</div>
 						</div>
 						<div style="background: #f0f0f1; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #50575e;">
@@ -76,7 +76,7 @@
 						</div>
 					</div>
 					<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #2271b1;">
-						' . esc_html( number_format_i18n( $stat->total_tokens ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">' . esc_html__( 'Tokens', 'jeowp' ) . '</span>
+						' . esc_html( number_format_i18n( $stat->total_tokens ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #646970;">' . esc_html__( 'Tokens', 'jeowp' ) . '</span>
 					</div>
 					<div style="display: flex; justify-content: space-between; font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
 						<div><strong>' . esc_html__( 'In (Prompt):', 'jeowp' ) . '</strong> ' . esc_html( number_format_i18n( $stat->total_input ) ) . '</div>
@@ -99,9 +99,9 @@
 			// Vectorize Card.
 			echo '
 			<div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 6px; border-left: 5px solid #46b450; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-				<div style="font-size: 14px; color: #1d2327; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">' . esc_html__( 'Document Vectorization', 'jeowp' ) . '</div>
-				<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #46b450;">
-					' . esc_html( number_format_i18n( $embedding_tokens['vectorize'] ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">' . esc_html__( 'Tokens', 'jeowp' ) . '</span>
+				<div style="font-size: 14px; color: #1d2327; font-weight: 700;  margin-bottom: 12px;">' . esc_html__( 'Document vectorization', 'jeowp' ) . '</div>
+				<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #007017;">
+					' . esc_html( number_format_i18n( $embedding_tokens['vectorize'] ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #646970;">' . esc_html__( 'Tokens', 'jeowp' ) . '</span>
 				</div>
 				<div style="font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
 					' . esc_html__( 'Tokens used inserting posts to Vector Store.', 'jeowp' ) . '
@@ -111,9 +111,9 @@
 			// Retrieve Card.
 			echo '
 			<div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 6px; border-left: 5px solid #f56e28; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-				<div style="font-size: 14px; color: #1d2327; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">' . esc_html__( 'Semantic Retrieval', 'jeowp' ) . '</div>
+				<div style="font-size: 14px; color: #1d2327; font-weight: 700;  margin-bottom: 12px;">' . esc_html__( 'Semantic retrieval', 'jeowp' ) . '</div>
 				<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #f56e28;">
-					' . esc_html( number_format_i18n( $embedding_tokens['retrieve'] ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">' . esc_html__( 'Tokens', 'jeowp' ) . '</span>
+					' . esc_html( number_format_i18n( $embedding_tokens['retrieve'] ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #646970;">' . esc_html__( 'Tokens', 'jeowp' ) . '</span>
 				</div>
 				<div style="font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
 					' . esc_html__( 'Tokens used mapping user queries to vectors.', 'jeowp' ) . '
@@ -149,15 +149,35 @@
 				<input type="submit" id="search-submit" class="button" value="<?php esc_attr_e( 'Search Logs', 'jeowp' ); ?>">
 			</p>
 		</form>
-
-		<form method="post" action="" style="display:inline-block;">
-			<?php wp_nonce_field( 'jeo_clear_logs_action' ); ?>
-			<input type="hidden" name="jeo_clear_logs" value="1">
-			<button type="submit" class="button button-secondary" onclick="return confirm('<?php esc_attr_e( 'Are you sure you want to delete ALL logs?', 'jeowp' ); ?>');">
-				<?php esc_html_e( 'Clear All Logs', 'jeowp' ); ?>
-			</button>
-		</form>
 	</div>
+
+	<?php
+	// Confirmation step for "Clear All Logs" (wp-admin pattern for destructive
+	// actions: an interstitial notice instead of the browser's OS-styled confirm()).
+	$confirming_clear = isset( $_GET['jeo_confirm_clear'] ) && check_admin_referer( 'jeo_confirm_clear_logs' );
+
+	if ( $confirming_clear ) :
+		$counts     = (array) wp_count_posts( \Jeo\AI\AI_Logger::POST_TYPE );
+		$logs_count = (int) array_sum( $counts );
+		?>
+		<div class="notice notice-warning inline">
+			<p>
+				<strong><?php esc_html_e( 'Clear all AI logs?', 'jeowp' ); ?></strong>
+				<?php
+				/* translators: %s: number of log entries. */
+				printf( esc_html__( 'This will permanently delete ALL AI usage logs (%s items), including the cost totals above. This action cannot be undone.', 'jeowp' ), esc_html( number_format_i18n( $logs_count ) ) );
+				?>
+			</p>
+			<form method="post" action="" style="display:inline-block; margin: 6px 0;">
+				<?php wp_nonce_field( 'jeo_clear_logs_action' ); ?>
+				<input type="hidden" name="jeo_clear_logs" value="1">
+				<button type="submit" class="button button-secondary" style="color:#b32d2e; border-color:#b32d2e;">
+					<?php esc_html_e( 'Yes, delete all logs', 'jeowp' ); ?>
+				</button>
+				<a class="button" style="margin-left:6px;" href="<?php echo esc_url( admin_url( 'admin.php?page=jeo-ai-logs' ) ); ?>"><?php esc_html_e( 'Cancel', 'jeowp' ); ?></a>
+			</form>
+		</div>
+	<?php endif; ?>
 
 	<div class="tablenav top">
 		<div class="tablenav-pages">
@@ -227,7 +247,7 @@
 					}
 					?>
 					<tr>
-						<td><?php echo esc_html( get_the_date( 'Y-m-d H:i:s' ) ); ?></td>
+						<td><?php echo esc_html( \Jeo::admin_datetime( get_post() ) ); ?></td>
 						<td>
 							<span class="badge" style="background:#0073aa;color:#fff;padding:3px 6px;border-radius:3px;font-size:11px;font-weight:600;display:inline-block;margin-bottom:4px;"><?php echo esc_html( $provider_name ); ?></span>
 							<?php if ( $model_name ) : ?>
@@ -251,7 +271,7 @@
 								</div>
 								
 								<div style="display:flex; gap:20px; margin-bottom: 15px;">
-									<div><strong><?php esc_html_e( 'Timestamp', 'jeowp' ); ?>:</strong> <?php echo esc_html( get_the_date( 'Y-m-d H:i:s' ) ); ?></div>
+									<div><strong><?php esc_html_e( 'Timestamp', 'jeowp' ); ?>:</strong> <?php echo esc_html( \Jeo::admin_datetime( get_post() ) ); ?></div>
 									<div><strong><?php esc_html_e( 'Input Tokens', 'jeowp' ); ?>:</strong> <?php echo esc_html( $in_tok ); ?></div>
 									<div><strong><?php esc_html_e( 'Output Tokens', 'jeowp' ); ?>:</strong> <?php echo esc_html( $out_tok ); ?></div>
 								</div>
@@ -271,6 +291,14 @@
 			<?php endif; ?>
 		</tbody>
 	</table>
+
+	<?php if ( ! $confirming_clear ) : ?>
+		<p style="margin-top:12px;">
+			<a class="button-link-delete" style="color:#8a2424;" href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=jeo-ai-logs&jeo_confirm_clear=1' ), 'jeo_confirm_clear_logs' ) ); ?>">
+				<?php esc_html_e( 'Clear All Logs', 'jeowp' ); ?>
+			</a>
+		</p>
+	<?php endif; ?>
 
 	<style>
 		dialog.jeo-ai-modal {

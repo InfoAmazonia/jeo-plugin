@@ -21,7 +21,13 @@ The `jeo/ai-minimap` block generates interactive contextual maps inside the Gute
 | `src/includes/ai/class-wp-option-storage.php` | `StorageInterface` adapter for `wp_options` (single option per namespace, `autoload=false`) |
 | `src/js/src/map-blocks/minimap-editor.js` | Edit component — placeholder, map preview, inspector chat panel (composed Mapbox style support), "Understand chosen layers" link that opens the block sidebar scrolled to the Map layers panel |
 | `src/js/src/map-blocks/minimap-display.js` | Save component — renders `<div class="jeomap">` for frontend JS |
-| `src/js/src/map-blocks/index.js` | Block registration with `conversation_id` and `conversation` attributes |
+| `src/js/src/map-blocks/minimap-status.js` | Status derivation (`deriveMinimapStatus` — persisted `loading`/`error` never resurrect) + content fingerprint for the request race guard (V1) |
+| `src/js/src/map-blocks/minimap-wait.js` | Wait contract (2.2/A5): `useElapsedSeconds` + `MinimapWaitNote` (phase + elapsed + recovery instruction; no Cancel — server persists the turn synchronously) |
+| `src/js/src/map-blocks/minimap-ai-gate.js` | AI-not-configured gate (2.1/K-3): capability-aware texts (Contrato D), "Configure AI Provider" CTA that saves the draft before navigating, standard pre-publish warning panel |
+| `src/js/src/map-blocks/minimap-versions.js` | "Versions" panel (C2-01, Contrato G): numbered list + timestamp + label + per-item Restore with confirm |
+| `src/js/src/map-blocks/minimap-api.js` | REST client for the Contract F/G endpoints (`state`, `versions`) + the chat restore message builder — single adjustment point if shapes change |
+| `src/js/src/map-blocks/minimap-editor.css` | Styles for the wait note, gate, framing note and versions panel |
+| `src/js/src/map-blocks/index.js` | Block registration with `conversation_id` and `conversation` attributes (legacy fallback — new turns write conversation server-side only) |
 | `src/js/src/map-blocks/minimap-config.js` | Attribute coercion helpers |
 | `src/js/src/map-blocks/layers-panel.js` | Sidebar summary of selected layers with metadata |
 | `src/js/src/map-blocks/layers-settings.js` | Modal layer library / selected layers editor |
@@ -80,6 +86,14 @@ graph TB
 ## REST Endpoints
 
 All three endpoints are gated by `AI_Handler::is_configured()` (defense in depth — the JS gates this earlier). When no AI provider is correctly configured (valid provider slug **and** its API key, or `ollama_url` for Ollama; filterable via `jeo_ai_is_configured`), they return a `400` with `"No AI provider configured. Set one in JEO AI Settings."`.
+
+### `GET /jeo/v1/minimap/state` — Server-side conversation state (Contract F, C2-32)
+
+Reads the clean server-side conversation for a block: `conversation` (clean UI messages `{role, text, username, created_at}` — user messages carry the author's username), terminal `status` (`success`|`error`|`idle` — **never** `loading`), the accumulated notice `message`, and `versions_count`. Permission: `edit_posts`. The editor restores chat context from here; block attributes keep only the visual map output (layers/base/center/zoom/pins), so post undo/redo no longer contains AI conversational state. Storage: `_jeo_minimap_chat_{conversation_id}` + `_jeo_minimap_state_{conversation_id}` post meta (written on every successful turn and on persisted failures — same pattern as the Context Handler). During the FE migration both sources coexist.
+
+### `GET /jeo/v1/minimap/versions` — Version list (Contract G, C2-01)
+
+Lightweight list for the versions panel: `{ success, count, versions: [{ n, timestamp, label, is_current }] }`. `n` is the 1-based index over the stored window — the SAME numbering the agent sees in its state context (`format_versions_for_context()`) and that `restore_version` refers to; `is_current` is the last entry. Read-only: restoring still goes through the chat/`restore_version` flow. Permission: `edit_posts`.
 
 ### `POST /jeo/v1/minimap/setup` — Generate from post content
 
@@ -147,10 +161,13 @@ graph LR
     B --> K[autoDelegate: true]
 ```
 
+### Framing Honesty (W3 3.6)
+
+`Minimap_Output::$framing_note` (optional string, AI-populated) declares the framing (geographic scope/center/zoom) actually applied. The agent prompt ("Framing Honesty") REQUIRES applying the user's requested framing and declaring any divergence in plain language ("Kept the whole Amazon because..."). `to_rest_response()` includes `framing_note` only when non-empty (additive); the editor renders it when present. The interface never claims one framing while rendering another (audit G-B).
+
 ### Optional Minilayer Integration
 
 `Minimap_Agent::create()` always registers `Generate_Boundary_Layer_Tool` alongside the standard tools (it needs no Mapbox key). When a Mapbox API key is configured, `Generate_Layer_Tool` is also registered:
-
 - `Generate_Boundary_Layer_Tool` — resolves a place name into an authoritative boundary polygon via `Place_Polygon_Service` and creates a client-side `geojson` layer CPT (GeoJSON published as a WordPress attachment).
 - `Generate_Layer_Tool` — creates custom Mapbox styles from a text prompt via `Minilayer_Service`. Only available when a Mapbox API key is configured.
 
@@ -251,6 +268,54 @@ The agent always returns a `Minimap_Output` DTO via NeuronAI structured output:
 | `restored_version` | `?int` | Backend-populated: version actually applied after validation (null = no valid restore) |
 | `message` | `string` | Info/warning for the block editor |
 | `assistant_message` | `string` | Chat message shown in the inspector panel |
+| `framing_note` | `?string` | W3 3.6: humanized declaration of the REAL framing applied (mandatory when it diverges from the request). Rendered by the editor as an info notice next to the map ("Map framing: …") and persisted in the `framing_note` block attribute. The editor always rewrites it on every successful turn (a turn without a note clears the previous one — r3b BUG-C1) and clears it on manual pan/zoom reframes |
+
+### Editor State Division (W2/W3 — Contracts D/F/G)
+
+The block's edit component splits state across three homes:
+
+- **Block attributes** hold only the visual map output (`layers`, `base_layer`,
+  `center_*`, `initial_zoom`, `pins`, `show_pins`, `framing_note`) plus
+  `conversation_id` and a terminal `status: 'ready'` (the save component renders
+  nothing when a legacy `error` status survives). Transient statuses
+  (`loading`/`error`) and the notice `message` NEVER reach the attributes — they
+  live in React state (`uiStatus`/`uiError`/`uiMessage`), so the undo history can
+  never land on a persisted spinner (the V1 bricked-block bug). On mount/reload
+  and after external attribute changes (undo/redo), the status is re-derived from
+  the content by `deriveMinimapStatus()`.
+- **React state** holds the conversation too (hydrated from
+  `GET /minimap/state`, Contrato F; the attribute copy is only the legacy
+  fallback — an empty server history never wipes it).
+- **Server-side post meta** (`_jeo_minimap_chat_*` / `_jeo_minimap_state_*` /
+  `_jeo_minimap_versions_*`) is written by the backend on every turn.
+
+Race guard (V1): every AI request captures a `minimapContentKey()` fingerprint
+on dispatch; if the content changed when the response arrives (the user
+edited/undid mid-flight), the response's attribute writes are discarded, the
+answer stays in the chat, and a dismissible notice explains what happened.
+
+Wait contract (2.2/A5): the generation placeholder and every chat turn show the
+current phase + elapsed seconds + a recovery instruction (`MinimapWaitNote`).
+No Cancel button — the server persists the turn synchronously, so a client abort
+would diverge the block from the stored conversation (see Track A report §1).
+The rotating loading messages are untouched (regression nº 1).
+
+AI gate (2.1/K-3): when `ai_configured` is false the placeholder renders
+`MinimapAiGate` (two capability-aware texts via `can_configure_ai`, Contrato D;
+the "Configure AI Provider" CTA saves the draft before navigating) and a standard
+`PluginPrePublishPanel` warns about publishing with the dead block. The gate
+never blocks saving. The block stays in the inserter (C2-06 gave the 5 map/story
+blocks distinct descriptions/keywords/icons).
+
+Versions (C2-01/Contrato G): the "Versions" panel lists the server snapshots and
+restores through the existing chat channel with a button-level confirmation
+stating what is discarded and that the current version stays in the history. The
+Regenerate button confirms before discarding manually added layers
+(`provenance === 'manual'`).
+
+Base variant failures (3.7/G-C) are never silent: the select reverts to the base
+that is actually active (so attribution matches the rendered base) and a warning
+notice states what happened.
 
 ### Conversation History Persistence
 

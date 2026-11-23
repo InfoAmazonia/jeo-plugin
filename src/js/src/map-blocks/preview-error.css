@@ -1,0 +1,82 @@
+/**
+ * Single preview error state (layer editor, map editor, minimap).
+ * Rendered in place of the map preview when a source/style fails to load.
+ */
+.jeo-preview-error {
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	min-height: 200px;
+	height: 100%;
+	padding: 24px;
+	background: #fcf0f1;
+	border: 1px solid #d63638;
+	border-left-width: 4px;
+	border-radius: 2px;
+	color: #1e1e1e;
+}
+
+.jeo-preview-error__message {
+	margin: 0;
+	font-weight: 600;
+}
+
+/* Neutral idle state (form incomplete): no error colors, just guidance. */
+.jeo-preview-error--idle {
+	background: #f0f0f1;
+	border-color: #c3c4c7;
+}
+
+.jeo-preview-error__hint {
+	margin: 0;
+	color: #646970;
+	font-size: 12px;
+}
+
+.jeo-preview-error__actions {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
+	margin-top: 4px;
+}
+
+.jeo-preview-error__action-text {
+	font-size: 13px;
+	color: #3c434a;
+}
+
+.jeo-preview-error__details {
+	margin-top: 4px;
+	font-size: 12px;
+}
+
+.jeo-preview-error__details summary {
+	cursor: pointer;
+	color: #3c434a;
+}
+
+.jeo-preview-error__details pre {
+	margin: 8px 0 4px;
+	padding: 8px;
+	max-width: 100%;
+	max-height: 160px;
+	overflow: auto;
+	background: #f0f0f1;
+	border: 1px solid #ddd;
+	border-radius: 2px;
+	font-family: Consolas, Monaco, monospace;
+	font-size: 11px;
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+/* Keep the copy feedback from shifting layout ("Copied!" vs "Copy details"). */
+.jeo-preview-error__copy {
+	min-width: 96px;
+	justify-content: center;
+}

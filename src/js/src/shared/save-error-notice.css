@@ -1,0 +1,23 @@
+/* Enriched save-error notice (Contract A): action line + collapsed detail. */
+.jeo-save-error__action {
+	margin: 4px 0 0;
+	font-weight: 600;
+}
+
+.jeo-save-error__details {
+	margin-top: 4px;
+}
+
+.jeo-save-error__details summary {
+	cursor: pointer;
+}
+
+.jeo-save-error__details pre {
+	max-height: 160px;
+	overflow: auto;
+	background: #f0f0f1;
+	padding: 8px;
+	font-size: 11px;
+	white-space: pre-wrap;
+	word-break: break-word;
+}

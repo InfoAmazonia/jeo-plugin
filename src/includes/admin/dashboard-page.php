@@ -356,7 +356,7 @@
 		</div>
 	</div>
 
-	<div class="jeo-dashboard-loader" id="jeo-dashboard-loader">
+	<div class="jeo-dashboard-loader" id="jeo-dashboard-loader" role="status" aria-live="polite">
 		<div class="jeo-pulse-icon"></div>
 		<div class="jeo-loading-text"><?php esc_html_e( 'Gathering geodata and initializing JEO Engine...', 'jeowp' ); ?></div>
 	</div>

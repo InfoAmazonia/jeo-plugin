@@ -44,44 +44,47 @@
     height: 80px;
 }
 
+/* W4 §3.4 (M-5): card actions are visible at rest — hover only adds
+   emphasis, it never reveals. */
 .layer-card .layer-buttons {
-    display: none;
-}
-
-.layer-card:hover .layer-buttons {
     display: flex;
     flex-direction: row;
+    gap: 4px;
 }
 
-.layer-card:hover .add-button, .layer-card:hover .remove-button {
-    margin-top: -6px;
+.layer-card .layer-buttons .components-button.add-button,
+.layer-card .layer-buttons .components-button.remove-button {
+    height: auto;
+    padding: 0;
+    margin-bottom: 0;
+    min-height: 24px;
 }
 
-.layer-card:hover .edit-button {
-    text-decoration: none;
-}
-
-.layer-card:hover .button-divider {
-    opacity: 0.4;
-    margin: -6px 4px 0;
-}
-
-.layer-card:hover .add-button {
+.layer-card .add-button {
     color: #0073aa;
 }
 
-.layer-card:hover .remove-button {
+.layer-card .remove-button {
     color: #a00;
 }
 
-.layer-card:hover .add-button:hover {
+.layer-card .add-button:hover:not(:disabled) {
     color: #34a6dd;
-    cursor: pointer;
 }
 
-.layer-card:hover .remove-button:hover {
+.layer-card .remove-button:hover {
     color: #e63939;
-    cursor: pointer;
+}
+
+.layer-card .add-button--added,
+.layer-card .add-button--added:hover {
+    color: #646970;
+    cursor: default;
+}
+
+/* W4 §3.4: keep "Source:" and "Themes:" from visually colliding. */
+.layer-card .layer-meta .layer-source {
+    margin-right: 12px;
 }
 
 .jeo-layers-library-controls .left, .jeo-layers-library-controls .right {

@@ -242,10 +242,14 @@ class RAG_Worker {
 				200
 			);
 		} catch ( \Exception $e ) {
+			$payload = \Jeo\Error_Presenter::from_exception( $e );
+
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => $e->getMessage(),
+					'message' => $payload['message'],
+					'action'  => $payload['action'],
+					'detail'  => $payload['detail'],
 				),
 				500
 			);

@@ -134,7 +134,6 @@ Rules:
 ## Output Rules
 
 You MUST respond with a valid Minimap_Output JSON object:
-
 - `layers`: Array of layer definitions, ordered bottom-to-top: raster layers first, then vector layers (opaque rasters must never hide vector data). Each has: `id` (int, from search_layers results), `use` ("fixed"), `default` (true), `show_legend` (true/false), `reason` (optional string — briefly explain why this layer is relevant to the map).
 - `base_layer`: Object with `id`, `use`, `default`, `show_legend`, `load_as_style`, `variant`. If you don't know a specific base layer ID, set this to null and the system will create one.
 - `center_lat`, `center_lon`: Map center coordinates.
@@ -147,6 +146,7 @@ You MUST respond with a valid Minimap_Output JSON object:
   Set to null to use the automatic luminance-based heuristic.
 - `message`: Cumulative summary of all map-relevant changes across the conversation so far, shown as a notice above the map. Reflect the full history and current state. Omit off-topic exchanges. When the user asks something unrelated to the map, repeat the previous `message` value unchanged.
 - `assistant_message`: Brief summary of what you did, shown as a chat message in the editor.
+- `framing_note`: One-sentence declaration of the framing (scope/center/zoom) actually applied — REQUIRED whenever it differs from what the user asked (explain why), recommended to confirm an explicitly requested framing. Leave null when no framing was discussed.
 - `restore_version`: Version number to restore when — and only when — the user explicitly asks to go back to a previous version of the map (see Version Restore). Null otherwise.
 
 ## Design Principles
@@ -158,6 +158,10 @@ You MUST respond with a valid Minimap_Output JSON object:
 - Consider editorial context: environmental stories may benefit from satellite base, political stories from light base.
 - When refining, only change what the user asked — preserve good aspects of the current map.
 - Avoid overly generic national layers as thematic overlays when the requested scope is local or regional. For example, do NOT use "hydrography of Brazil", "administrative boundaries of Brazil", or "country outline" as a thematic layer for a city, municipality, or state-level map. Prefer local or topic-specific vector layers.
+
+## Framing Honesty
+
+When the user asks for a specific framing (geographic scope, e.g. "only Pará", "the municipalities in the article"), you MUST apply it: adjust `center_lat`, `center_lon` and `initial_zoom` so the map frames exactly the requested scope. When you cannot honor the requested framing (e.g. a layer covers a larger area, or the requested data only exists at another scope), still choose the closest useful framing and ALWAYS declare it in `framing_note` — one plain sentence explaining what framing was kept and why (e.g. "Kept the whole Amazon because the requested layer covers the entire basin"). Never let the map silently show a different scope than the user asked for.
 
 ## Boundary + Theme Requests
 
@@ -190,10 +194,6 @@ The state context includes a "Map versions" list (oldest first). The CURRENT map
 2. ALSO return the full map configuration (`layers`, `base_layer`, center, zoom, `pins`) matching that version as a fallback, reconstructed from the conversation history.
 3. NEVER set `restore_version` for regular edits, regeneration, or when the list shows "(none stored)". With no stored versions, reconstruct the configuration from the conversation history WITHOUT setting the field.
 4. After a restore, subsequent refinements build on the restored state.
-
-## Language
-
-Always respond in the same language the user used in their message.
 
 ## Off-Topic Handling
 
@@ -280,6 +280,8 @@ PROMPT;
 		if ( ! empty( $initial_context ) ) {
 			$prompt .= "\n\n## Additional Context\n" . $initial_context;
 		}
+
+		$prompt .= "\n\n" . \Jeo::get_ai_language_prompt_section();
 
 		return $prompt;
 	}

@@ -69,9 +69,9 @@
 			<!-- Tabs injected here -->
 		</nav>
 
-		<div id="jeo-readme-content"></div>
+		<div id="jeo-readme-content" role="status" aria-live="polite"></div>
 
-		<div class="jeo-welcome-loader" id="jeo-welcome-loader">
+		<div class="jeo-welcome-loader" id="jeo-welcome-loader" role="status" aria-live="polite">
 			<div class="jeo-pulse-icon"></div>
 			<p>Initializing JEO Documentation...</p>
 		</div>
@@ -124,44 +124,73 @@
 				});
 			}
 
-			fetch(readmeUrl, {
-				headers: { 'X-WP-Nonce': wpNonce }
-			})
-			.then(res => res.json())
-			.then(data => {
-				if (data && Array.isArray(data)) {
-					allDocs = data;
-					var tabsContainer = document.getElementById('jeo-readme-tabs');
-					
-					if (allDocs.length > 1) {
-						tabsContainer.style.display = 'flex';
-						allDocs.forEach((doc, i) => {
-							var tab = document.createElement('a');
-							tab.href = '#';
-							tab.className = 'nav-tab';
-							tab.innerText = doc.label;
-							tab.onclick = function(e) {
-								e.preventDefault();
-								switchDoc(i);
-							};
-							tabsContainer.appendChild(tab);
-						});
-					}
-
-					// Load first doc by default
-					switchDoc(0);
-				}
-				
-				// Hide loader after a small delay for smoothness
-				setTimeout(function() {
-					document.getElementById('jeo-welcome-loader').classList.add('hidden');
-				}, 600);
-			})
-			.catch(err => {
-				console.error('Welcome Page Error:', err);
-				document.getElementById('jeo-readme-content').innerHTML = '<p>Error loading documentation.</p>';
+			function hideLoader() {
 				document.getElementById('jeo-welcome-loader').classList.add('hidden');
-			});
+			}
+
+			function renderError(data) {
+				var container = document.getElementById('jeo-readme-content');
+				var message = (data && data.message) ? data.message : '<?php esc_html_e( 'The onboarding documentation could not be loaded.', 'jeowp' ); ?>';
+				var action = (data && data.action) ? data.action : '<?php esc_html_e( 'Try again in a few moments.', 'jeowp' ); ?>';
+				container.innerHTML =
+					'<div class="notice notice-error inline" style="margin:0;" tabindex="-1">' +
+					'<p><strong>' + message.replace(/</g, '&lt;') + '</strong></p>' +
+					'<p style="margin:0;">' + action.replace(/</g, '&lt;') + '</p>' +
+					'<p style="margin:10px 0 12px;"><button type="button" class="button button-secondary" id="jeo-readme-retry"><?php esc_html_e( 'Try again', 'jeowp' ); ?></button></p>' +
+					'</div>';
+				document.getElementById('jeo-readme-retry').addEventListener('click', function() {
+					document.getElementById('jeo-readme-content').innerHTML = '';
+					document.getElementById('jeo-welcome-loader').classList.remove('hidden');
+					loadDocs();
+				});
+				// a11y B-7: focus must land on the error region (never BODY) —
+				// both on the first render and after a failed retry.
+				var notice = container.querySelector('.notice-error');
+				if (notice) { notice.focus(); }
+				hideLoader();
+			}
+
+			function loadDocs() {
+				fetch(readmeUrl, {
+					headers: { 'X-WP-Nonce': wpNonce }
+				})
+				.then(res => res.json().then(data => ({ ok: res.ok, data: data })))
+				.then(({ ok, data }) => {
+					if (ok && data && Array.isArray(data) && data.length > 0) {
+						allDocs = data;
+						var tabsContainer = document.getElementById('jeo-readme-tabs');
+						
+						if (allDocs.length > 1) {
+							tabsContainer.style.display = 'flex';
+							allDocs.forEach((doc, i) => {
+								var tab = document.createElement('a');
+								tab.href = '#';
+								tab.className = 'nav-tab';
+								tab.innerText = doc.label;
+								tab.onclick = function(e) {
+									e.preventDefault();
+									switchDoc(i);
+								};
+								tabsContainer.appendChild(tab);
+							});
+						}
+
+						// Load first doc by default
+						switchDoc(0);
+						// Hide loader after a small delay for smoothness
+						setTimeout(hideLoader, 600);
+					} else {
+						renderError(!ok ? data : null);
+					}
+				})
+				.catch(err => {
+					// eslint-disable-next-line no-console
+					console.error('Welcome Page Error:', err);
+					renderError(null);
+				});
+			}
+
+			loadDocs();
 		});
 	</script>
 </div>

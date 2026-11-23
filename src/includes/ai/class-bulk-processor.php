@@ -191,7 +191,7 @@ class Bulk_Processor {
 
 		$time   = current_time( 'Y-m-d H:i:s' );
 		$source = current_action() === 'jeo_bulk_ai_cron_hook' || current_action() === 'jeo_bulk_ai_clear_cron_hook' ? 'Cron' : 'Manual';
-		$status = $is_error ? '❌ ' . __( 'Error', 'jeowp' ) : '✅ ' . __( 'Success', 'jeowp' );
+		$status = $is_error ? __( 'Error', 'jeowp' ) : __( 'Success', 'jeowp' );
 
 		array_unshift( $logs, compact( 'time', 'source', 'status', 'message' ) );
 		$logs = array_slice( $logs, 0, 5 );
@@ -661,7 +661,7 @@ class Bulk_Processor {
 		?>
 		<div id="jeo-bulk-ai-modal" style="display:none; position:fixed; z-index:99999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); overflow:hidden;">
 			<div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:25px; border-radius:8px; width:600px; max-width:90%; max-height:85vh; display:flex; flex-direction:column; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
-				<h2 style="margin-top:0; border-bottom:1px solid #ccc; padding-bottom:10px; font-weight:600; color:#1d2327;">✨ <?php esc_html_e( 'Review Bulk AI Approval', 'jeowp' ); ?></h2>
+				<h2 style="margin-top:0; border-bottom:1px solid #ccc; padding-bottom:10px; font-weight:600; color:#1d2327;"><?php esc_html_e( 'Review Bulk AI Approval', 'jeowp' ); ?></h2>
 				<div id="jeo-bulk-ai-modal-content" style="overflow-y:auto; flex-grow:1; margin-bottom:20px;">
 					<p style="text-align:center; padding:20px; color:#666; font-style:italic;">
 						<?php esc_html_e( 'Analyzing selected posts...', 'jeowp' ); ?>
@@ -714,10 +714,10 @@ class Bulk_Processor {
 						success: function(res) {
 							var html = '<p style="font-size:14px;"><strong>' + res.will_approve + '</strong> posts will be approved.</p>';
 							if ( res.ignored_by_score > 0 ) {
-								html += '<p style="color:#d63638; font-size:13px;">⚠️ <strong>' + res.ignored_by_score + '</strong> posts have a confidence score below your threshold (' + res.threshold + '%) and will be ignored.</p>';
+								html += '<p style="color:#d63638; font-size:13px;"><strong>' + res.ignored_by_score + '</strong> posts have a confidence score below your threshold (' + res.threshold + '%) and will be ignored.</p>';
 							}
 							if ( res.not_applicable > 0 ) {
-								html += '<p style="color:#666; font-size:13px;">ℹ️ <strong>' + res.not_applicable + '</strong> posts are already geolocated or don\'t have AI suggestions.</p>';
+								html += '<p style="color:#666; font-size:13px;"><strong>' + res.not_applicable + '</strong> posts are already geolocated or don\'t have AI suggestions.</p>';
 							}
 
 							html += '<table class="wp-list-table widefat fixed striped" style="margin-top:15px; border:1px solid #e0e0e0;">';

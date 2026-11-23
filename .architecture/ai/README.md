@@ -57,6 +57,16 @@
 | Grok | Yes | — | `Neuron_Factory::get_chat_provider()` |
 | Cohere | Yes | — | `Neuron_Factory::get_chat_provider()` |
 
+## Provider Payload Sanitizer (W2 latency fix)
+
+`Sanitized_Message_Mapper` (`class-sanitized-message-mapper.php`) decorates every provider mapper created by `Neuron_Factory::create_provider()` (injected via the providers' protected `$messageMapper` property — no vendor patching). At the transport boundary it repairs OpenAI-chat-format payloads whose tool protocol is broken: an assistant message with dangling `tool_calls` (no matching `tool` responses) is demoted to a plain assistant message, and orphan `tool` results are dropped. Valid sequences pass through byte-identical.
+
+Root cause it fixes: sub-agent delegation inherits the parent's history *while the delegate tool call is still pending* (ends with an unanswered `tool_calls`), which strict providers (DeepSeek, OpenAI) reject with HTTP 400 — the parent then retried the delegation in a loop, burning minutes per editor turn (audit K-4). Non-OpenAI payload shapes (Anthropic, Gemini) pass through untouched.
+
+## Unified Output Language Policy (W3 3.4)
+
+Setting `ai_output_language` (`auto` default | `site` | ISO code; AI Settings → General) governs every user-visible AI output. **Configuration wins over the article language**; `auto` follows the editor's conversation and the article. `Jeo::get_configured_ai_language()` resolves the effective value; `Jeo::get_ai_language_prompt_section()` produces the "## Output Language" block appended to the Minimap agent prompt and mirrored in the Context agent rules. The FE reads the effective language from `jeoContext.ai_language` (for the Insert language-mismatch warning).
+
 ## REST Routes (12+)
 
 | Route | Method | Description |

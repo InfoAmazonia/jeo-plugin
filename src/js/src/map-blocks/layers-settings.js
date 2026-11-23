@@ -10,6 +10,7 @@ import { mergeLayerTypeOptions } from './layer-type-options';
 import { loadLayer } from './utils';
 import { decodeHtmlEntity, decodeHtmlEntities, sanitizeHtml } from '../shared/html';
 import { usePaginatedRecords } from '../shared/rest-records';
+import { getLayerOrigin } from '../shared/layer-origin-badge';
 
 import './layers-settings.css';
 
@@ -125,6 +126,29 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 		[ setLayers ]
 	);
 
+	// W4 §8: keyboard alternative to drag — move an item one position.
+	const moveLayerBy = useCallback(
+		( id, delta ) => {
+			const layers = [ ...attributesRef.current.layers ];
+			const from = layers.findIndex( ( l ) => l.id === id );
+			const to = from + delta;
+			if ( from < 0 || to < 0 || to >= layers.length ) {
+				return;
+			}
+			const moved = arrayMove( layers, from, to );
+			if ( moved.length ) {
+				moved[ 0 ].use = 'fixed';
+			}
+			moved.forEach( ( setting ) => {
+				if ( setting.use === 'fixed' ) {
+					setting.default = true;
+				}
+			} );
+			setLayers( moved );
+		},
+		[ setLayers ]
+	);
+
 	const handleSwitchDefault = useCallback(
 		( id, def ) =>
 			setLayers(
@@ -172,6 +196,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 						...currentJeoLayerProps.meta,
 						layer_id: currentJeoLayerProps.id,
 					} )
+					.catch( () => null )
 					.then( ( response ) => {
 						if ( ! response ) {
 							return;
@@ -302,6 +327,8 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 					<div>
 						<form action="javascript:void(0);" style={ { display: "flex" }}>
 							<TextControl
+								label={ __( 'Search layers', 'jeowp' ) }
+								hideLabelFromVision={ true }
 								placeholder={ __( 'Enter keywords to search layers', 'jeowp' ) }
 								value={ layerNameFilter }
 								onChange={ ( value ) => {
@@ -318,24 +345,31 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 									setLayerTypeFilter( value )
 								} }
 							/>
-							<Button
-								className="jeo-layers-library-filters-button-clear"
-								variant="primary"
-								isLarge
-								onClick={ () => {
-									setLayerTypeFilter( '' );
-									setLayerNameFilter('');
-								} }
-							>
-								{ __( 'Clear', 'jeowp' ) }
-							</Button>
+							{ /* W4 §2.2: "Clear" is tertiary and only
+							     visible while a filter is active — never a
+							     co-primary next to "New Layer". */ }
+							{ searchEnabled && (
+								<Button
+									className="jeo-layers-library-filters-button-clear"
+									variant="tertiary"
+									isLarge
+									onClick={ () => {
+										setLayerTypeFilter( '' );
+										setLayerNameFilter('');
+									} }
+								>
+									{ __( 'Clear', 'jeowp' ) }
+								</Button>
+							) }
 						</form>
 					</div>
 				</div>
 				<div className="right">
+					{ /* W4 §2.2: secondary — the modal's only primary is the
+					     "Done" in the fixed footer. */ }
 					<Button
 						className="create-layer-button"
-						variant="primary"
+						variant="secondary"
 						isLarge
 						href="/wp-admin/post-new.php?post_type=map-layer"
 						target="_blank"
@@ -345,14 +379,25 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 					</Button>
 				</div>
 			</div>
-				<div name="map-layers" className="jeo-layers-panel">
+				{ /* C-3 (a11y): the results region (list + spinner + empty
+				     state) updates async after each search — it must be
+				     announced. */ }
+				<div
+					name="map-layers"
+					className="jeo-layers-panel"
+					role="status"
+					aria-live="polite"
+				>
+					{ ! searchEnabled && (
+						<p>{ __( 'Search layers by name or type to browse the library.', 'jeowp' ) }</p>
+					) }
+					{ searchEnabled && searchingLayers && ! searchedLayers.length && (
+						<Spinner />
+					) }
+					{ /* C-1 (a11y): the <ul> may only contain <li> children —
+					     the hint/spinner live above it and each card is wrapped
+					     in an <li> (the inner element is a plain <div>). */ }
 					<ul className="jeo-layers-list">
-						{ ! searchEnabled && (
-							<p>{ __( 'Search layers by name or type to browse the library.', 'jeowp' ) }</p>
-						) }
-						{ searchEnabled && searchingLayers && ! searchedLayers.length && (
-							<Spinner />
-						) }
 						{ searchedLayers.map( ( layer, i ) => {
 						let inUse = false;
 						attributes.layers.map( ( l ) => {
@@ -366,14 +411,14 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 						}
 
 						return (
+							<li key={ layer.id } className="layer-card-item">
 							<Card
-								key={ layer.id }
 								style={ { background: i % 2 !== 0 ? "white": "#f9f9f9" } }
 								size="small"
 								className="layer-card"
 							>
 								<CardBody>
-									<li className="jeo-setting-layer all-layers-list">
+									<div className="jeo-setting-layer all-layers-list">
 										<div className="layer-info">
 											<p className="layer-info__single-row">
 												<a
@@ -405,9 +450,15 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 													) }
 												</p>
 											) }
+										{ /* W4 §3.4 (M-5): real buttons, visible at
+										     rest (no hover reveal), keyboard/SR
+										     reachable. In-use layers show a disabled
+										     "Added" with the reason on the tooltip. */ }
 											<div className="layer-buttons">
 												{ ! inUse && (
-													<p
+													<Button
+														variant="link"
+														className="add-button"
 														onClick={ () => {
 															const new_layer = setLayer( layer.id );
 															const existing_ids = new Set( attributes.layers.map( ( l ) => l.id ) );
@@ -418,32 +469,44 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 																layers: [ ...attributes.layers, new_layer ],
 															} );
 														} }
-														className="add-button"
 													>
 														{ __( 'Add to map', 'jeowp' ) }
-													</p>
+													</Button>
 												) }
 												{ inUse && (
-													<p
-														onClick={ () => {
-															const confirmation = confirm( __( 'Do you really want to delete this layer?', 'jeowp' ) );
+													<>
+														<Button
+															variant="link"
+															className="add-button add-button--added"
+															disabled
+															aria-disabled={ true }
+															title={ __( 'Already on this map', 'jeowp' ) }
+														>
+															{ __( 'Added', 'jeowp' ) }
+														</Button>
+														<Button
+															variant="link"
+															className="remove-button"
+															onClick={ () => {
+																const confirmation = confirm( __( 'Do you really want to delete this layer?', 'jeowp' ) );
 
-															if ( confirmation ) {
-																return setLayers(
-																	attributes.layers.filter( ( settings ) => settings.id !== layer.id )
-																);
-															}
-														} }
-														className="remove-button"
-													>
-														{ __( 'Remove from map', 'jeowp' ) }
-													</p>
+																if ( confirmation ) {
+																	return setLayers(
+																		attributes.layers.filter( ( settings ) => settings.id !== layer.id )
+																	);
+																}
+															} }
+														>
+															{ __( 'Remove from map', 'jeowp' ) }
+														</Button>
+													</>
 												) }
 											</div>
 										</div>
-									</li>
+									</div>
 								</CardBody>
 							</Card>
+							</li>
 						);
 						} ) }
 					</ul>
@@ -537,7 +600,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										}
 
 										if ( def ) {
-											layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).then( response => {
+											layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).catch( () => null ).then( response => {
 												if(!response) {
 													return;
 												}
@@ -636,6 +699,23 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										return null;
 									}
 
+									// W4 §5 (Contrato O): origin badge on the
+									// selected instance; "Manual" only shows when
+									// the list mixes in AI layers.
+									const layerOrigin = getLayerOrigin( {
+										instance: layer,
+										record: loadedLayer.layer,
+									} );
+									const showManualBadge = attributes.layers.some(
+										( l ) =>
+											getLayerOrigin( {
+												instance: l,
+												record: stableLoadedLayers.find(
+													( r ) => r.id === l.id
+												),
+											} ) === 'ai'
+									);
+
 									return <LayerSettings
 										itemProps={ props }
 										index={ index }
@@ -652,21 +732,17 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										updateStyle={ updateStyle }
 										widths={ widths }
 										updateStyleLayers={ updateStyleLayers }
+										moveLayerBy={ moveLayerBy }
+										totalLayers={ attributes.layers.length }
+										origin={ layerOrigin }
+										showManualBadge={ showManualBadge }
 										key={ layer.id }
 									/>;
 								} }
 				/>
 			) }
-			<Button
-				className="done-button"
-				variant="primary"
-				isLarge
-				target="_blank"
-				rel="noopener noreferrer"
-				onClick={ closeModal }
-			>
-				{ __( 'Done', 'jeowp' ) }
-			</Button>
+			{ /* W4 §2.2/§3.3: "Done" lives in the modal's fixed footer
+			     (rendered by LayersSettingsModal) — the single primary. */ }
 		</Fragment>
 	);
 };

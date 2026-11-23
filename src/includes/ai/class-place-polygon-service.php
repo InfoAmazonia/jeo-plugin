@@ -175,6 +175,7 @@ class Place_Polygon_Service {
 		update_post_meta( $post_id, 'attribution', $result['attribution'] );
 		update_post_meta( $post_id, '_jeo_boundary_source', $result['source'] );
 		update_post_meta( $post_id, '_jeo_boundary_geojson_url', $geojson_url );
+		update_post_meta( $post_id, 'provenance', 'ai' );
 
 		Minilayer_Metadata::assign_theme( $post_id, $theme );
 
