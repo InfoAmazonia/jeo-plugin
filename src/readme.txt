@@ -2,12 +2,12 @@
 Contributors: infoamazonia
 Tags: maps, geolocation, gutenberg, storymap, map, geocoding, journalism, interactive-maps, blocks, openstreetmap, news, maplibre
 Tested up to: 7.0
-Stable tag: 4.0.0-beta.1
+Stable tag: 4.0.0-beta.2
 Requires PHP: 8.2
 Requires at least: 6.9
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
-Version: 4.0.0-beta.1
+Version: 4.0.0-beta.2
 
 Geojournalism platform for building maps, geolocating posts, and publishing interactive storymaps in WordPress.
 
