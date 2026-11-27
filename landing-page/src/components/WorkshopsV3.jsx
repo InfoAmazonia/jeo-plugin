@@ -1,7 +1,7 @@
 import { Rocket, Github, CodeXml } from 'lucide-react'
 import Reveal from './ui/Reveal.jsx'
 import { useI18n } from '../i18n/index.jsx'
-import { GITHUB_URL, DOCS_URL } from '../links.js'
+import { GITHUB_URL, docsUrl } from '../links.js'
 
 /**
  * Workshops + Community (redesign v3) — Figma section "Workshops"
@@ -32,7 +32,7 @@ import { GITHUB_URL, DOCS_URL } from '../links.js'
  *   exact three paragraphs from the Figma node (explicit line breaks).
  * - Figma "Frame 23" buttons: borderless icon+label links in the accent
  *   green (#00A67E), 32px icons, 18px bold labels, 40px row inset.
- *   GitHub → GITHUB_URL, docs → DOCS_URL. The Figma uses mdi glyphs
+ *   GitHub → GITHUB_URL, docs → docsUrl(lang). The Figma uses mdi glyphs
  *   ("mdi:github" / "Code off"); lucide Github/CodeXml are the closest
  *   available equivalents.
  *
@@ -53,7 +53,7 @@ import { GITHUB_URL, DOCS_URL } from '../links.js'
 const SHOW_WORKSHOP_CARD = false
 
 export default function WorkshopsV3() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const ws = t.workshops
 
   const inputClass =
@@ -180,7 +180,7 @@ export default function WorkshopsV3() {
                 </span>
               </a>
               <a
-                href={DOCS_URL}
+                href={docsUrl(lang)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex h-16 items-center gap-2 text-v3-accent transition-opacity hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-v3-green focus-visible:ring-offset-2 focus-visible:ring-offset-v3-mint"

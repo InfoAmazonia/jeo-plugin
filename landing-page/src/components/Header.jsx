@@ -7,7 +7,7 @@ import { DOWNLOAD_URL } from '../links.js'
 
 const ANCHORS = ['#top', '#recursos', '#inteligencia-artificial', '#experimente']
 
-const LANGUAGE_LABELS = { 'pt-BR': 'Português', en: 'English' }
+const LANGUAGE_LABELS = { 'pt-BR': 'Português', en: 'English', es: 'Español' }
 
 function LanguageSwitcher({ className = '', onSelect }) {
   const { lang, setLang, t } = useI18n()
