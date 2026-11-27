@@ -13,7 +13,7 @@ if ( ! \jeo_ai_handler()->is_configured() ) :
 		.jeo-tab-content-wrapper { display: block !important; }
 	</style>
 	<div class="card" style="max-width: 100%; margin-top: 0; padding: 40px; border-radius: 8px; text-align: center;">
-		<span style="font-size: 48px; display: block; margin-bottom: 20px;">🔌</span>
+		<span class="dashicons dashicons-admin-plugins" style="font-size: 48px; width: 48px; height: 48px; display: block; margin-bottom: 20px;" aria-hidden="true"></span>
 		<h2 style="margin-top: 0; color: #1d2327;"><?php esc_html_e( 'AI Provider Required', 'jeowp' ); ?></h2>
 		<p style="font-size: 15px; color: #50575e; max-width: 500px; margin: 0 auto 25px; line-height: 1.6;">
 			<?php esc_html_e( 'You need to configure an AI Provider before you can use the Knowledge Base. Set up your API key and choose a model in the Provider tab first.', 'jeowp' ); ?>
@@ -32,7 +32,7 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 
 <div class="card" style="max-width: 100%; margin-top: 0; padding: 20px; border-radius: 8px; position: relative;">
 	
-	<h3 style="margin-top: 0; color: #1d2327;">🧠 <?php esc_html_e( 'RAG Knowledge Base (Vector Store)', 'jeowp' ); ?></h3>
+	<h2 style="margin-top: 0; color: #1d2327;"><?php esc_html_e( 'RAG Knowledge Base (Vector Store)', 'jeowp' ); ?></h2>
 	<p class="description"><?php esc_html_e( 'Vectorize your WordPress posts to allow the JEO AI to contextually answer questions and cross-reference territorial data.', 'jeowp' ); ?></p>
 
 	<table class="form-table" style="margin-top: 20px;">
@@ -52,11 +52,11 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 									?>
 									
 									<?php if ( $is_locked ) : ?>
-										<div style="background: #fff8e1; border-left: 4px solid #ffb900; padding: 10px 15px; margin-bottom: 15px; border-radius: 4px;">
-											<p style="margin: 0; font-weight: 600; color: #856404;">
-												🔒 <?php esc_html_e( 'Model selection is locked.', 'jeowp' ); ?>
+										<div class="notice notice-warning inline" style="margin-bottom: 15px;">
+											<p style="margin: 0; font-weight: 600;">
+												<?php esc_html_e( 'Model selection is locked.', 'jeowp' ); ?>
 											</p>
-											<p style="margin: 5px 0 0 0; font-size: 13px;">
+											<p style="margin: 5px 0 0 0;">
 												<?php
 												/* translators: %s: locked embedding model name */
 												printf( esc_html__( 'This Vector Store was initialized with %s. To use a different model, you must clear the current store first.', 'jeowp' ), '<code>' . esc_html( $locked_model ) . '</code>' );
@@ -103,35 +103,33 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 
 	<div style="position: relative; <?php echo $is_rag_blocked ? 'background: #f6f7f7; border-color: #dcdcde;' : ''; ?> padding: 20px; border-radius: 8px;">
 	
-		<?php if ( $is_rag_blocked ) : ?>
-			<div class="jeo-rag-blocked-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; border-radius: 8px; text-align: center; padding: 40px; box-sizing: border-box;">
-				<div style="background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #dcdcde; max-width: 500px;">
-					<span style="font-size: 40px; display: block; margin-bottom: 15px;">🚧</span>
-					<h3 style="margin-top: 0; color: #d63638;"><?php esc_html_e( 'RAG Knowledge Base is not available', 'jeowp' ); ?></h3>
-					<p style="font-size: 14px; line-height: 1.6; color: #50575e; margin-bottom: 20px;">
-						<?php echo esc_html( $rag_feasibility->get_error_message() ); ?>
-					</p>
-					<div style="background: #f0f6fb; padding: 15px; border-left: 4px solid #2271b1; border-radius: 4px; text-align: left; margin-bottom: 20px;">
-						<strong><?php esc_html_e( 'How to fix this:', 'jeowp' ); ?></strong>
-						<ul style="margin: 10px 0 0 20px; list-style: disc; font-size: 13px;">
-							<?php if ( $rag_feasibility->get_error_code() === 'rag_no_embedding_model' ) : ?>
-								<li><?php esc_html_e( 'Please select an Embedding Model from the dropdown above and click "Save AI Settings".', 'jeowp' ); ?></li>
-							<?php else : ?>
-								<li><?php esc_html_e( 'Ensure you have an active AI Provider (Gemini, OpenAI, or Ollama) configured in the "AI Provider" tab.', 'jeowp' ); ?></li>
-								<li><?php esc_html_e( 'Check if the "wp-content/uploads" directory exists and is writable.', 'jeowp' ); ?></li>
-							<?php endif; ?>
-						</ul>
-					</div>
-					<?php if ( $rag_feasibility->get_error_code() !== 'rag_no_embedding_model' ) : ?>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=jeo-ai-settings&tab=provider' ) ); ?>" class="button button-primary"><?php esc_html_e( 'Go to AI Provider Settings', 'jeowp' ); ?></a>
+<?php if ( $is_rag_blocked ) : ?>
+			<?php // Knowledge Base gate (gabarito) — same content, wp-admin inline notice vehicle (W4 D1). ?>
+			<div class="notice notice-warning inline" style="margin: 0 0 20px;">
+				<p style="font-weight: 600; margin-bottom: 5px;"><?php esc_html_e( 'RAG Knowledge Base is not available', 'jeowp' ); ?></p>
+				<p style="margin-top: 0;">
+					<?php echo esc_html( $rag_feasibility->get_error_message() ); ?>
+				</p>
+				<p style="margin-bottom: 5px;"><strong><?php esc_html_e( 'How to fix this:', 'jeowp' ); ?></strong></p>
+				<ul style="margin: 5px 0 15px 20px; list-style: disc;">
+					<?php if ( $rag_feasibility->get_error_code() === 'rag_no_embedding_model' ) : ?>
+						<li><?php esc_html_e( 'Please select an Embedding Model from the dropdown above and click "Save AI Settings".', 'jeowp' ); ?></li>
+					<?php else : ?>
+						<li><?php esc_html_e( 'Ensure you have an active AI Provider (Gemini, OpenAI, or Ollama) configured in the "AI Provider" tab.', 'jeowp' ); ?></li>
+						<li><?php esc_html_e( 'Check if the "wp-content/uploads" directory exists and is writable.', 'jeowp' ); ?></li>
 					<?php endif; ?>
-				</div>
+				</ul>
+				<?php if ( $rag_feasibility->get_error_code() !== 'rag_no_embedding_model' ) : ?>
+					<p style="margin: 0;">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=jeo-ai-settings&tab=provider' ) ); ?>" class="button button-primary"><?php esc_html_e( 'Go to AI Provider Settings', 'jeowp' ); ?></a>
+					</p>
+				<?php endif; ?>
 			</div>
 		<?php endif; ?>
 
 	<div style="margin-top: 20px; display: flex; align-items: flex-start; gap: 20px; background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 6px;">
 			<div style="flex: 1;">
-					<h4 style="margin-top: 0;"><?php esc_html_e( 'Background Indexing', 'jeowp' ); ?></h4>
+					<h3 style="margin-top: 0;"><?php esc_html_e( 'Background Indexing', 'jeowp' ); ?></h3>
 					<p class="description"><?php esc_html_e( 'Automatically vectorize your posts in small batches using WP-Cron.', 'jeowp' ); ?></p>
 					
 					<div style="margin-top: 15px;">
@@ -139,19 +137,19 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 							<input name="<?php echo esc_html( \jeo_settings()->get_field_name( 'jeo_rag_auto_index' ) ); ?>" type="checkbox" value="1" <?php checked( \jeo_settings()->get_option( 'jeo_rag_auto_index' ), 1 ); ?>>
 							<strong><?php esc_html_e( 'Enable Auto-indexing', 'jeowp' ); ?></strong>
 						</label>
-						<p style="font-size: 11px; margin-top: 5px; color: #8c8f94; font-style: italic;">
+						<p style="font-size: 11px; margin-top: 5px; color: #646970; font-style: italic;">
 							<?php esc_html_e( 'Note: WP-Cron only runs when your site receives visitor traffic. If you are on a local development server with no traffic, indexing will pause until pages are loaded.', 'jeowp' ); ?>
 						</p>
 					</div>
 
 					<div style="margin-top: 15px; display: flex; gap: 20px;">
 						<div class="jeo-filter-group">
-							<label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #8c8f94; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Batch Size', 'jeowp' ); ?></label>
-							<input name="<?php echo esc_html( \jeo_settings()->get_field_name( 'jeo_rag_batch_size' ) ); ?>" type="number" value="<?php echo esc_attr( \jeo_settings()->get_option( 'jeo_rag_batch_size' ) ); ?>" min="1" max="100" class="small-text">
+							<label for="jeo_rag_batch_size_input" style="font-size: 12px; font-weight: 600; color: #50575e; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Batch size', 'jeowp' ); ?></label>
+							<input id="jeo_rag_batch_size_input" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'jeo_rag_batch_size' ) ); ?>" type="number" value="<?php echo esc_attr( \jeo_settings()->get_option( 'jeo_rag_batch_size' ) ); ?>" min="1" max="100" class="small-text">
 						</div>
 						<div class="jeo-filter-group">
-							<label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #8c8f94; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Cron Interval', 'jeowp' ); ?></label>
-							<select name="<?php echo esc_html( \jeo_settings()->get_field_name( 'jeo_rag_cron_interval' ) ); ?>">
+							<label for="jeo_rag_cron_interval_input" style="font-size: 12px; font-weight: 600; color: #50575e; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Cron interval', 'jeowp' ); ?></label>
+							<select id="jeo_rag_cron_interval_input" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'jeo_rag_cron_interval' ) ); ?>">
 								<option value="every_minute" <?php selected( \jeo_settings()->get_option( 'jeo_rag_cron_interval' ), 'every_minute' ); ?>><?php esc_html_e( 'Every Minute', 'jeowp' ); ?></option>
 								<option value="every_5_mins" <?php selected( \jeo_settings()->get_option( 'jeo_rag_cron_interval' ), 'every_5_mins' ); ?>><?php esc_html_e( 'Every 5 Minutes', 'jeowp' ); ?></option>
 								<option value="every_15_mins" <?php selected( \jeo_settings()->get_option( 'jeo_rag_cron_interval' ), 'every_15_mins' ); ?>><?php esc_html_e( 'Every 15 Minutes', 'jeowp' ); ?></option>
@@ -159,26 +157,26 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 							</select>
 						</div>
 						<div class="jeo-filter-group">
-							<label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #8c8f94; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Search Results (topK)', 'jeowp' ); ?></label>
-							<input name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_rag_topk' ) ); ?>" type="number" value="<?php echo esc_attr( \jeo_settings()->get_option( 'ai_rag_topk' ) ); ?>" min="1" max="50" class="small-text">
+							<label for="ai_rag_topk_input" style="font-size: 12px; font-weight: 600; color: #50575e; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Search results (top K)', 'jeowp' ); ?></label>
+							<input id="ai_rag_topk_input" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_rag_topk' ) ); ?>" type="number" value="<?php echo esc_attr( \jeo_settings()->get_option( 'ai_rag_topk' ) ); ?>" min="1" max="50" class="small-text">
 							<p class="description" style="font-size: 11px; margin-top: 4px;"><?php esc_html_e( 'Max semantic matches returned per search.', 'jeowp' ); ?></p>
 						</div>
 					</div>
 
 					<div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee;">
-						<h5 style="margin: 0 0 10px 0;"><?php esc_html_e( 'Recent Background Logs', 'jeowp' ); ?></h5>
+						<h4 style="margin: 0 0 10px 0;"><?php esc_html_e( 'Recent Background Logs', 'jeowp' ); ?></h4>
 						<?php
 						$cron_logs = get_option( 'jeo_rag_cron_logs', array() );
 						if ( empty( $cron_logs ) || ! is_array( $cron_logs ) ) :
 							?>
-							<p style="font-size: 11px; color: #8c8f94; font-style: italic; margin: 0;">
+							<p style="font-size: 11px; color: #646970; font-style: italic; margin: 0;">
 								<?php esc_html_e( 'No indexing jobs have run recently.', 'jeowp' ); ?>
 							</p>
 						<?php else : ?>
 							<ul style="margin: 0; padding: 0; list-style: none; font-size: 11px; font-family: monospace;">
 								<?php foreach ( $cron_logs as $log ) : ?>
 									<li style="margin-bottom: 5px; padding: 5px 8px; background: #f6f7f7; border-left: 2px solid #ccc; border-radius: 3px;">
-										<span style="color: #8c8f94;">[<?php echo esc_html( $log['time'] ); ?>]</span> 
+										<span style="color: #646970;">[<?php echo esc_html( \Jeo::admin_datetime( $log['time'] ) ); ?>]</span> 
 										<strong><?php echo esc_html( $log['source'] ); ?>:</strong> 
 										<?php echo esc_html( $log['status'] ); ?> - 
 										<?php echo esc_html( $log['message'] ); ?>
@@ -193,7 +191,7 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 					<p class="description"><?php esc_html_e( 'Trigger a single batch vectorization immediately.', 'jeowp' ); ?></p>
 					
 					<button type="button" class="button button-primary" id="jeo-ai-rag-manual-btn" style="margin-top: 15px;">
-						🚀 <?php esc_html_e( 'Vectorize 1 Batch Now', 'jeowp' ); ?>
+						<?php esc_html_e( 'Vectorize 1 Batch Now', 'jeowp' ); ?>
 					</button>
 
 					<?php
@@ -244,7 +242,7 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 	<div style="margin-top: 20px; display: flex; align-items: center; gap: 20px;">
 			<div>
 					<strong><?php esc_html_e( 'Status:', 'jeowp' ); ?></strong>
-					<span style="color: #46b450; font-weight: bold;">
+					<span style="color: #007017; font-weight: bold;">
 							<?php esc_html_e( 'Active (Local File Store)', 'jeowp' ); ?>
 					</span>
 			</div>
@@ -254,10 +252,10 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 			</div>
 			<div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
 				<button type="button" class="button button-secondary" id="jeo-ai-backup-store-btn">
-					📦 <?php esc_html_e( 'Backup Store', 'jeowp' ); ?>
+					<?php esc_html_e( 'Backup Store', 'jeowp' ); ?>
 				</button>
-				<button type="button" class="button jeo-ai-clear-store-btn" data-store="production" style="border-color: #d63638; color: #d63638;">
-					🗑️ <?php esc_html_e( 'Clear & Reset Model', 'jeowp' ); ?>
+				<button type="button" class="button jeo-ai-clear-store-btn" data-store="production" style="border-color: #b32d2e; color: #b32d2e;">
+					<?php esc_html_e( 'Clear & Reset Model', 'jeowp' ); ?>
 				</button>
 			</div>
 	</div>
@@ -265,7 +263,7 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 	<div id="jeo-ai-backups-container" style="margin-top: 20px; border-top: 1px dashed #ccd0d4; padding-top: 20px;">
 		<h4 style="margin-top: 0;"><?php esc_html_e( 'Available Backups (Last 3)', 'jeowp' ); ?></h4>
 		<div id="jeo-ai-backups-list">
-			<p style="color: #8c8f94; font-style: italic;"><?php esc_html_e( 'No backups found.', 'jeowp' ); ?></p>
+			<p style="color: #646970; font-style: italic;"><?php esc_html_e( 'No backups found.', 'jeowp' ); ?></p>
 		</div>
 	</div>
 
@@ -285,7 +283,7 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 		<!-- RAG Retrieval Modal -->
 		<dialog id="rag-retrieval-modal" class="jeo-ai-modal jeo-dict-modal" style="width: 90%; max-width: 1000px;">
 				<div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #ccc; padding-bottom: 15px; margin-bottom: 20px; position: sticky; top: 0; background: #fff; z-index: 10;">
-						<h2 style="margin:0;">🔍 <?php esc_html_e( 'Test Local Vector Retrieval', 'jeowp' ); ?></h2>
+						<h2 style="margin:0;"><?php esc_html_e( 'Test Local Vector Retrieval', 'jeowp' ); ?></h2>
 						<button type="button" class="button jeo-ai-close-retrieval-modal-btn"><?php esc_html_e( 'Close', 'jeowp' ); ?></button>
 				</div>
 
@@ -316,7 +314,7 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 						<p class="description"><?php esc_html_e( 'Trigger a single batch vectorization for map layers. Layers are also auto-indexed on the background cron schedule and when saved.', 'jeowp' ); ?></p>
 
 						<button type="button" class="button button-primary" id="jeo-ai-layer-rag-manual-btn" style="margin-top: 15px;">
-								🚀 <?php esc_html_e( 'Vectorize 1 Batch Now', 'jeowp' ); ?>
+								<?php esc_html_e( 'Vectorize 1 Batch Now', 'jeowp' ); ?>
 						</button>
 
 						<?php
@@ -361,14 +359,14 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 								$layer_cron_logs = get_option( 'jeo_layer_rag_cron_logs', array() );
 								if ( empty( $layer_cron_logs ) || ! is_array( $layer_cron_logs ) ) :
 									?>
-									<p style="font-size: 11px; color: #8c8f94; font-style: italic; margin: 0;">
+									<p style="font-size: 11px; color: #646970; font-style: italic; margin: 0;">
 										<?php esc_html_e( 'No layer indexing jobs have run recently.', 'jeowp' ); ?>
 									</p>
 								<?php else : ?>
 									<ul style="margin: 0; padding: 0; list-style: none; font-size: 11px; font-family: monospace;">
 										<?php foreach ( $layer_cron_logs as $log ) : ?>
 											<li style="margin-bottom: 5px; padding: 5px 8px; background: #f6f7f7; border-left: 2px solid #d63638; border-radius: 3px;">
-												<span style="color: #8c8f94;">[<?php echo esc_html( $log['time'] ); ?>]</span>
+												<span style="color: #646970;">[<?php echo esc_html( \Jeo::admin_datetime( $log['time'] ) ); ?>]</span>
 												<strong><?php echo esc_html( $log['source'] ); ?>:</strong>
 												<?php echo esc_html( $log['status'] ); ?> -
 												<?php echo esc_html( $log['message'] ); ?>
@@ -384,11 +382,11 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 
 						<div style="margin-top: 15px; display: flex; gap: 10px; align-items: flex-end;">
 								<div>
-										<label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #8c8f94; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Post ID', 'jeowp' ); ?></label>
+										<label for="jeo-ai-suggest-layers-post-id" style="font-size: 12px; font-weight: 600; color: #50575e; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Post ID', 'jeowp' ); ?></label>
 										<input type="number" id="jeo-ai-suggest-layers-post-id" class="small-text" placeholder="<?php esc_attr_e( 'e.g. 123', 'jeowp' ); ?>" min="1">
 								</div>
 								<div style="flex: 1;">
-										<label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #8c8f94; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Or search text', 'jeowp' ); ?></label>
+										<label for="jeo-ai-suggest-layers-query" style="font-size: 12px; font-weight: 600; color: #50575e; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Or search text', 'jeowp' ); ?></label>
 										<input type="text" id="jeo-ai-suggest-layers-query" class="regular-text" style="width: 100%;" placeholder="<?php esc_attr_e( 'e.g., deforestation in Amazon rainforest', 'jeowp' ); ?>">
 								</div>
 								<button type="button" class="button button-primary" id="jeo-ai-suggest-layers-btn"><?php esc_html_e( 'Find Layers', 'jeowp' ); ?></button>
@@ -410,8 +408,8 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 						<code style="display: block; margin-top: 5px; background: #000; color: #0f0; padding: 10px; border-radius: 4px;">wp jeo ai vectorize-layers --batch_size=20</code>
 				</div>
 				<div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
-						<button type="button" class="button jeo-ai-clear-layer-store-btn" style="border-color: #d63638; color: #d63638;">
-								🗑️ <?php esc_html_e( 'Clear Layer Store', 'jeowp' ); ?>
+						<button type="button" class="button jeo-ai-clear-layer-store-btn" style="border-color: #b32d2e; color: #b32d2e;">
+								<?php esc_html_e( 'Clear Layer Store', 'jeowp' ); ?>
 						</button>
 				</div>
 		</div>

@@ -1,6 +1,6 @@
 import { Dashicon } from '@wordpress/components';
 import { memo, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { isEqual } from 'lodash-es';
 import { decodeHtmlEntity } from '../shared/html';
@@ -8,6 +8,7 @@ import LayerStyleEditor, { isStyleableLayerType } from '../shared/layer-style-ed
 import { CheckboxControl, SelectControl } from '../shared/wp-form-controls';
 import RadioControl from './radio-control';
 import { layerUseLabels } from './utils';
+import LayerOriginBadge from '../shared/layer-origin-badge';
 
 import './layer-settings.css';
 
@@ -34,6 +35,10 @@ const LayerSettings = (
 		updateUse,
 		updateStyle,
 		widths,
+		moveLayerBy,
+		totalLayers,
+		origin,
+		showManualBadge,
 	}
 ) => {
 	const classes = classNames( [
@@ -72,11 +77,48 @@ const LayerSettings = (
 				>
 					<div className="handle" style={ setWidth( 0 ) }>
 						<Dashicon className="drag-handle" icon="move" data-movable-handle />
+						{ /* W4 §8: keyboard alternative to drag reordering. */ }
+						{ moveLayerBy && (
+							<>
+								<button
+									type="button"
+									className="jeo-layer-move jeo-layer-move--up"
+									aria-label={ sprintf(
+										/* translators: %s: layer title. */
+										__( 'Move %s up', 'jeowp' ),
+										decodeHtmlEntity( settings.layer.title.rendered )
+									) }
+									disabled={ layerIndex === 0 }
+									onClick={ () => moveLayerBy( settings.id, -1 ) }
+								>
+									<Dashicon icon="arrow-up-alt2" />
+								</button>
+								<button
+									type="button"
+									className="jeo-layer-move jeo-layer-move--down"
+									aria-label={ sprintf(
+										/* translators: %s: layer title. */
+										__( 'Move %s down', 'jeowp' ),
+										decodeHtmlEntity( settings.layer.title.rendered )
+									) }
+									disabled={ layerIndex === totalLayers - 1 }
+									onClick={ () => moveLayerBy( settings.id, 1 ) }
+								>
+									<Dashicon icon="arrow-down-alt2" />
+								</button>
+							</>
+						) }
 					</div>
 					<div className="display" style={ setWidth( 1 ) }>
 						<span className="layer-title">
 							{ decodeHtmlEntity( settings.layer.title.rendered ) }
-						</span>{ ' ' }
+						</span>
+						{ /* C8c: badge derived from primitives so the memo
+						     comparator catches live origin updates. */ }
+						<LayerOriginBadge
+							origin={ origin }
+							showManual={ showManualBadge }
+						/>{ ' ' }
 						| { settings.layer.meta.type }
 					</div>
 					<div className="use-control" style={ setWidth( 2 ) }>
@@ -279,6 +321,8 @@ export default memo( LayerSettings, ( prevProps, nextProps ) => {
 		prevProps.isOutOfBounds === nextProps.isOutOfBounds &&
 		isEqual( prevProps.settings, nextProps.settings ) &&
 		isEqual( prevProps.widths, nextProps.widths ) &&
+		prevProps.origin === nextProps.origin &&
+		prevProps.showManualBadge === nextProps.showManualBadge &&
 		prevStyle.visibility === nextStyle.visibility &&
 		prevStyle.zIndex === nextStyle.zIndex
 	);

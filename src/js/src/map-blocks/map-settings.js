@@ -6,8 +6,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	CheckboxControl,
 	RangeControl,
-	TextControl,
 } from '../shared/wp-form-controls';
+import { GeoNumberControl } from '../shared/geo-format';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
@@ -30,7 +30,7 @@ function parseNumber( value ) {
 	return isNaN( numValue ) ? value : numValue;
 }
 
-export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = false } ) => {
+export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = false, normalizationNotes = [] } ) => {
 	const {
 		center_lat: centerLat,
 		center_lon: centerLon,
@@ -38,6 +38,13 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 		min_zoom: minZoom,
 		max_zoom: maxZoom,
 	} = { ...mapDefaults, ...attributes };
+
+	// Contrato N (W4 §6.2): server-side normalization notes are shown inline
+	// next to the field they adjusted — the displayed value never differs
+	// from what was typed without a note.
+	const noteFor = ( field ) =>
+		( normalizationNotes || [] ).find( ( note ) => note.field === field )
+			?.message || null;
 
 	const attributeUpdater = ( attribute ) => ( value ) => {
 		setAttributes( { [ attribute ]: value } );
@@ -54,20 +61,20 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 			<form className="jeo-map-settings">
 				<section className="center">
 					<h3>{ __( 'Center', 'jeowp' ) }</h3>
-					<TextControl
-						type="number"
+					<GeoNumberControl
 						label={ __( 'Latitude', 'jeowp' ) }
 						value={ centerLat }
+						help={ noteFor( 'center_lat' ) }
 						onChange={ ( value ) => {
 							editingMap.current = true;
 							setTimeout( () => ( editingMap.current = false ), 50 );
 							return attributeUpdater( 'center_lat' )( parseNumber( value ) );
 						} }
 					/>
-					<TextControl
-						type="number"
+					<GeoNumberControl
 						label={ __( 'Longitude', 'jeowp' ) }
 						value={ centerLon }
+						help={ noteFor( 'center_lon' ) }
 						onChange={ ( value ) => {
 							editingMap.current = true;
 							setTimeout( () => ( editingMap.current = false ), 50 );
@@ -111,6 +118,11 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 							attributeUpdater( 'min_zoom' )( newValue );
 						} }
 					/>
+					{ noteFor( 'min_zoom' ) && (
+						<p className="jeo-normalization-note" role="status">
+							{ noteFor( 'min_zoom' ) }
+						</p>
+					) }
 					<RangeControl
 						label={ __( 'Max zoom', 'jeowp' ) }
 						initialPosition={ 20 }
@@ -128,6 +140,11 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 							attributeUpdater( 'max_zoom' )( newValue );
 						} }
 					/>
+					{ noteFor( 'max_zoom' ) && (
+						<p className="jeo-normalization-note" role="status">
+							{ noteFor( 'max_zoom' ) }
+						</p>
+					) }
 					<CheckboxControl
 						label={ __( 'Scroll zoom on post', 'jeowp' ) }
 						checked={ ! attributes.disable_scroll_zoom }
@@ -171,8 +188,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 					<h3>{ __( 'Pan limits', 'jeowp' ) }</h3>
 					<p>
 					<div className="pan-wrapper">
-						<TextControl
-							type="number"
+						<GeoNumberControl
 							label={ __( 'North', 'jeowp' ) }
 							value={ attributes.pan_limits?.north ?? '' }
 							onChange={ ( value ) => {
@@ -185,8 +201,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 							} }
 						/>
 
-						<TextControl
-							type="number"
+						<GeoNumberControl
 							label={ __( 'East', 'jeowp' ) }
 							value={ attributes.pan_limits?.east ?? '' }
 							onChange={ ( value ) => {
@@ -200,8 +215,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 						/>
 
 
-						<TextControl
-							type="number"
+						<GeoNumberControl
 							label={ __( 'South', 'jeowp' ) }
 							value={ attributes.pan_limits?.south ?? '' }
 							onChange={ ( value ) => {
@@ -214,8 +228,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 							} }
 						/>
 
-						<TextControl
-							type="number"
+						<GeoNumberControl
 							label={ __( 'West', 'jeowp' ) }
 							value={ attributes.pan_limits?.west ?? '' }
 							onChange={ ( value ) => {

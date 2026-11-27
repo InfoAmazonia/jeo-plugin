@@ -97,8 +97,6 @@ export default {
   footer: {
     navLabel: 'Footer navigation',
     cta: 'Install for free',
-    termsLead: 'Read the',
-    termsLink: 'Terms of use and privacy',
     production: 'production',
     development: 'development',
   },

@@ -56,6 +56,87 @@
 			if(body) body.scrollTop = body.scrollHeight;
 		}
 
+		// Translate through wp-i18n (enqueued as a script dependency with
+		// wp_set_script_translations) with an English fallback. The local
+		// `__` alias keeps strings extractable by `wp i18n make-pot`.
+		var __ = (window.wp && window.wp.i18n && typeof window.wp.i18n.__ === 'function')
+			? window.wp.i18n.__
+			: function(text) { return text; };
+
+		// Escape server-provided messages before injecting them via .html().
+		function escapeHtml(text) {
+			return String(text == null ? '' : text)
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;');
+		}
+
+		// Copy helper with a fallback for contexts where the async clipboard
+		// API is blocked.
+		function copyDetailsText(text, onDone) {
+			function fallback() {
+				try {
+					var textarea = document.createElement('textarea');
+					textarea.value = text;
+					textarea.style.position = 'fixed';
+					textarea.style.opacity = '0';
+					document.body.appendChild(textarea);
+					textarea.select();
+					var ok = document.execCommand('copy');
+					document.body.removeChild(textarea);
+					onDone(ok);
+				} catch (e) {
+					onDone(false);
+				}
+			}
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(text).then(function() { onDone(true); }, fallback);
+			} else {
+				fallback();
+			}
+		}
+
+		// Contract A on the classic settings screens (Gate 2 — BUG-01):
+		// render the humanized payload ({ message, action, detail }) with the
+		// action line and a collapsed "Copy details" block, mirroring the
+		// single error pattern used by the editor previews. Payloads without
+		// action/detail degrade gracefully to the message alone.
+		function renderContractError($container, res, fallbackMsg) {
+			res = res || {};
+			var message = res.message || res.error || fallbackMsg;
+			var action = res.action;
+			if (action && typeof action === 'object') {
+				action = action.label || '';
+			}
+			var detail = typeof res.detail === 'string' && res.detail ? res.detail : null;
+
+			var html = '<span style="color: #d63638;">' + escapeHtml(message) + '</span>';
+			if (action) {
+				html += '<br><span class="jeo-contract-action" style="color:#3c434a; font-weight:600;">' + escapeHtml(action) + '</span>';
+			}
+			if (detail) {
+				html += '<details class="jeo-contract-details" style="margin-top:4px;">' +
+					'<summary style="cursor:pointer;">' + escapeHtml(__('Technical details', 'jeowp')) + '</summary>' +
+					'<pre style="max-height:160px; overflow:auto; background:#f0f0f1; padding:8px; font-size:11px; white-space:pre-wrap; word-break:break-word;">' + escapeHtml(detail) + '</pre>' +
+					'<button type="button" class="button button-small jeo-copy-details-btn">' + escapeHtml(__('Copy details', 'jeowp')) + '</button>' +
+					'</details>';
+			}
+			$container.html(html).show();
+		}
+
+		$(document).on('click', '.jeo-copy-details-btn', function(e) {
+			e.preventDefault();
+			var $btn = $(this);
+			var text = $btn.closest('details').find('pre').text();
+			copyDetailsText(text, function(ok) {
+				if (!ok) return;
+				var original = $btn.text();
+				$btn.text(__('Copied!', 'jeowp'));
+				setTimeout(function() { $btn.text(original); }, 2000);
+			});
+		});
+
 		// Helper wrapper for apiFetch with logging
 		function loggedApiFetch(options) {
 			logToConsole(options.path, 'req', options.data || {});
@@ -71,6 +152,44 @@
 		// ------------------------------------
 		// AI API Key Validation Logic
 		// ------------------------------------
+
+		// W4 §3.1 — one primary action per state on the Provider tab: the
+		// "Test Connection" button carries the section's primary weight only
+		// while the key is present and untested; an empty key or a validated
+		// key demotes it to secondary (the page footer's "Save AI Settings"
+		// keeps the global primary weight).
+		function updateTestKeyWeight($row, state) {
+			var $btn = $row.find('.jeo-ai-test-key-btn');
+			if (!$btn.length) return;
+			if (state === 'key-untested') {
+				$btn.removeClass('button-secondary').addClass('button-primary');
+			} else {
+				$btn.removeClass('button-primary').addClass('button-secondary');
+			}
+		}
+
+		function keyStateForRow($row) {
+			var key = $row.find('.jeo-ai-key-input').val();
+			if (!key) return 'no-key';
+			var badge = $row.find('.jeo-ai-key-status-badge').text();
+			// The badge text after a successful test is the "Key valid" seal.
+			if (badge === __('Key valid', 'jeowp')) return 'key-valid';
+			return 'key-untested';
+		}
+
+		$(document).on('input', '.jeo-ai-key-input', function() {
+			var $row = $(this).closest('tr');
+			updateTestKeyWeight($row, $(this).val() ? 'key-untested' : 'no-key');
+		});
+
+		$(document).on('click', '.jeo-ai-unlock-key-btn', function() {
+			updateTestKeyWeight($(this).closest('tr'), 'no-key');
+		});
+
+		// W4 §4.1.3 (a11y): the test result region must be ANNOUNCED by screen
+		// readers — it updates async after the request finishes.
+		$('.jeo-ai-key-test-detail').attr({ role: 'status', 'aria-live': 'polite' });
+
 		function runApiKeyTest($btn) {
 			if (!$btn || !$btn.length) return;
 
@@ -111,17 +230,32 @@
 				data: apiData
 			}).then(function(res) {
 				if (res && res.success) {
-					$badge.text(i18n.active || 'Active').css({ 'background': '#edfaef', 'color': '#008a20' });
-					$detail.html('<span style="color: #46b450;">✅ ' + res.message + '</span>').show();
+					// A6-seal: this test only validates the credential. The seal
+					// must not claim the configured model works in operation —
+					// a full model check (real API call) is still pending.
+					// A11y exception (human-approved): the seal's green is
+					// darkened from #008a20 (4.19:1 on #edfaef, below WCAG AA)
+					// to #007017 (5.86:1). Position/format/copy unchanged.
+					$badge.text(__('Key valid', 'jeowp')).css({ 'background': '#edfaef', 'color': '#007017' });
+					updateTestKeyWeight($row, 'key-valid');
+					$detail.html(
+						'<span style="color: #007017;">' + escapeHtml(res.message) + '</span>' +
+						'<br><span style="color: #646970;">' + escapeHtml(__('Valid key — the model in use has not been tested in operation.', 'jeowp')) + '</span>'
+					).show();
 				} else {
-					var msg = res.message || 'Error';
 					$badge.text(i18n.invalid || 'Invalid').css({ 'background': '#fcf0f1', 'color': '#d63638' });
-					$detail.html('<span style="color: #d63638;">❌ ' + msg + '</span>').show();
+					updateTestKeyWeight($row, 'key-untested');
+					renderContractError($detail, res, 'Error');
 				}
 			}).catch(function(err) {
-				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : (i18n.request_failed || 'Request Failed');
+				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : (err.message || (i18n.request_failed || 'Request Failed'));
 				$badge.text(i18n.failed || 'Failed').css({ 'background': '#fcf0f1', 'color': '#d63638' });
-				$detail.html('<span style="color: #d63638;">❌ ' + msg + '</span>').show();
+				updateTestKeyWeight($row, 'key-untested');
+				renderContractError($detail, {
+					message: msg,
+					action: err.data && err.data.action,
+					detail: err.data && err.data.detail
+				}, msg);
 			}).finally(function() {
 				$btn.prop('disabled', false);
 			});
@@ -132,6 +266,12 @@
 			var initialProvider = $('#ai_default_provider').val();
 			$('.jeo-ai-provider-settings').hide();
 			$('.jeo-ai-provider-settings[data-provider="' + initialProvider + '"]').show();
+
+			// W4 §3.1: initial primary weight per state (before any test).
+			$('.jeo-ai-test-key-btn').each(function() {
+				var $row = $(this).closest('tr');
+				updateTestKeyWeight($row, keyStateForRow($row));
+			});
 
 			// Auto test on load if on provider tab
 			if (window.location.search.includes('tab=provider') || window.location.hash === '#tab-ai') {
@@ -288,11 +428,11 @@
 			var $collapseBtn = $('#jeo-ai-collapse-btn');
 			if ($ta.hasClass('jeo-chat-fullscreen')) {
 				$ta.removeClass('jeo-chat-fullscreen');
-				$expandBtn.html('⛶ ' + (jeo_settings.i18n ? jeo_settings.i18n.expand : 'Expand'));
+				$expandBtn.html('' + (jeo_settings.i18n ? jeo_settings.i18n.expand : 'Expand'));
 				$collapseBtn.hide();
 			} else {
 				$ta.addClass('jeo-chat-fullscreen').focus();
-				$expandBtn.html('⛶ ' + (jeo_settings.i18n ? jeo_settings.i18n.collapse : 'Collapse'));
+				$expandBtn.html('' + (jeo_settings.i18n ? jeo_settings.i18n.collapse : 'Collapse'));
 				$collapseBtn.show();
 			}
 		}
@@ -307,11 +447,11 @@
 			var $collapseBtn = $('#jeo-ai-sys-collapse-btn');
 			if ($ta.hasClass('jeo-sys-fullscreen')) {
 				$ta.removeClass('jeo-sys-fullscreen');
-				$expandBtn.html('⛶ ' + (jeo_settings.i18n ? jeo_settings.i18n.expand : 'Expand'));
+				$expandBtn.html('' + (jeo_settings.i18n ? jeo_settings.i18n.expand : 'Expand'));
 				$collapseBtn.hide();
 			} else {
 				$ta.addClass('jeo-sys-fullscreen').focus();
-				$expandBtn.html('⛶ ' + (jeo_settings.i18n ? jeo_settings.i18n.collapse : 'Collapse'));
+				$expandBtn.html('' + (jeo_settings.i18n ? jeo_settings.i18n.collapse : 'Collapse'));
 				$collapseBtn.show();
 			}
 		}
@@ -475,7 +615,7 @@
 			}).then(function(res) {
 				if (res && res.prompt) {
 					$('#ai_system_prompt').val(res.prompt);
-					$status.text(i18n.applied_above || '✨ Applied above.').css('color', 'green');
+					$status.text(i18n.applied_above || 'Applied above.').css('color', 'green');
 				}
 			}).catch(function(err) {
 				$status.text(i18n.error_generating || 'Error generating prompt.').css('color', 'red');
@@ -488,7 +628,14 @@
 			e.preventDefault();
 			var $btn = $(this);
 			var $status = $('#jeo-ai-validate-status');
-			var prompt = $('#ai_system_prompt').val() || $('#ai_system_prompt').attr('placeholder');
+			// Never validate the placeholder: an empty prompt must be rejected,
+			// not approved as "Valid" (item 1.8 / G-D).
+			var prompt = ($('#ai_system_prompt').val() || '').trim();
+
+			if (!prompt) {
+				$status.text(i18n.empty_prompt || __('The prompt is empty — write or generate a prompt before validating.', 'jeowp')).css('color', 'red');
+				return;
+			}
 
 			var provider = $('#ai_default_provider').val();
 			var $container = $('.jeo-ai-provider-settings[data-provider="' + provider + '"]');
@@ -506,7 +653,7 @@
 				method: 'POST',
 				data: apiData
 			}).then(function(res) {
-				$status.text(res.success ? (i18n.valid || '✅ Valid') : (i18n.invalid_prompt || '❌ Invalid')).css('color', res.success ? 'green' : 'red');
+				$status.text(res.success ? (i18n.valid || 'Valid') : (i18n.invalid_prompt || 'Invalid')).css('color', res.success ? 'green' : 'red');
 			}).finally(function() {
 				$btn.prop('disabled', false).text(i18n.validate_prompt || 'Validate Prompt');
 			});
@@ -717,6 +864,84 @@
 			}
 		});
 
+		// ------------------------------------
+		// W4 §3.2 — Collapsible calibration sections (Provider tab)
+		// Everything stays one click away (M-6); collapsed by default on first
+		// visit; the open/closed state persists across sessions.
+		// ------------------------------------
+		(function initCollapsibleSections() {
+			var STYLE_ID = 'jeo-ai-collapsible-styles';
+			if (!document.getElementById(STYLE_ID)) {
+				var style = document.createElement('style');
+				style.id = STYLE_ID;
+				style.textContent =
+					'.jeo-collapsible__toggle{cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none;}' +
+					'.jeo-collapsible__toggle:focus-visible{outline:2px solid #2271b1;outline-offset:2px;}' +
+					'.jeo-collapsible__toggle .dashicons{transition:transform .15s ease;color:#50575e;}' +
+					'.jeo-collapsible--collapsed .jeo-collapsible__toggle .dashicons{transform:rotate(-90deg);}' +
+					'.jeo-collapsible--collapsed .jeo-collapsible__content{display:none;}' +
+					'.jeo-collapsible__content{margin-top:12px;}';
+				document.head.appendChild(style);
+			}
+
+			function makeCollapsible(selector, storageKey) {
+				var $wrapper = $(selector).first();
+				if (!$wrapper.length || $wrapper.data('jeoCollapsible')) return;
+				$wrapper.data('jeoCollapsible', true);
+
+				var $heading = $wrapper.children('h3, h4').first();
+				if (!$heading.length) return;
+
+				var collapsed;
+				try {
+					collapsed = window.localStorage.getItem(storageKey) !== 'open';
+				} catch (e) {
+					collapsed = true;
+				}
+
+				var $content = $('<div class="jeo-collapsible__content" />');
+				$heading.nextAll().appendTo($content);
+				$wrapper.append($content);
+
+				var contentId = storageKey + '-content';
+				$content.attr('id', contentId);
+
+				$heading
+					.addClass('jeo-collapsible__toggle')
+					.attr({
+						role: 'button',
+						tabindex: 0,
+						'aria-expanded': collapsed ? 'false' : 'true',
+						'aria-controls': contentId
+					})
+					.prepend('<span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>');
+
+				$wrapper.addClass('jeo-collapsible');
+				if (collapsed) {
+					$wrapper.addClass('jeo-collapsible--collapsed');
+				}
+
+				function toggle() {
+					var nowCollapsed = $wrapper.toggleClass('jeo-collapsible--collapsed').hasClass('jeo-collapsible--collapsed');
+					$heading.attr('aria-expanded', nowCollapsed ? 'false' : 'true');
+					try {
+						window.localStorage.setItem(storageKey, nowCollapsed ? 'closed' : 'open');
+					} catch (e) {}
+				}
+
+				$heading.on('click', toggle);
+				$heading.on('keydown', function(e) {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault();
+						toggle();
+					}
+				});
+			}
+
+			makeCollapsible('#jeo-prompt-generator-wrapper', 'jeo-ai-section-prompt-engineer');
+			makeCollapsible('.jeo-ai-calibration', 'jeo-ai-section-calibration');
+		})();
+
 		$('#jeo-ai-test-embedding-btn').click(function(e) {
 			e.preventDefault();
 			var $btn = $(this);
@@ -741,10 +966,16 @@
 					html += '<p><strong>' + (i18n.vector_preview || 'Vector Preview:') + '</strong> <code>[' + res.details.vector_start.join(', ') + '...]</code></p>';
 					$results.html(html).slideDown();
 				} else {
-					$status.text((i18n.failed || 'Failed') + ': ' + (res.message || res.error || (i18n.unknown_error || 'Unknown error'))).css('color', 'red');
+					$status.css('color', 'red');
+					renderContractError($status, res, (i18n.failed || 'Failed') + ': ' + (i18n.unknown_error || 'Unknown error'));
 				}
 			}).catch(function(err) {
-				$status.text((i18n.error || 'Error') + ': ' + (err.message || err.error || (i18n.api_call_failed || 'API call failed'))).css('color', 'red');
+				$status.css('color', 'red');
+				renderContractError($status, {
+					message: (i18n.error || 'Error') + ': ' + (err.message || err.error || (i18n.api_call_failed || 'API call failed')),
+					action: err.data && err.data.action,
+					detail: err.data && err.data.detail
+				}, i18n.api_call_failed || 'API call failed');
 			}).finally(function() {
 				$btn.prop('disabled', false).text(i18n.run_test || 'Run Test on Random Post');
 			});
@@ -798,10 +1029,14 @@
 
 					$resultsContainer.html(html);
 				} else {
-					$resultsContainer.html('<p style="color: #d63638;">' + (res.message || res.error || (i18n.unknown_error || 'Unknown error')) + '</p>');
+					renderContractError($resultsContainer, res, i18n.unknown_error || 'Unknown error');
 				}
 			}).catch(function(err) {
-				$resultsContainer.html('<p style="color: #d63638;">' + (err.message || err.error || (i18n.api_call_failed || 'API call failed')) + '</p>');
+				renderContractError($resultsContainer, {
+					message: err.message || err.error || (i18n.api_call_failed || 'API call failed'),
+					action: err.data && err.data.action,
+					detail: err.data && err.data.detail
+				}, i18n.api_call_failed || 'API call failed');
 			}).finally(function() {
 				$btn.prop('disabled', false).text(i18n.search_btn || 'Search');
 			});

@@ -39,7 +39,8 @@ jobs:
         php-version: '8.4'
         coverage: none
         extensions: mysqli
-        tools: wp-cli
+    - name: Install WP-CLI
+      uses: ./.github/actions/install-wp-cli
     - name: Install frontend dependencies
       run: |
         npm ci

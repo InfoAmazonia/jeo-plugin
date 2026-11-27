@@ -1,4 +1,10 @@
 export function resolveTileUrl( url ) {
+	// Tolerate transient undefined/empty values while the layer form syncs
+	// (a mid-typing frame used to crash the block into the core error
+	// boundary — GAP-A).
+	if ( typeof url !== 'string' ) {
+		return '';
+	}
 	return url.replace( /\{r\}/g, window.devicePixelRatio >= 2 ? '@2x' : '' );
 }
 

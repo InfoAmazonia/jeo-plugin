@@ -90,6 +90,10 @@ class Jeo {
 		// so they don't show the "template mismatch" warning.
 		add_filter( 'rest_prepare_map', array( $this, 'inject_editor_block_for_map' ), 10, 3 );
 		add_filter( 'rest_prepare_map-layer', array( $this, 'inject_editor_block_for_layer' ), 10, 3 );
+
+		// Translate cryptic core meta-schema errors on map routes into
+		// editor-friendly payloads (Contract A of the W1 reliability wave).
+		add_filter( 'rest_post_dispatch', array( '\Jeo\Error_Presenter', 'translate_map_rest_error' ), 10, 3 );
 	}
 
 	/**
@@ -164,7 +168,16 @@ class Jeo {
 		$readmes = array();
 
 		if ( empty( $unique_files ) ) {
-			return new \WP_REST_Response( array( 'error' => 'No README files found' ), 404 );
+			$payload = \Jeo\Error_Presenter::wrap(
+				__( 'The onboarding documentation could not be loaded.', 'jeowp' ),
+				__( 'Try again in a few moments. If the problem persists, reinstall the JEO plugin — the welcome guide file is missing from the plugin folder.', 'jeowp' ),
+				'No README files found (searched: ' . implode( ', ', $paths ) . ')'
+			);
+
+			return new \WP_REST_Response(
+				array_merge( array( 'success' => false ), $payload ),
+				404
+			);
 		}
 
 		foreach ( $unique_files as $file_name => $file_path ) {
@@ -367,6 +380,99 @@ class Jeo {
 			$language = ICL_LANGUAGE_CODE;
 		}
 		return apply_filters( 'wpml_current_language', $language );
+	}
+
+	/**
+	 * Resolve the configured AI output language.
+	 *
+	 * Unified language policy (W3 3.4): configuration takes precedence over
+	 * the article language. Returns 'auto' (follow the editor and the
+	 * article) or a resolved ISO language code ('site' resolves to the site
+	 * language's primary tag).
+	 *
+	 * @return string
+	 */
+	public static function get_configured_ai_language(): string {
+		$value = strtolower( (string) \jeo_settings()->get_option( 'ai_output_language', 'auto' ) );
+
+		if ( 'site' === $value ) {
+			$site    = strtolower( sanitize_text_field( get_bloginfo( 'language' ) ) );
+			$primary = substr( $site, 0, strpos( $site . '-', '-' ) );
+
+			return $primary ? $primary : 'en';
+		}
+
+		if ( preg_match( '/^[a-z]{2,3}$/', $value ) ) {
+			return $value;
+		}
+
+		return 'auto';
+	}
+
+	/**
+	 * Build the "## Output Language" prompt section for AI agents.
+	 *
+	 * The section enforces the unified language policy in every agent
+	 * system prompt (minimap, context assistant): the configured language
+	 * wins; 'auto' follows the editor's conversation and the article.
+	 *
+	 * @return string
+	 */
+	public static function get_ai_language_prompt_section(): string {
+		$language = self::get_configured_ai_language();
+
+		if ( 'auto' === $language ) {
+			return "## Output Language\n\nFollow the editor's language: reply in the language the user writes in. Write content destined for the article (suggested paragraphs, notices that quote or summarize article content) in the article's own language. When the two differ, keep chat replies in the user's language and article-bound content in the article's language.";
+		}
+
+		$names = array(
+			'en' => 'English',
+			'pt' => 'Portuguese',
+			'es' => 'Spanish',
+			'fr' => 'French',
+			'de' => 'German',
+			'it' => 'Italian',
+		);
+		$name  = $names[ $language ] ?? $language;
+
+		return "## Output Language\n\nAlways write EVERY user-visible output — chat replies, notices, suggested paragraphs and any content destined for the article — in {$name} (configured site policy; ISO code: {$language}). This configured language takes precedence over the article's language.";
+	}
+
+	/**
+	 * Format a post (or MySQL) date in the site's admin datetime format (W4 4.5).
+	 *
+	 * Machine-facing payloads (REST responses, version timestamps) keep raw
+	 * MySQL datetimes for the frontend to localize; anything the plugin
+	 * renders in wp-admin lists uses the SITE's configured date/time formats
+	 * (Gate W4 decision), localized via date_i18n.
+	 *
+	 * @param string|\WP_Post|null $value MySQL datetime or post object (null = now).
+	 * @return string
+	 */
+	public static function admin_datetime( $value = null ) {
+		$format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+
+		if ( $value instanceof \WP_Post ) {
+			$timestamp = get_post_timestamp( $value );
+
+			return false !== $timestamp
+				? date_i18n( $format, $timestamp )
+				: date_i18n( $format );
+		}
+
+		if ( is_string( $value ) && '' !== $value ) {
+			// Stored MySQL datetimes are site-local (current_time( 'mysql' ));
+			// neutralize the GMT offset date_i18n() applies so the stored
+			// wall-clock time is preserved with localized text.
+			$offset    = (int) round( (float) get_option( 'gmt_offset' ) * HOUR_IN_SECONDS );
+			$timestamp = strtotime( $value );
+
+			return false !== $timestamp
+				? date_i18n( $format, $timestamp - $offset )
+				: date_i18n( $format );
+		}
+
+		return date_i18n( $format );
 	}
 
 	/**
@@ -869,8 +975,11 @@ class Jeo {
 			'jeo-context-sidebar',
 			'jeoContext',
 			array(
-				'rest_url' => rest_url( 'jeo/v1' ),
-				'nonce'    => wp_create_nonce( 'wp_rest' ),
+				'rest_url'         => rest_url( 'jeo/v1' ),
+				'nonce'            => wp_create_nonce( 'wp_rest' ),
+				'ai_configured'    => \jeo_ai_handler()->is_configured(),
+				'can_configure_ai' => current_user_can( 'manage_options' ),
+				'ai_language'      => $this->get_configured_ai_language(),
 			)
 		);
 
@@ -923,6 +1032,7 @@ class Jeo {
 				'ajax_url'         => admin_url( 'admin-ajax.php' ),
 				'ai_provider_name' => $ai_provider_name,
 				'ai_configured'    => \jeo_ai_handler()->is_configured(),
+				'can_configure_ai' => current_user_can( 'manage_options' ),
 				'map_runtime'      => $map_runtime_requested,
 				'mapbox_key'       => $mapbox_key,
 				'default_lat'      => $default_lat,
@@ -1051,6 +1161,7 @@ class Jeo {
 				'nonce'                      => $this->get_rest_nonce(),
 				'currentLang'                => $this->get_current_language(),
 				'ai_configured'              => \jeo_ai_handler()->is_configured(),
+				'can_configure_ai'           => current_user_can( 'manage_options' ),
 			)
 		);
 	}
@@ -1461,10 +1572,11 @@ class Jeo {
 			wp_enqueue_script( 'jeo-js' );
 			wp_enqueue_style( 'jeo-js' );
 
-			if ( \jeo_ai_handler()->is_configured() ) {
-				wp_enqueue_script( 'jeo-context-sidebar' );
-				wp_enqueue_style( 'jeo-context-sidebar' );
-			}
+			// Always enqueued for enabled post types: the panel renders an
+			// explanatory gate (via `ai_configured`/`can_configure_ai`) when
+			// no AI provider is configured, instead of disappearing.
+			wp_enqueue_script( 'jeo-context-sidebar' );
+			wp_enqueue_style( 'jeo-context-sidebar' );
 		}
 	}
 
@@ -1971,7 +2083,14 @@ class Jeo {
 
 	/**
 	 * Auto-inject the editor preview block into existing map posts
-	 * so the block editor template matches without user intervention.
+	 * so they don't show the "template mismatch" warning.
+	 *
+	 * Legacy safety net: since the block editor template is now declared in the
+	 * `map` post type registration args, new posts receive the `jeo/map-editor`
+	 * block at creation. This injection keeps serving posts saved before that
+	 * change (pre-existing content whose stored block content lacks the block).
+	 * Brand-new `auto-draft` posts are skipped — they are covered by the
+	 * template.
 	 *
 	 * @param WP_REST_Response $response REST response.
 	 * @param WP_Post          $post Current post object.
@@ -1979,7 +2098,10 @@ class Jeo {
 	 * @return WP_REST_Response
 	 */
 	public function inject_editor_block_for_map( $response, $post, $request ) {
-		unset( $post );
+		if ( 'auto-draft' === $post->post_status ) {
+			return $response;
+		}
+
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			$raw = $response->data['content']['raw'] ?? '';
 			if ( false === strpos( $raw, 'jeo/map-editor' ) ) {
@@ -1991,7 +2113,11 @@ class Jeo {
 
 	/**
 	 * Auto-inject the editor preview block into existing layer posts
-	 * so the block editor template matches without user intervention.
+	 * so they don't show the "template mismatch" warning.
+	 *
+	 * Legacy safety net — same rationale as inject_editor_block_for_map():
+	 * new posts get the `jeo/layer-editor` block from the post type template;
+	 * this only serves pre-existing content.
 	 *
 	 * @param WP_REST_Response $response REST response.
 	 * @param WP_Post          $post Current post object.
@@ -1999,7 +2125,10 @@ class Jeo {
 	 * @return WP_REST_Response
 	 */
 	public function inject_editor_block_for_layer( $response, $post, $request ) {
-		unset( $post );
+		if ( 'auto-draft' === $post->post_status ) {
+			return $response;
+		}
+
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			$raw = $response->data['content']['raw'] ?? '';
 			if ( false === strpos( $raw, 'jeo/layer-editor' ) ) {
@@ -2010,7 +2139,14 @@ class Jeo {
 	}
 
 	/**
-	 * Lock the story map post type to a single block and enforce preview rendering.
+	 * Enforce the storymap preview rendering on preview requests.
+	 *
+	 * Block editor templates for the `map`, `map-layer` and `storymap` post
+	 * types (including the storymap `template_lock`) are declared directly in
+	 * the `register_post_type()` args (Maps, Layers and Storymap classes), so
+	 * they are available in every context — including post-new.php — without
+	 * depending on hook ordering. This callback only handles the storymap
+	 * front-end preview below.
 	 *
 	 * @return void
 	 */
@@ -2034,47 +2170,6 @@ class Jeo {
 				if ( is_object( $wp_post ) && $wp_post instanceof WP_Post && 'storymap' === $wp_post->post_type ) {
 					add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
 				}
-			}
-		}
-
-		if ( is_admin() ) {
-			global $wp_post_types;
-
-			if ( isset( $wp_post_types['storymap'] ) ) {
-				$wp_post_types['storymap']->template      = array(
-					array( 'jeo/storymap' ),
-				);
-				$wp_post_types['storymap']->template_lock = 'all';
-			}
-
-			if ( isset( $wp_post_types['map'] ) ) {
-				$wp_post_types['map']->template = array(
-					array(
-						'jeo/map-editor',
-						array(
-							'align' => 'full',
-							'lock'  => array(
-								'move'   => true,
-								'remove' => true,
-							),
-						),
-					),
-				);
-			}
-
-			if ( isset( $wp_post_types['map-layer'] ) ) {
-				$wp_post_types['map-layer']->template = array(
-					array(
-						'jeo/layer-editor',
-						array(
-							'align' => 'full',
-							'lock'  => array(
-								'move'   => true,
-								'remove' => true,
-							),
-						),
-					),
-				);
 			}
 		}
 	}

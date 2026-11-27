@@ -1,3 +1,10 @@
 .jeo-embed-url .components-base-control {
 	width: 60%;
 }
+
+/* W4 §6.3 — long URL affordance: ellipsis + full value on the tooltip. */
+.jeo-embed-url input {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}

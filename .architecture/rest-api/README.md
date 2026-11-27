@@ -52,6 +52,8 @@ See [`ai/README.md`](../ai/README.md) for full details.
 | `/jeo/v1/minimap/setup` | POST | `api_setup` | Generate map from post content (RAG + post geopoints) |
 | `/jeo/v1/minimap/setup-prompt` | POST | `api_setup_prompt` | Generate map from text prompt via AI agent |
 | `/jeo/v1/minimap/chat` | POST | `api_chat` | Multi-turn map refinement via AI agent (requires `conversation_id`) |
+| `/jeo/v1/minimap/state` | GET | `api_get_state` | Server-side conversation state (Contract F — clean chat, terminal status, notice; `edit_posts`) |
+| `/jeo/v1/minimap/versions` | GET | `api_get_versions` | Version list `{n, timestamp, label, is_current}` for the versions panel (Contract G; `edit_posts`) |
 
 ### AI Context (Editorial Suggestions)
 
@@ -98,11 +100,11 @@ See [`ai/README.md`](../ai/README.md) for full details.
 
 ### Maps
 
-`rest_prepare_map` → Injects block editor preview HTML into REST response.
+`rest_prepare_map` → Injects block editor preview HTML into REST response (**legacy only**: pre-existing posts whose stored content lacks the `jeo/map-editor` block; `auto-draft` posts are skipped — new posts get the block from the post type template).
 
 ### Layers
 
-`rest_prepare_map-layer` → Injects block editor preview HTML into REST response.
+`rest_prepare_map-layer` → Injects block editor preview HTML into REST response (**legacy only**, same rationale as Maps).
 
 ### Storymaps
 
@@ -117,3 +119,28 @@ protected function validate_meta_initial_zoom( $value ) {
     return ( $value >= 1 && $value <= 14 ) ? $value : new WP_Error( ... );
 }
 ```
+
+`Maps::validate_meta_layers()` implements this for the `layers` meta with editor-friendly errors (see Error Payloads below).
+
+## Error Payloads (Contract A — W1 reliability)
+
+`Jeo\Error_Presenter` (`src/includes/class-error-presenter.php`) produces the canonical
+human error payload used across REST surfaces:
+
+```json
+{ "message": "<human cause, one sentence>",
+  "action":  "<next step for the editor>",
+  "detail":  "<full technical detail, preserved>" }
+```
+
+Producers:
+
+| Surface | Behavior |
+|---------|----------|
+| `POST /wp/v2/map*` failures | `rest_post_dispatch` filter (`Error_Presenter::translate_map_rest_error`) translates core meta-schema errors (`rest_additional_properties_forbidden`, `rest_invalid_param` for `meta`, `rest_meta_database_error`) into the payload — original message kept in `data.detail`, code/status unchanged |
+| `POST /jeo/v1/ai-test-key` | Useful provider cause (extracted from the raw JSON blob) surfaces as `message`; full raw provider response in `detail`; `success`/`message` keys kept for the current JS |
+| `POST /jeo/v1/ai-test-retrieval`, `/ai-test-embedding` | `Error_Presenter::from_exception()` — known jargon (missing embedding model) gets a dedicated message+action; file:line detail preserved |
+| `POST /jeo/v1/suggest_layers` (RAG) | Same `from_exception()` translation (HTTP 500) |
+
+The frontend collapses `detail` behind a "Copy details" affordance (W1-FE). The
+technical detail is never discarded.

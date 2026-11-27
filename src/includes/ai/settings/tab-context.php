@@ -71,7 +71,7 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 </table>
 
 <div id="jeo-context-prompt-generator-wrapper" style="margin-top: 30px; background: #fff; padding: 25px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 900px;">
-	<h3 style="margin-top: 0;">✨ <?php esc_html_e( 'AI Context Prompt Engineer Assistant', 'jeowp' ); ?></h3>
+	<h2 style="margin-top: 0;"><?php esc_html_e( 'AI Context Prompt Engineer Assistant', 'jeowp' ); ?></h2>
 	<p style="font-size: 14px; color: #50575e;">
 		<?php esc_html_e( 'Describe how you want the Context Assistant to behave (e.g., "Always link place names to the original article" or "Ground every claim with a verbatim quote"). The active LLM will generate a highly optimized system prompt for you, strictly adhering to JEO formatting rules.', 'jeowp' ); ?>
 	</p>

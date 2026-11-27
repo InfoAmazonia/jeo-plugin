@@ -7,6 +7,7 @@ import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import JeoGeocodePosts from './geo-posts';
 import { JeoGeocodePostsAI } from './geo-posts-ai';
+import '../map-blocks/modals.css';
 
 /**
  * Apply configured primary/secondary point limits to a list of formatted locations.
@@ -300,6 +301,7 @@ const JeoGeocodePanel = ( props ) => {
 					title={ __( 'Review AI Suggestions', 'jeowp' ) }
 					onRequestClose={ () => setState( ( prev ) => ( { ...prev, isApprovalModalOpen: false } ) ) }
 					className="jeo-geocode-modal"
+					overlayClassName="jeo-opaque-overlay"
 					isFullScreen={ true }
 				>
 					<JeoGeocodePostsAI
@@ -319,6 +321,7 @@ const JeoGeocodePanel = ( props ) => {
 					title={ __( 'Geolocate this post', 'jeowp' ) }
 					onRequestClose={ () => setState( ( prev ) => ( { ...prev, isOpen: false } ) ) }
 					className="jeo-geocode-modal"
+					overlayClassName="jeo-opaque-overlay"
 					isFullScreen={ true }
 				>
 					<JeoGeocodePosts

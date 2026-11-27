@@ -1,5 +1,35 @@
 /* AI Context Sidebar Styles */
 
+/* Gate (2.1-contexto): Knowledge Base tone — icon, one-sentence cause, action */
+
+.jeo-context-gate {
+	text-align: center;
+	padding: 20px 8px;
+}
+
+.jeo-context-gate__icon {
+	color: #787c82;
+	margin-bottom: 8px;
+}
+
+.jeo-context-gate__title {
+	margin: 0 0 8px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.jeo-context-gate__message {
+	font-size: 12px;
+	color: #50575e;
+	line-height: 1.6;
+	margin: 0 0 14px;
+}
+
+.jeo-context-gate__cta {
+	justify-content: center;
+}
+
 .jeo-context-sidebar-panel .components-panel__body-title button {
 	font-weight: 600;
 }
@@ -126,7 +156,6 @@
 	font-size: 9px;
 	font-weight: 600;
 	color: #2271b1;
-	text-transform: uppercase;
 	letter-spacing: 0.3px;
 	background: rgba(255, 255, 255, 0.7);
 	padding: 1px 4px;
@@ -181,6 +210,28 @@
 
 .jeo-context-chat__error {
 	margin: 0;
+}
+
+/* 3.3 (G-A): inline two-step Clear confirmation.
+   GAP-C: the cluster must wrap inside the compact sidebar (1440px viewport) —
+   the "Cancel" exit can never overflow out of reach. */
+
+.jeo-context-chat__secondary-actions {
+	flex-wrap: wrap;
+	row-gap: 4px;
+}
+
+.jeo-context-chat__clear-confirm {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 4px 6px;
+	max-width: 100%;
+}
+
+.jeo-context-chat__clear-confirm-text {
+	font-size: 11px;
+	color: #50575e;
 }
 
 /* Suggestions */
@@ -261,6 +312,30 @@
 }
 
 .jeo-context-reference a {
+	font-weight: 500;
+}
+
+/* 3.1 (K-5): explanatory empty state — the section never disappears */
+
+.jeo-context-references__empty {
+	font-size: 12px;
+	padding: 8px;
+	background: #f0f0f1;
+	border-radius: 4px;
+}
+
+.jeo-context-references__empty-message {
+	margin: 0;
+	color: #50575e;
+	line-height: 1.5;
+}
+
+.jeo-context-references__empty-action {
+	margin: 6px 0 0;
+}
+
+.jeo-context-references__empty-action a {
+	font-size: 12px;
 	font-weight: 500;
 }
 

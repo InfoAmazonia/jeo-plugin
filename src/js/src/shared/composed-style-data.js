@@ -51,9 +51,22 @@ export function fetchJson( url, options = {} ) {
 			...getJsonHeaders( url ),
 			...( options.headers || {} ),
 		},
-	} ).then( ( response ) => {
+	} ).then( async ( response ) => {
 		if ( ! response.ok ) {
-			throw new Error( `${ response.status } ${ response.statusText }` );
+			const error = new Error( `${ response.status } ${ response.statusText }` );
+			error.status = response.status;
+			error.url = url;
+
+			// Preserve the REST error body (when present) so callers can render
+			// the humanized { message, action, detail } payload produced by the
+			// server-side error translation layer.
+			try {
+				error.data = await response.clone().json();
+			} catch ( parseError ) {
+				error.data = null;
+			}
+
+			throw error;
 		}
 
 		return response.json();

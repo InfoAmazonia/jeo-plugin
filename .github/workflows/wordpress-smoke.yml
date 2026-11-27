@@ -88,7 +88,9 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none
           extensions: mysqli, zip
-          tools: wp-cli
+
+      - name: Install WP-CLI
+        uses: ./.github/actions/install-wp-cli
 
       - name: Show PHP version
         run: php -v
