@@ -30,7 +30,9 @@ jobs:
         with:
           php-version: '8.4'
           coverage: none
-          tools: wp-cli
+
+      - name: Install WP-CLI
+        uses: ./.github/actions/install-wp-cli
 
       - name: Build assets
         run: npm run build

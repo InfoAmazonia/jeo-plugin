@@ -1,0 +1,65 @@
+name: Install WP-CLI
+description: Install a pinned WP-CLI with download retries, binary caching, and fail-fast verification.
+
+inputs:
+  version:
+    description: WP-CLI version to install.
+    default: '2.12.0'
+
+runs:
+  using: composite
+  steps:
+    - name: Restore cached WP-CLI binary
+      uses: actions/cache@v6
+      with:
+        path: /usr/local/bin/wp
+        key: wp-cli-${{ runner.os }}-${{ inputs.version }}
+
+    - name: Install and verify WP-CLI
+      shell: bash
+      env:
+        WP_CLI_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+
+        wp_bin="/usr/local/bin/wp"
+
+        # Use the restored binary when the cache hit and it still works.
+        needs_download=1
+        if [ -f "$wp_bin" ]; then
+          chmod +x "$wp_bin"
+          if "$wp_bin" --version >/dev/null 2>&1; then
+            needs_download=0
+            echo "Using cached WP-CLI at ${wp_bin}."
+          fi
+        fi
+
+        # Shared GitHub runner IPs are intermittently rate-limited (429) or
+        # reset by the release CDN, so retry instead of failing the job.
+        # Never install WP-CLI through setup-php's "tools: wp-cli": its
+        # download failures do not reliably fail the step, deferring the
+        # breakage to a later "wp: command not found".
+        if [ "$needs_download" -eq 1 ]; then
+          url="https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar"
+          echo "Downloading WP-CLI v${WP_CLI_VERSION}..."
+          attempt=1
+          max_attempts=3
+          tmp_bin="$(mktemp)"
+          until curl -fsSL --retry 3 --retry-all-errors --connect-timeout 15 -o "$tmp_bin" "$url"; do
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "::error::Could not download WP-CLI v${WP_CLI_VERSION} from ${url} after ${max_attempts} attempts."
+              rm -f "$tmp_bin"
+              exit 1
+            fi
+            echo "Download attempt ${attempt} failed; retrying in 10s..."
+            attempt=$(( attempt + 1 ))
+            sleep 10
+          done
+          mv "$tmp_bin" "$wp_bin"
+        fi
+
+        chmod +x "$wp_bin"
+
+        # Fail here, with a clear message, instead of a "wp: command not
+        # found" several steps later.
+        "$wp_bin" --version

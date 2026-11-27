@@ -212,7 +212,7 @@ The repository maintains the following automated checks. All must pass before a 
 
 ### CI/CD
 
-GitHub Actions run via **9 workflows** in `.github/workflows/` plus a shared composite action in `.github/actions/wordpress-plugin-check/`. Notable flows:
+GitHub Actions run via **9 workflows** in `.github/workflows/` plus shared composite actions in `.github/actions/` (`wordpress-plugin-check/`, `install-wp-cli/`). WP-CLI in CI is always installed by `.github/actions/install-wp-cli` (pinned phar + download retries + `actions/cache`) — never via `setup-php`'s `tools: wp-cli`, whose download failures do not reliably fail the step and surface later as `wp: command not found`. Notable flows:
 - `deploy-wordpress-org.yml` — GitHub Release + WordPress.org deploy (can be split via workflow input)
 - `plugin-check.yml` — WordPress Plugin Check, now reuses `.github/actions/wordpress-plugin-check`. Advisory by default: results (errors/warnings with file + line) surface as annotations, a `$GITHUB_STEP_SUMMARY` table, and an uploaded artifact, but the job stays green. Set the composite action input `fail-on-errors: true` on any caller to opt back into failing on errors.
 - `wordpress-smoke.yml` — Builds webpack assets once, uploads artifact, and downloads it across the WordPress/PHP matrix
