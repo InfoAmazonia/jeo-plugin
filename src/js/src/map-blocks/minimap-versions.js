@@ -68,8 +68,8 @@ export function buildRestoreConfirmation( version, current ) {
  */
 export function buildRestoreAriaLabel( version ) {
 	return sprintf(
-		/* translators: %d: version number, %s: version label. */
-		__( 'Restore version %d (%s)', 'jeowp' ),
+		/* translators: %1$d: version number, %2$s: version label. */
+		__( 'Restore version %1$d (%2$s)', 'jeowp' ),
 		version.n,
 		version.label || __( 'no description', 'jeowp' )
 	);

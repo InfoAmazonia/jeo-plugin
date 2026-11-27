@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-23T18:23:40+00:00\n"
+"POT-Creation-Date: 2026-11-27T18:07:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -4720,10 +4720,10 @@ msgstr ""
 msgid "This post contains an AI-Assisted Map block without a generated map: no AI provider is configured. The block renders nothing on the published post until an administrator configures one — remove the block or configure the provider before publishing."
 msgstr ""
 
-#. translators: %d: version number, %s: version label.
+#. translators: %1$d: version number, %2$s: version label.
 #: js/build/mapBlocks.js:6
 #, js-format
-msgid "Restore version %d (%s)"
+msgid "Restore version %1$d (%2$s)"
 msgstr ""
 
 #: js/build/mapBlocks.js:6

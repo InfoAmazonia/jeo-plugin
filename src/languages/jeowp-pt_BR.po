@@ -8,7 +8,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2026-06-09T19:53:28+00:00\n"
-"PO-Revision-Date: 2026-07-17 12:00-0300\n"
+"PO-Revision-Date: 2026-11-27 12:00-0300\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Domain: jeowp\n"
@@ -5401,59 +5401,59 @@ msgstr "Não foi possível gravar o artefato do estilo composto %s. Verifique se
 #: includes/class-error-presenter.php:117
 #, php-format
 msgid "The AI provider rejected the request (code %1$s): %2$s"
-msgstr ""
+msgstr "O provedor de IA rejeitou a solicitação (código %1$s): %2$s"
 
 #. translators: %s: short technical cause.
 #: includes/class-error-presenter.php:127
 #, php-format
 msgid "The AI provider test failed: %s"
-msgstr ""
+msgstr "O teste do provedor de IA falhou: %s"
 
 #: includes/class-error-presenter.php:130
 msgid "Check the API key and model on the AI settings page and run the test again. If the key is correct and the error persists, the provider may be temporarily unavailable."
-msgstr ""
+msgstr "Verifique a chave de API e o modelo na página de configurações de IA e execute o teste novamente. Se a chave estiver correta e o erro persistir, o provedor pode estar temporariamente indisponível."
 
 #: includes/class-error-presenter.php:168
 msgid "Semantic layer search is unavailable because no embedding model is configured."
-msgstr ""
+msgstr "A busca semântica de camadas está indisponível porque nenhum modelo de Embedding está configurado."
 
 #: includes/class-error-presenter.php:169
 msgid "Select an embedding model in Settings → AI (General tab) and save, then try again."
-msgstr ""
+msgstr "Selecione um modelo de Embedding em Configurações → IA (aba Geral), salve e tente novamente."
 
 #. translators: %s: field name rejected by the server.
 #: includes/class-error-presenter.php:232
 #, php-format
 msgid "This map could not be saved completely: the data sent contains a field the server does not accept (\"%s\")."
-msgstr ""
+msgstr "Este mapa não pôde ser salvo por completo: os dados enviados contêm um campo que o servidor não aceita (\"%s\")."
 
 #: includes/class-error-presenter.php:234
 msgid "This map could not be saved completely: the data sent contains a field the server does not accept."
-msgstr ""
+msgstr "Este mapa não pôde ser salvo por completo: os dados enviados contêm um campo que o servidor não aceita."
 
 #: includes/class-error-presenter.php:236
 msgid "The map was saved without the rejected change. Review the map panels (layers and settings) and save again."
-msgstr ""
+msgstr "O mapa foi salvo sem a alteração rejeitada. Revise os painéis do mapa (camadas e configurações) e salve novamente."
 
 #: includes/class-error-presenter.php:246
 msgid "The map settings could not be saved: some of the data sent is invalid."
-msgstr ""
+msgstr "As configurações do mapa não puderam ser salvas: alguns dos dados enviados são inválidos."
 
 #: includes/class-error-presenter.php:247
 msgid "Review the map panels (layers, settings) and try saving again."
-msgstr ""
+msgstr "Revise os painéis do mapa (camadas, configurações) e tente salvar novamente."
 
 #: includes/class-error-presenter.php:251
 msgid "The map data could not be stored in the database."
-msgstr ""
+msgstr "Os dados do mapa não puderam ser armazenados no banco de dados."
 
 #: includes/class-error-presenter.php:252
 msgid "Try saving again. If the problem persists, contact the site administrator."
-msgstr ""
+msgstr "Tente salvar novamente. Se o problema persistir, entre em contato com o administrador do site."
 
 #: includes/maps/class-maps.php:100
 msgid "No layers"
-msgstr ""
+msgstr "Nenhuma camada"
 
 #. translators: %s: number of layers on this map.
 #: includes/maps/class-maps.php:106
@@ -5465,507 +5465,508 @@ msgstr[1] ""
 
 #: includes/maps/class-maps.php:114
 msgid "Disabled"
-msgstr ""
+msgstr "Desativado"
 
 #: includes/maps/class-maps.php:115
 msgid "Enabled"
-msgstr ""
+msgstr "Ativado"
 
 #: includes/maps/class-maps.php:133
 msgid "The layers of this map could not be saved: the value sent is not a list of layers."
-msgstr ""
+msgstr "As camadas deste mapa não puderam ser salvas: o valor enviado não é uma lista de camadas."
 
 #: includes/maps/class-maps.php:134
 #: includes/maps/class-maps.php:146
 msgid "Reopen the \"Map layers\" panel, review the selected layers and save again."
-msgstr ""
+msgstr "Reabra o painel \"Camadas do mapa\", revise as camadas selecionadas e salve novamente."
 
 #: includes/maps/class-maps.php:145
 msgid "The layers of this map could not be saved: one of the items is malformed."
-msgstr ""
+msgstr "As camadas deste mapa não puderam ser salvas: um dos itens está malformado."
 
 #: includes/maps/class-maps.php:157
 msgid "The layers of this map could not be saved: one of the layers is missing a valid layer ID."
-msgstr ""
+msgstr "As camadas deste mapa não puderam ser salvas: falta um ID de camada válido em uma das camadas."
 
 #: includes/maps/class-maps.php:158
 msgid "Remove the offending layer in the \"Map layers\" panel and add it again from the library."
-msgstr ""
+msgstr "Remova a camada com problema no painel \"Camadas do mapa\" e adicione-a novamente por meio da biblioteca."
 
 #: includes/maps/class-maps.php:169
 msgid "The layers of this map could not be saved: one of the layers has an invalid usage setting (expected fixed, switchable or swappable)."
-msgstr ""
+msgstr "As camadas deste mapa não puderam ser salvas: uma das camadas tem uma configuração de uso inválida (valores esperados: fixed, switchable ou swappable)."
 
 #: includes/maps/class-maps.php:170
 msgid "Open the layer settings in the \"Map layers\" panel and pick a valid usage option."
-msgstr ""
+msgstr "Abra as configurações da camada no painel \"Camadas do mapa\" e escolha uma opção de uso válida."
 
 #: includes/maps/class-maps.php:545
 msgid "Layer origin on this map: \"manual\" for layers added by an editor through the layer library, \"ai\" for layers generated by the AI assistant."
-msgstr ""
+msgstr "Origem da camada neste mapa: \"manual\" para camadas adicionadas por um editor por meio da biblioteca de camadas, \"ai\" para camadas geradas pelo assistente de IA."
 
 #: includes/settings/settings-page.js:120
 #: js/build/layersSidebar.js:12
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "Technical details"
-msgstr ""
+msgstr "Detalhes técnicos"
 
 #: includes/settings/settings-page.js:122
 #: js/build/layersSidebar.js:12
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "Copy details"
-msgstr ""
+msgstr "Copiar detalhes"
 
 #: includes/settings/settings-page.js:176
 #: includes/settings/settings-page.js:239
 msgid "Key valid"
-msgstr ""
+msgstr "Chave válida"
 
 #: includes/settings/settings-page.js:243
 msgid "Valid key — the model in use has not been tested in operation."
-msgstr ""
+msgstr "Chave válida — o modelo em uso não foi testado em operação."
 
 #: includes/settings/settings-page.js:636
 msgid "The prompt is empty — write or generate a prompt before validating."
-msgstr ""
+msgstr "O prompt está vazio — escreva ou gere um prompt antes de validar."
 
 #. translators: %s: label of the previous layer type.
 #: js/build/layersSidebar.js:8
 #, js-format
 msgid "Changing the layer type clears the fields filled for \"%s\". The values are kept and restored if you switch back. Change the layer type?"
-msgstr ""
+msgstr "Alterar o tipo da camada limpa os campos preenchidos para \"%s\". Os valores são mantidos e restaurados se você voltar. Alterar o tipo da camada?"
 
 #: js/build/layersSidebar.js:12
 msgid "The interactive layer editor is not loaded yet. Save the draft to load it."
-msgstr ""
+msgstr "O editor interativo de camadas ainda não foi carregado. Salve o rascunho para carregá-lo."
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "The preview could not be loaded: the access token is missing or invalid."
-msgstr ""
+msgstr "Não foi possível carregar a pré-visualização: o token de acesso está ausente ou é inválido."
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "Check the access token in the plugin settings"
-msgstr ""
+msgstr "Verifique o token de acesso nas configurações do plugin"
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "The preview could not be loaded: the style was not found (404). Review the Style ID field."
-msgstr ""
+msgstr "Não foi possível carregar a pré-visualização: o estilo não foi encontrado (404). Revise o campo ID do estilo."
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "The preview could not be loaded: the layer source was not found (404). Review the layer fields."
-msgstr ""
+msgstr "Não foi possível carregar a pré-visualização: a origem da camada não foi encontrada (404). Revise os campos da camada."
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "The preview could not be loaded: the map server could not be reached. Check your connection."
-msgstr ""
+msgstr "Não foi possível carregar a pré-visualização: o servidor de mapas não pôde ser alcançado. Verifique sua conexão."
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "The preview could not be loaded: the style is invalid or unavailable."
-msgstr ""
+msgstr "Não foi possível carregar a pré-visualização: o estilo é inválido ou está indisponível."
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "The preview could not be loaded: the layer source is invalid or unavailable."
-msgstr ""
+msgstr "Não foi possível carregar a pré-visualização: a origem da camada é inválida ou está indisponível."
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "You can still save a draft, but the map will not render until this is fixed."
-msgstr ""
+msgstr "Você ainda pode salvar um rascunho, mas o mapa não será renderizado até isso ser corrigido."
 
 #: includes/admin/welcome-page.php:139
 #: js/build/layersSidebar.js:12
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "Try again"
-msgstr ""
+msgstr "Tentar novamente"
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapsSidebar.js:4
 msgid "Required fields"
-msgstr ""
+msgstr "Campos obrigatórios"
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapsSidebar.js:4
 msgid "Save draft"
-msgstr ""
+msgstr "Salvar rascunho"
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapsSidebar.js:4
 msgid "Publishing failed."
-msgstr ""
+msgstr "Falha ao publicar."
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapsSidebar.js:4
 msgid "Updating failed."
-msgstr ""
+msgstr "Falha ao atualizar."
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapsSidebar.js:4
 msgid "Scheduling failed."
-msgstr ""
+msgstr "Falha ao agendar."
 
 #: js/build/layersSidebar.js:12
 #: js/build/mapsSidebar.js:4
 msgid "Details copied to clipboard."
-msgstr ""
+msgstr "Detalhes copiados para a área de transferência."
 
 #: js/build/mapBlocks.js:1
 msgid "The preview could not be loaded: the inline style is not valid JSON."
-msgstr ""
+msgstr "Não foi possível carregar a pré-visualização: o estilo embutido não é um JSON válido."
 
 #: js/build/mapBlocks.js:1
 msgid "The inline style must be a JSON object."
-msgstr ""
+msgstr "O estilo embutido deve ser um objeto JSON."
 
 #: js/build/mapBlocks.js:1
 msgid "Fill the required fields to load the layer preview."
-msgstr ""
+msgstr "Preencha os campos obrigatórios para carregar a pré-visualização da camada."
 
 #: js/build/mapsSidebar.js:4
 msgid "View the autosave"
-msgstr ""
+msgstr "Ver o salvamento automático"
 
 #: js/build/mapsSidebar.js:4
 msgid "This map was saved without layers. If you had added layers before, the autosave may still contain them."
-msgstr ""
+msgstr "Este mapa foi salvo sem camadas. Se você tinha adicionado camadas antes, o salvamento automático ainda pode contê-las."
 
 #: js/build/mapsSidebar.js:4
 msgid "This map was saved without layers. Use \"Edit layers settings\" to add layers again."
-msgstr ""
+msgstr "Este mapa foi salvo sem camadas. Use \"Editar configurações de camadas\" para adicionar camadas novamente."
 
 #: js/build/mapsSidebar.js:4
 msgid "The interactive map editor is not loaded yet. Save the draft to load it."
-msgstr ""
+msgstr "O editor interativo de mapas ainda não foi carregado. Salve o rascunho para carregá-lo."
 
 #: includes/admin/welcome-page.php:133
 #: includes/class-jeo.php:172
 msgid "The onboarding documentation could not be loaded."
-msgstr ""
+msgstr "Não foi possível carregar a documentação de boas-vindas."
 
 #: includes/admin/welcome-page.php:134
 msgid "Try again in a few moments."
-msgstr ""
+msgstr "Tente novamente em alguns instantes."
 
 #: includes/ai/settings/tab-bulk.php:62
 msgid "Recent background activity"
-msgstr ""
+msgstr "Atividade recente em segundo plano"
 
 #: includes/ai/settings/tab-embedded.php:14
 msgid "Embedded Brazilian territories"
-msgstr ""
+msgstr "Territórios brasileiros incorporados"
 
 #: includes/ai/settings/tab-general.php:14
 msgid "AI Output Language"
-msgstr ""
+msgstr "Idioma de saída da IA"
 
 #: includes/ai/settings/tab-general.php:17
 msgid "Automatic (match the editor and the article)"
-msgstr ""
+msgstr "Automático (segue o editor e o artigo)"
 
 #. translators: %s: site language tag.
 #: includes/ai/settings/tab-general.php:18
 #, php-format
 msgid "Site language (%s)"
-msgstr ""
+msgstr "Idioma do site (%s)"
 
 #. translators: %s: site language tag.
 #: includes/ai/settings/tab-general.php:19
 #: js/build/contextSidebar.js:1
 msgid "English"
-msgstr ""
+msgstr "Inglês"
 
 #: includes/ai/settings/tab-general.php:20
 #: js/build/contextSidebar.js:1
 msgid "Portuguese"
-msgstr ""
+msgstr "Português"
 
 #: includes/ai/settings/tab-general.php:21
 #: js/build/contextSidebar.js:1
 msgid "Spanish"
-msgstr ""
+msgstr "Espanhol"
 
 #: includes/ai/settings/tab-general.php:22
 msgid "French"
-msgstr ""
+msgstr "Francês"
 
 #: includes/ai/settings/tab-general.php:24
 msgid "Applies to every AI output: minimap chat and notices, context assistant suggestions, and inserted paragraphs. The chosen language takes precedence over the article language; \"Automatic\" follows the editor and the article."
 msgstr ""
+"Aplica-se a toda saída da IA: chat e avisos do minimapa, sugestões do assist"
+"ente de contexto e parágrafos inseridos. O idioma escolhido tem precedência "
+"sobre o idioma do artigo; \"Automático\" segue o editor e o artigo."
 
 #: includes/ai/settings/tab-knowledge.php:147
 msgid "Batch size"
-msgstr ""
+msgstr "Tamanho do lote"
 
 #: includes/ai/settings/tab-knowledge.php:151
 msgid "Cron interval"
-msgstr ""
+msgstr "Intervalo do cron"
 
 #: includes/ai/settings/tab-knowledge.php:160
 msgid "Search results (top K)"
-msgstr ""
+msgstr "Resultados da busca (top K)"
 
 #: includes/ai/settings/tab-provider.php:92
 msgid "Use a custom prompt"
-msgstr ""
+msgstr "Usar um prompt personalizado"
 
 #: includes/ai/settings/tab-provider.php:99
 msgid "Include taxonomies in the AI request"
-msgstr ""
+msgstr "Incluir taxonomias na solicitação à IA"
 
 #: includes/class-jeo.php:173
 msgid "Try again in a few moments. If the problem persists, reinstall the JEO plugin — the welcome guide file is missing from the plugin folder."
-msgstr ""
+msgstr "Tente novamente em alguns instantes. Se o problema persistir, reinstale o plugin JEO — o arquivo do guia de boas-vindas está faltando na pasta do plugin."
 
 #: includes/layers/class-layers.php:81
 #: includes/layers/class-layers.php:86
 msgid "Origin"
-msgstr ""
+msgstr "Origem"
 
 #: includes/layers/class-layers.php:108
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "AI-generated"
-msgstr ""
+msgstr "Gerada por IA"
 
 #: includes/layers/class-layers.php:109
 #: js/build/mapBlocks.js:16
 #: js/build/mapsSidebar.js:4
 msgid "Manual"
-msgstr ""
+msgstr "Manual"
 
 #: includes/layers/class-layers.php:369
 msgid "Layer origin: \"ai\" for layers generated by the AI tools, \"manual\" for layers created by an editor. Absent on legacy layers — use the resolved `layer_origin` response field."
-msgstr ""
+msgstr "Origem da camada: \"ai\" para camadas geradas pelas ferramentas de IA, \"manual\" para camadas criadas por um editor. Ausente em camadas antigas — use o campo de resposta resolvido `layer_origin`."
 
 #. translators: 1: submitted value, 2: adjusted value (the maximum allowed).
 #: includes/maps/class-maps.php:250
 #, php-format
 msgid "Adjusted from %1$s to the maximum of %2$s"
-msgstr ""
+msgstr "Ajustado de %1$s para o máximo de %2$s"
 
 #. translators: 1: submitted value, 2: adjusted value (the minimum allowed).
 #: includes/maps/class-maps.php:260
 #, php-format
 msgid "Adjusted from %1$s to the minimum of %2$s"
-msgstr ""
+msgstr "Ajustado de %1$s para o mínimo de %2$s"
 
 #. translators: 1: submitted value, 2: adjusted value.
 #: includes/maps/class-maps.php:272
 #, php-format
 msgid "Adjusted from %1$s to %2$s (zoom levels cannot be negative)"
-msgstr ""
+msgstr "Ajustado de %1$s para %2$s (os níveis de zoom não podem ser negativos)"
 
 #: includes/menu/class-menu.php:69
 #: includes/menu/class-menu.php:70
 msgid "AI Settings"
-msgstr ""
+msgstr "Configurações de IA"
 
 #: includes/settings/ai-logs-page.php:102
 msgid "Document vectorization"
-msgstr ""
+msgstr "Vetorização de documentos"
 
 #: includes/settings/ai-logs-page.php:114
 msgid "Semantic retrieval"
-msgstr ""
+msgstr "Recuperação semântica"
 
 #: includes/settings/ai-logs-page.php:165
 msgid "Clear all AI logs?"
-msgstr ""
+msgstr "Limpar todos os registros de IA?"
 
 #. translators: %s: number of log entries.
 #: includes/settings/ai-logs-page.php:168
 #, php-format
 msgid "This will permanently delete ALL AI usage logs (%s items), including the cost totals above. This action cannot be undone."
-msgstr ""
+msgstr "Isto excluirá permanentemente TODOS os registros de uso da IA (%s itens), incluindo os totais de custo acima. Esta ação não pode ser desfeita."
 
 #: includes/settings/ai-logs-page.php:175
 msgid "Yes, delete all logs"
-msgstr ""
+msgstr "Sim, excluir todos os registros"
 
 #: includes/settings/class-settings.php:598
 msgid "Applied above."
-msgstr ""
+msgstr "Aplicado acima."
 
 #: includes/settings/class-settings.php:602
 msgid "Valid"
-msgstr ""
+msgstr "Válido"
 
 #: includes/settings/class-settings.php:603
 msgid "Invalid"
-msgstr ""
+msgstr "Inválido"
 
 #. translators: 1: suggestion language, 2: article language
 #: js/build/contextSidebar.js:2
 #, js-format
 msgid "This suggestion appears to be in %1$s, but the article appears to be in %2$s. The paragraph was inserted anyway — review it before publishing."
-msgstr ""
+msgstr "Esta sugestão parece estar em %1$s, mas o artigo parece estar em %2$s. O parágrafo foi inserido mesmo assim — revise-o antes de publicar."
 
 #: js/build/contextSidebar.js:2
 msgid "No references available — the knowledge base is empty or disabled, so these suggestions are not grounded in your site's articles."
-msgstr ""
+msgstr "Nenhuma referência disponível — a base de conhecimento está vazia ou desativada, por isso estas sugestões não se baseiam nos artigos do seu site."
 
 #: js/build/contextSidebar.js:2
 msgid "Index your content in AI Settings → Knowledge Base to enable references."
-msgstr ""
+msgstr "Indexe seu conteúdo em Configurações de IA → Base de Conhecimento para habilitar referências."
 
 #: js/build/contextSidebar.js:2
 msgid "Clear everything?"
-msgstr ""
+msgstr "Limpar tudo?"
 
 #: js/build/contextSidebar.js:2
 msgid "Yes, clear"
-msgstr ""
+msgstr "Sim, limpar"
 
 #: js/build/contextSidebar.js:2
 msgid "the AI Context Assistant"
-msgstr ""
+msgstr "o Assistente de Contexto da IA"
 
 #. translators: %s: feature name (e.g. "the AI-Assisted Map block").
 #: js/build/contextSidebar.js:3
 #: js/build/mapBlocks.js:4
 #, js-format
 msgid "You need to configure an AI Provider before you can use %s."
-msgstr ""
+msgstr "Você precisa configurar um Provedor de IA antes de usar %s."
 
 #. translators: %s: feature name (e.g. "the AI-Assisted Map block").
 #: js/build/contextSidebar.js:4
 #: js/build/mapBlocks.js:5
 #, js-format
 msgid "%s needs an AI Provider configured by a site administrator. Ask the site administrator to set up an API key in the AI Settings."
-msgstr ""
+msgstr "%s precisa de um Provedor de IA configurado por um administrador do site. Peça ao administrador do site que configure uma chave de API nas Configurações de IA."
 
 #. translators: %d: elapsed seconds.
 #: js/build/mapBlocks.js:2
 #, js-format
 msgid "%ds"
-msgstr ""
+msgstr "%ds"
 
 #. translators: 1: elapsed minutes, 2: remaining seconds (zero-padded).
 #: js/build/mapBlocks.js:3
 #, js-format
 msgid "%1$dm %2$ss"
-msgstr ""
+msgstr "%1$dmin %2$ss"
 
 #: js/build/mapBlocks.js:3
 msgid "the AI-Assisted Map block"
-msgstr ""
+msgstr "o bloco de Mapa assistido por IA"
 
 #: js/build/mapBlocks.js:5
 msgid "This post contains an AI-Assisted Map block without a generated map: no AI provider is configured. The block renders nothing on the published post until an administrator configures one — remove the block or configure the provider before publishing."
 msgstr ""
-
-#. translators: %d: version number, %s: version label.
-#: js/build/mapBlocks.js:6
-#, js-format
-msgid "Restore version %d (%s)"
-msgstr ""
+"Este post contém um bloco de Mapa assistido por IA sem um mapa gerado: nenhu"
+"m provedor de IA está configurado. O bloco não renderiza nada no post public"
+"ado até que um administrador configure um — remova o bloco ou configure o pr"
+"ovedor antes de publicar."
 
 #: js/build/mapBlocks.js:6
 msgid "no description"
-msgstr ""
+msgstr "sem descrição"
 
 #: js/build/mapBlocks.js:6
 msgid "Versions"
-msgstr ""
+msgstr "Versões"
 
 #: js/build/mapBlocks.js:6
 msgid "No stored versions yet — each accepted AI result adds one."
-msgstr ""
+msgstr "Ainda não há versões armazenadas — cada resultado da IA aceito adiciona uma."
 
 #. translators: %d: version number.
 #: js/build/mapBlocks.js:7
 #, js-format
 msgid "#%d"
-msgstr ""
+msgstr "#%d"
 
 #: js/build/mapBlocks.js:7
 msgid "current"
-msgstr ""
+msgstr "atual"
 
 #: js/build/mapBlocks.js:7
 msgid "(no description)"
-msgstr ""
+msgstr "(sem descrição)"
 
 #: js/build/mapBlocks.js:7
 msgid "Restore"
-msgstr ""
+msgstr "Restaurar"
 
 #: js/build/mapBlocks.js:7
 msgid "The map changed while the AI was thinking — its edits were discarded to protect yours. The answer is still in the chat."
-msgstr ""
+msgstr "O mapa mudou enquanto a IA pensava — as edições dela foram descartadas para proteger as suas. A resposta continua no chat."
 
 #: js/build/mapBlocks.js:7
 msgid "The selected base could not be loaded; the previous base was kept. Check your connection and try again."
-msgstr ""
+msgstr "A base selecionada não pôde ser carregada; a base anterior foi mantida. Verifique sua conexão e tente novamente."
 
 #. translators: 1: version number being restored, 2: its label, 3: current version number, 4: current version label.
 #: js/build/mapBlocks.js:8
 #, js-format
 msgid "Restore version #%1$d (\"%2$s\")? The current map (#%3$d, \"%4$s\") will be replaced. Nothing is lost: the current version stays in the history and can be restored later."
-msgstr ""
+msgstr "Restaurar a versão #%1$d (\"%2$s\")? O mapa atual (#%3$d, \"%4$s\") será substituído. Nada é perdido: a versão atual permanece no histórico e pode ser restaurada depois."
 
 #: js/build/mapBlocks.js:8
 msgid "untitled"
-msgstr ""
+msgstr "sem título"
 
 #: js/build/mapBlocks.js:8
 msgid "current map"
-msgstr ""
+msgstr "mapa atual"
 
 #. translators: %d: version number to restore.
 #: js/build/mapBlocks.js:9
 #, js-format
 msgid "Restore version #%d."
-msgstr ""
+msgstr "Restaurar a versão #%d."
 
 #: js/build/mapBlocks.js:9
 msgid "Generating the map…"
-msgstr ""
+msgstr "Gerando o mapa…"
 
 #: js/build/mapBlocks.js:9
 msgid "This can take a couple of minutes. If it takes too long, reload the page — the block offers to generate again and nothing already saved is lost."
-msgstr ""
+msgstr "Isto pode levar alguns minutos. Se demorar demais, recarregue a página — o bloco oferece gerar novamente e nada do que já foi salvo é perdido."
 
 #: js/build/mapBlocks.js:9
 msgid "No pins were generated for this map."
-msgstr ""
+msgstr "Nenhum pino foi gerado para este mapa."
 
 #: js/build/mapBlocks.js:9
 msgid "Waiting for the AI…"
-msgstr ""
+msgstr "Aguardando a IA…"
 
 #: js/build/mapBlocks.js:9
 msgid "If it takes too long, reload the page — everything already generated stays saved."
-msgstr ""
+msgstr "Se demorar demais, recarregue a página — tudo que já foi gerado permanece salvo."
 
 #. translators: %d: number of manually added layers.
 #: js/build/mapBlocks.js:10
 #, js-format
 msgid "Regenerating the map discards the %d layer(s) you added manually. The conversation and the version history are kept. Continue?"
-msgstr ""
+msgstr "Regenerar o mapa descarta as %d camada(s) que você adicionou manualmente. A conversa e o histórico de versões são mantidos. Continuar?"
 
 #. translators: %s: humanized framing note from the AI.
 #: js/build/mapBlocks.js:11
 #, js-format
 msgid "Map framing: %s"
-msgstr ""
+msgstr "Enquadramento do mapa: %s"
 
 #: js/build/mapBlocks.js:11
 msgid "The \"Navigate to map\" step requires a published map."
@@ -5973,122 +5974,122 @@ msgstr "A etapa \"Navegar no mapa\" exige um mapa publicado."
 
 #: js/build/mapBlocks.js:11
 msgid "Reuse a saved map in this post."
-msgstr ""
+msgstr "Reutilize um mapa salvo neste post."
 
 #: js/build/mapBlocks.js:11
 msgctxt "block keyword"
 msgid "map"
-msgstr ""
+msgstr "mapa"
 
 #: js/build/mapBlocks.js:11
 msgctxt "block keyword"
 msgid "layers"
-msgstr ""
+msgstr "camadas"
 
 #: js/build/mapBlocks.js:11
 msgctxt "block keyword"
 msgid "saved map"
-msgstr ""
+msgstr "mapa salvo"
 
 #: js/build/mapBlocks.js:11
 msgid "Build a one-off map in this post, choosing layers without saving a reusable map."
-msgstr ""
+msgstr "Construa um mapa de uso único neste post, escolhendo camadas sem salvar um mapa reutilizável."
 
 #: js/build/mapBlocks.js:11
 msgctxt "block keyword"
 msgid "one-off"
-msgstr ""
+msgstr "uso único"
 
 #: js/build/mapBlocks.js:11
 msgctxt "block keyword"
 msgid "custom"
-msgstr ""
+msgstr "personalizado"
 
 #: js/build/mapBlocks.js:11
 msgctxt "block keyword"
 msgid "temporary"
-msgstr ""
+msgstr "temporário"
 
 #: js/build/mapBlocks.js:11
 msgid "Let AI build a map from this article's content, then refine it by chat."
-msgstr ""
+msgstr "Deixe a IA construir um mapa a partir do conteúdo deste artigo e refine-o pelo chat."
 
 #: js/build/mapBlocks.js:11
 msgctxt "block keyword"
 msgid "ai"
-msgstr ""
+msgstr "ia"
 
 #: js/build/mapBlocks.js:11
 msgctxt "block keyword"
 msgid "automatic map"
-msgstr ""
+msgstr "mapa automático"
 
 #: js/build/mapBlocks.js:11
 msgctxt "block keyword"
 msgid "assistant"
-msgstr ""
+msgstr "assistente"
 
 #: js/build/mapBlocks.js:13
 msgid "Create a storytelling sequence over a map, slide by slide."
-msgstr ""
+msgstr "Crie uma sequência narrativa sobre um mapa, slide por slide."
 
 #: js/build/mapBlocks.js:13
 msgctxt "block keyword"
 msgid "story"
-msgstr ""
+msgstr "história"
 
 #: js/build/mapBlocks.js:13
 msgctxt "block keyword"
 msgid "slides"
-msgstr ""
+msgstr "slides"
 
 #: js/build/mapBlocks.js:13
 msgctxt "block keyword"
 msgid "narrative"
-msgstr ""
+msgstr "narrativa"
 
 #: js/build/mapBlocks.js:13
 msgid "Embed a saved story map in this post."
-msgstr ""
+msgstr "Incorpore um Mapa Narrativo salvo neste post."
 
 #: js/build/mapBlocks.js:13
 msgctxt "block keyword"
 msgid "embed"
-msgstr ""
+msgstr "incorporar"
 
 #: js/build/mapBlocks.js:13
 msgctxt "block keyword"
 msgid "story map"
-msgstr ""
+msgstr "mapa narrativo"
 
 #: js/build/mapBlocks.js:13
 msgctxt "block keyword"
 msgid "saved story"
-msgstr ""
+msgstr "história salva"
 
 #. translators: %s: layer title.
 #: js/build/mapBlocks.js:14
 #: js/build/mapsSidebar.js:2
 #, js-format
 msgid "Move %s up"
-msgstr ""
+msgstr "Mover %s para cima"
 
 #. translators: %s: layer title.
 #: js/build/mapBlocks.js:15
 #: js/build/mapsSidebar.js:3
 #, js-format
 msgid "Move %s down"
-msgstr ""
+msgstr "Mover %s para baixo"
 
 #: js/build/mapBlocks.js:15
 #: js/build/mapsSidebar.js:3
 msgid "Already on this map"
-msgstr ""
+msgstr "Já está neste mapa"
 
 #: js/build/mapBlocks.js:15
 #: js/build/mapsSidebar.js:3
 msgid "Added"
-msgstr ""
+msgstr "Adicionada"
 
 #. translators: %d: number of selected layers.
 #: js/build/mapBlocks.js:16
@@ -6101,4 +6102,10 @@ msgstr[1] ""
 
 #: js/build/postsSidebar.js:3
 msgid "Enriched"
-msgstr ""
+msgstr "Enriquecido"
+
+#. translators: %1$d: version number, %2$s: version label.
+#: js/build/mapBlocks.js:6
+#, js-format
+msgid "Restore version %1$d (%2$s)"
+msgstr "Restaurar a versão %1$d (%2$s)"
