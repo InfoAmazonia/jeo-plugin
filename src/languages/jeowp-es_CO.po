@@ -5707,11 +5707,7 @@ msgstr "Francés"
 
 #: includes/ai/settings/tab-general.php:24
 msgid "Applies to every AI output: minimap chat and notices, context assistant suggestions, and inserted paragraphs. The chosen language takes precedence over the article language; \"Automatic\" follows the editor and the article."
-msgstr ""
-"Se aplica a toda la salida de la IA: chat y avisos del minimapa, sugerencias"
-" del asistente de contexto y párrafos insertados. El idioma elegido tiene pr"
-"ioridad sobre el idioma del artículo; \"Automático\" sigue el editor y el artí"
-"culo."
+msgstr "Se aplica a toda la salida de la IA: chat y avisos del minimapa, sugerencias del asistente de contexto y párrafos insertados. El idioma elegido tiene prioridad sobre el idioma del artículo; \"Automático\" sigue el editor y el artículo."
 
 #: includes/ai/settings/tab-knowledge.php:147
 msgid "Batch size"
@@ -5873,11 +5869,7 @@ msgstr "el bloque de Mapa asistido por IA"
 
 #: js/build/mapBlocks.js:5
 msgid "This post contains an AI-Assisted Map block without a generated map: no AI provider is configured. The block renders nothing on the published post until an administrator configures one — remove the block or configure the provider before publishing."
-msgstr ""
-"Esta entrada contiene un bloque de Mapa asistido por IA sin un mapa generado"
-": no hay ningún proveedor de IA configurado. El bloque no muestra nada en la"
-" entrada publicada hasta que un administrador configure uno: quita el bloque"
-" o configura el proveedor antes de publicar."
+msgstr "Esta entrada contiene un bloque de Mapa asistido por IA sin un mapa generado: no hay ningún proveedor de IA configurado. El bloque no muestra nada en la entrada publicada hasta que un administrador configure uno: quita el bloque o configura el proveedor antes de publicar."
 
 #: js/build/mapBlocks.js:6
 msgid "no description"
